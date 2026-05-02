@@ -19,21 +19,9 @@ export default function ShareModal({ brochure, onClose, lang }) {
   }
 
   return (
-    // BEFORE
-<div style={{
-  position: 'fixed', inset: 0, background: 'rgba(15,45,94,0.7)',
-  backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
-  zIndex: 1000, display: 'flex', alignItems: 'flex-end',
-  justifyContent: 'center', padding: 0,
-}}>
-  <div style={{
-    background: '#FFFFFF', borderRadius: '20px 20px 0 0',
-    padding: '24px 24px 40px', width: '100%', maxWidth: 500,
-    boxShadow: '0 -8px 40px rgba(0,0,0,0.2)',
-  }}>
+    
 
-// AFTER
-<div style={{
+       <div style={{
   position: 'fixed', inset: 0, background: 'rgba(15,45,94,0.7)',
   backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
   zIndex: 1000, display: 'flex', alignItems: 'center',
@@ -43,7 +31,11 @@ export default function ShareModal({ brochure, onClose, lang }) {
     background: '#FFFFFF', borderRadius: 20,
     padding: '24px 24px 32px', width: '100%', maxWidth: 500,
     boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-  }}></div>
+  }}>
+
+
+
+
         {/* Drag handle */}
         <div style={{
           width: 40,
