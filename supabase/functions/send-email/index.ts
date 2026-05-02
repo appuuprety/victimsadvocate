@@ -1,17 +1,16 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { SmtpClient } from 'https://deno.land/x/smtp@v0.7.0/mod.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const FROM_EMAIL = 'onboarding@resend.dev'
+const GMAIL_USER = Deno.env.get('GMAIL_USER')     // avishekuprety@gmail.com
+const GMAIL_PASS = Deno.env.get('GMAIL_PASS')     // app password
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      },
-    })
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
     const { to, brochureTitle, link } = await req.json()
@@ -19,47 +18,46 @@ serve(async (req) => {
     if (!to || !link) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...CORS },
       })
     }
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to,
-        subject: `Resource shared with you: ${brochureTitle}`,
-        html: `
-          <p>A resource has been shared with you:</p>
-          <p><strong>${brochureTitle}</strong></p>
-          <p><a href="${link}">${link}</a></p>
-        `,
-        text: `A resource has been shared with you:\n\n${brochureTitle}\n${link}`,
-      }),
+    const client = new SmtpClient()
+    await client.connectTLS({
+      hostname: 'smtp.gmail.com',
+      port: 465,
+      username: GMAIL_USER,
+      password: GMAIL_PASS,
     })
 
-    if (!res.ok) {
-      const err = await res.text()
-      throw new Error(err)
-    }
+    await client.send({
+      from: `Victim Services Erie <${GMAIL_USER}>`,
+      to,
+      subject: brochureTitle ? `Resource shared with you: ${brochureTitle}` : 'A resource has been shared with you',
+      content: `A resource has been shared with you:\n\n${brochureTitle ?? ''}\n${link}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
+          <h2 style="color:#0F2D5E">A resource has been shared with you</h2>
+          ${brochureTitle ? `<p><strong>${brochureTitle}</strong></p>` : ''}
+          <a href="${link}" style="display:inline-block;background:#0F2D5E;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;margin-top:8px">
+            View Resource
+          </a>
+          <p style="margin-top:24px;font-size:12px;color:#888">
+            If the button doesn't work, copy this link: ${link}
+          </p>
+        </div>
+      `,
+    })
+
+    await client.close()
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', ...CORS },
     })
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', ...CORS },
     })
   }
 })
