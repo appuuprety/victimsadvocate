@@ -1,13 +1,23 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { SmtpClient } from 'https://deno.land/x/smtp@v0.7.0/mod.ts'
+import nodemailer from 'npm:nodemailer@6.9.9'
 
-const GMAIL_USER = Deno.env.get('GMAIL_USER')     // avishekuprety@gmail.com
-const GMAIL_PASS = Deno.env.get('GMAIL_PASS')     // app password
+const GMAIL_USER = Deno.env.get('GMAIL_USER')!
+const GMAIL_PASS = Deno.env.get('GMAIL_PASS')!
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: GMAIL_USER,
+    pass: GMAIL_PASS,
+  },
+})
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
@@ -22,19 +32,15 @@ serve(async (req) => {
       })
     }
 
-    const client = new SmtpClient()
-    await client.connectTLS({
-      hostname: 'smtp.gmail.com',
-      port: 465,
-      username: GMAIL_USER,
-      password: GMAIL_PASS,
-    })
+    const subject = brochureTitle
+      ? `Resource shared with you: ${brochureTitle}`
+      : 'A resource has been shared with you'
 
-    await client.send({
+    await transporter.sendMail({
       from: `Victim Services Erie <${GMAIL_USER}>`,
       to,
-      subject: brochureTitle ? `Resource shared with you: ${brochureTitle}` : 'A resource has been shared with you',
-      content: `A resource has been shared with you:\n\n${brochureTitle ?? ''}\n${link}`,
+      subject,
+      text: `A resource has been shared with you:\n\n${brochureTitle ?? ''}\n${link}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
           <h2 style="color:#0F2D5E">A resource has been shared with you</h2>
@@ -48,8 +54,6 @@ serve(async (req) => {
         </div>
       `,
     })
-
-    await client.close()
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { 'Content-Type': 'application/json', ...CORS },
