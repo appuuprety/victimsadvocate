@@ -420,14 +420,18 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       {/* ─── CONTACT ─── */}
       {page === 'contact' && (
         <div style={{ maxWidth: 800, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${px}px` }}>
-          <h2 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>{t.contact_title}</h2>
-          <p style={{ color: COLORS.textSecondary, margin: '0 0 32px', fontSize: 16, lineHeight: 1.7 }}>{t.contact_sub}</p>
+          <h2 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Victim Services</h2>
+          <p style={{ color: COLORS.textSecondary, margin: '0 0 32px', fontSize: 16, lineHeight: 1.7 }}>
+            Services are available seven days a week, 24 hours a day.
+          </p>
+
+          {/* Contact cards */}
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 32 }}>
             {[
-              { icon: '📞', label: lang === 'es' ? 'Teléfono' : 'Phone', detail: '(970) 555-0100', note: lang === 'es' ? 'Lun–Vie, 8am–6pm' : 'Mon–Fri, 8am–6pm' },
-              { icon: '💬', label: lang === 'es' ? 'Línea de Crisis' : 'Crisis Line', detail: '1-800-799-7233', note: '24/7' },
-              { icon: '✉️', label: lang === 'es' ? 'Correo' : 'Email', detail: 'help@covictims.org', note: lang === 'es' ? 'En 24 horas' : 'Within 24 hours' },
-              { icon: '📍', label: lang === 'es' ? 'Oficina' : 'Walk-in', detail: '123 Main St, Loveland CO', note: lang === 'es' ? 'Cita preferida' : 'Appointment preferred' },
+              { icon: '📞', label: 'After Hours', detail: '303-441-4444', note: '7 days, 24 hours' },
+              { icon: '🏢', label: 'Office', detail: '303-926-2841', note: 'Mon–Fri, 8am–5pm' },
+              { icon: '✉️', label: 'Email', detail: 'victimservices@erieco.gov', note: 'Town of Erie' },
+              { icon: '⚖️', label: 'Victim Rights', detail: '303-239-4497', note: 'CO Dept of Public Safety' },
             ].map(c => (
               <div key={c.label} style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid #E8E6DE', padding: isMobile ? 16 : 20 }}>
                 <div style={{ fontSize: 26, marginBottom: 8 }}>{c.icon}</div>
@@ -437,9 +441,36 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               </div>
             ))}
           </div>
-          <div style={{ background: '#EEF4FB', borderRadius: 16, padding: 22, borderLeft: `4px solid ${COLORS.primary}` }}>
-            <h3 style={{ margin: '0 0 8px', color: COLORS.primaryDark, fontSize: 16 }}>{t.privacy_title}</h3>
-            <p style={{ margin: 0, color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>{t.privacy_body}</p>
+
+          {/* Victim Rights Act */}
+          <div style={{ background: '#EEF4FB', borderRadius: 16, padding: 22, borderLeft: `4px solid ${COLORS.primary}`, marginBottom: 20 }}>
+            <h3 style={{ margin: '0 0 10px', color: COLORS.primaryDark, fontSize: 16 }}>Ensuring Rights — Colorado Victim Rights Act</h3>
+            <p style={{ margin: '0 0 12px', color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
+              The work of Victim Services is based on the{' '}
+              <a href="https://dcj.colorado.gov/dcj-offices/victims-programs/crime-victim-rights-act-vra" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.primary, fontWeight: 600 }}>
+                Colorado Victim Rights Act
+              </a>.
+            </p>
+            <p style={{ margin: '0 0 12px', color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
+              If you feel unable to address your concerns at the local level, you may request assistance from the Crime Victim Services Advisory Board by contacting the Victim Rights Act Specialist at:
+            </p>
+            <p style={{ margin: '0 0 12px', color: COLORS.primaryDark, fontSize: 14, lineHeight: 1.7, fontWeight: 600 }}>
+              Colorado Department of Public Safety, Division of Criminal Justice<br />
+              700 Kipling Street, Suite 1000, Denver, CO 80215-5865<br />
+              📞 303-239-4497
+            </p>
+            <p style={{ margin: 0, color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
+              Additional resource:{' '}
+              <a href="https://www.colorado.gov/dcj" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.primary, fontWeight: 600 }}>
+                Division of Criminal Justice Office for Victims' Programs
+              </a>
+            </p>
+          </div>
+
+          {/* Privacy note */}
+          <div style={{ background: '#F5F3EE', borderRadius: 16, padding: 22, borderLeft: `4px solid #C8C6BE` }}>
+            <h3 style={{ margin: '0 0 8px', color: COLORS.textPrimary, fontSize: 16 }}>{t.privacy_title}</h3>
+            <p style={{ margin: 0, color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{t.privacy_body}</p>
           </div>
         </div>
       )}
