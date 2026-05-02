@@ -132,7 +132,7 @@ function BrochureCard({brochure,categories,onShare,lang}){
         </div>
         <div style={{fontSize:28,flexShrink:0}}>📄</div>
       </div>
-      {brochure.description&&<p style={{margin:0,fontSize:13,color:'var(--color-text-secondary)',lineHeight:1.6}}>{brochure.description}</p>}
+      {brochure.description&&<p style={{margin:0,fontSize:13,color:'var(--color-text-secondary)',lineHeight:1.6,wordBreak:'break-all',overflowWrap:'break-word'}}>{brochure.description}</p>}
       {brochure.link_url&&<a href={brochure.link_url} target="_blank" rel="noreferrer" style={{fontSize:13,color:'#1B4D8E',textDecoration:'none',display:'flex',alignItems:'center',gap:6}}>🔗 <span style={{textDecoration:'underline',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:260}}>{brochure.link_url}</span></a>}
       <div style={{display:'flex',flexWrap:'wrap',gap:4}}>{(brochure.tags||[]).map(tag=><span key={tag} style={{fontSize:11,padding:'2px 8px',borderRadius:20,background:'#F1EFE8',color:'#5F5E5A'}}>{tag}</span>)}</div>
       <div style={{borderTop:'1px solid #F1EFE8',paddingTop:12,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
