@@ -98,8 +98,8 @@ function ShareModal({brochure,onClose,lang}){
   const link=brochure.link_url||buildShareLink(brochure)
   async function copy(){try{await navigator.clipboard.writeText(link)}catch{}setCopied(true);setTimeout(()=>setCopied(false),2000);logShare(brochure.id,'link')}
   return(
-    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
-      <div style={{background:'var(--color-background-primary)',borderRadius:16,padding:28,width:'100%',maxWidth:460}}>
+<div style={{position:'fixed',inset:0,background:'rgba(15,45,94,0.65)',backdropFilter:'blur(6px)',WebkitBackdropFilter:'blur(6px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+<div style={{background:'var(--color-background-primary)',borderRadius:16,padding:28,width:'100%',maxWidth:460}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}}>
           <div><h3 style={{margin:0,fontSize:18,fontFamily:'Georgia,serif',color:'#1B4D8E'}}>{t.share_resource}</h3><p style={{margin:'4px 0 0',fontSize:13,color:'#888780'}}>{brochure.title}</p></div>
           <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:22,color:'#888780'}}>×</button>
@@ -109,7 +109,7 @@ function ShareModal({brochure,onClose,lang}){
         </div>
         {tab==='email'&&<div><p style={{fontSize:13,color:'#5F5E5A',marginTop:0}}>{t.email_label}</p><Input value={email} onChange={setEmail} placeholder="recipient@email.com" type="email" style={{marginBottom:12}}/><Btn style={{width:'100%'}} onClick={()=>{emailBrochure(brochure,email);logShare(brochure.id,'email')}}>{t.open_email}</Btn></div>}
         {tab==='text'&&<div><p style={{fontSize:13,color:'#5F5E5A',marginTop:0}}>{t.text_label}</p><Input value={phone} onChange={setPhone} placeholder="+1 (970) 555-0100" type="tel" style={{marginBottom:12}}/><Btn style={{width:'100%'}} onClick={()=>{textBrochure(brochure,phone);logShare(brochure.id,'sms')}}>{t.open_text}</Btn></div>}
-        {tab==='link'&&<div><p style={{fontSize:13,color:'#5F5E5A',marginTop:0}}>{t.link_label}</p><div style={{display:'flex',gap:8}}><input readOnly value={link} style={{flex:1,padding:'9px 12px',borderRadius:8,border:'1.5px solid #D3D1C7',fontSize:12,fontFamily:'monospace',background:'#F1EFE8',color:'#444441'}}/><Btn variant={copied?'success':'ghost'} small onClick={copy}>{copied?t.copied:t.copy}</Btn></div></div>}
+        {tab==='link'&&<div><p style={{fontSize:13,color:'#5F5E5A',marginTop:0}}>{t.link_label}</p><div style={{display:'flex',gap:8,alignItems:'center'}}><input readOnly value={link} style={{flex:1,minWidth:0,padding:'9px 12px',borderRadius:8,border:'1.5px solid #D3D1C7',fontSize:12,fontFamily:'monospace',background:'#F1EFE8',color:'#444441',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}/><Btn variant={copied?'success':'ghost'} small onClick={copy} style={{flexShrink:0}}>{copied?t.copied:t.copy}</Btn></div></div>}
       </div>
     </div>
   )
