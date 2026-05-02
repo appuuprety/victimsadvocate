@@ -72,7 +72,7 @@ function Btn({children,onClick,variant='primary',small,disabled,style={}}){
 }
 
 const Field=({label,children})=><div><label style={{fontSize:11,fontWeight:700,color:'#5F5E5A',display:'block',marginBottom:5,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</label>{children}</div>
-const inp={width:'100%',padding:'9px 12px',borderRadius:8,border:'1.5px solid #D3D1C7',fontSize:14,fontFamily:'Georgia,serif',outline:'none',boxSizing:'border-box',background:'var(--color-background-primary)',color:'var(--color-text-primary)'}
+const inp={width:'100%',padding:'9px 12px',borderRadius:8,border:'1.5px solid #D3D1C7',fontSize:14,fontFamily:'Georgia,serif',outline:'none',boxSizing:'border-box',background:'#ffffff',color:'#2C2C2A'}
 const Input=({value,onChange,placeholder,type='text',style={}})=><input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{...inp,...style}}/>
 const Textarea=({value,onChange,placeholder,rows=3})=><textarea value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{...inp,resize:'vertical',lineHeight:1.6}}/>
 const SelectEl=({value,onChange,options})=><select value={value} onChange={e=>onChange(e.target.value)} style={inp}>{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>
@@ -99,7 +99,8 @@ function ShareModal({brochure,onClose,lang}){
   async function copy(){try{await navigator.clipboard.writeText(link)}catch{}setCopied(true);setTimeout(()=>setCopied(false),2000);logShare(brochure.id,'link')}
   return(
 <div style={{position:'fixed',inset:0,background:'rgba(15,45,94,0.65)',backdropFilter:'blur(6px)',WebkitBackdropFilter:'blur(6px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
-<div style={{background:'var(--color-background-primary)',borderRadius:16,padding:28,width:'100%',maxWidth:460}}>
+<div style={{background:'#ffffff',borderRadius:16,padding:28,width:'100%',maxWidth:460,boxShadow:'0 20px 60px rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.2)'}}>
+
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}}>
           <div><h3 style={{margin:0,fontSize:18,fontFamily:'Georgia,serif',color:'#1B4D8E'}}>{t.share_resource}</h3><p style={{margin:'4px 0 0',fontSize:13,color:'#888780'}}>{brochure.title}</p></div>
           <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:22,color:'#888780'}}>×</button>
