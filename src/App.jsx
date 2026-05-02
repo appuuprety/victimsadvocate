@@ -98,9 +98,8 @@ function ShareModal({brochure,onClose,lang}){
   const link=brochure.link_url||buildShareLink(brochure)
   async function copy(){try{await navigator.clipboard.writeText(link)}catch{}setCopied(true);setTimeout(()=>setCopied(false),2000);logShare(brochure.id,'link')}
   return(
-<div style={{position:'fixed',inset:0,background:'rgba(15,45,94,0.65)',backdropFilter:'blur(6px)',WebkitBackdropFilter:'blur(6px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
-<div style={{background:'#ffffff',borderRadius:16,padding:28,width:'100%',maxWidth:460,boxShadow:'0 20px 60px rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.2)'}}>
-
+    <div style={{position:'fixed',inset:0,background:'rgba(15,45,94,0.65)',backdropFilter:'blur(6px)',WebkitBackdropFilter:'blur(6px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+      <div style={{background:'#ffffff',borderRadius:16,padding:28,width:'100%',maxWidth:460,boxShadow:'0 20px 60px rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.2)'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}}>
           <div><h3 style={{margin:0,fontSize:18,fontFamily:'Georgia,serif',color:'#1B4D8E'}}>{t.share_resource}</h3><p style={{margin:'4px 0 0',fontSize:13,color:'#888780'}}>{brochure.title}</p></div>
           <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:22,color:'#888780'}}>×</button>
@@ -134,10 +133,9 @@ function BrochureCard({brochure,categories,onShare,lang}){
         <div style={{fontSize:28,flexShrink:0}}>📄</div>
       </div>
       {brochure.description&&<p style={{margin:0,fontSize:13,color:'var(--color-text-secondary)',lineHeight:1.6,wordBreak:'break-all',overflowWrap:'break-word'}}>{brochure.description}</p>}
-      {brochure.link_url&&<a href={brochure.link_url} target="_blank" rel="noreferrer" style={{fontSize:13,color:'#1B4D8E',textDecoration:'none',display:'flex',alignItems:'center',gap:6}}>🔗 <span style={{textDecoration:'underline',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:260}}>{brochure.link_url}</span></a>}
       <div style={{display:'flex',flexWrap:'wrap',gap:4}}>{(brochure.tags||[]).map(tag=><span key={tag} style={{fontSize:11,padding:'2px 8px',borderRadius:20,background:'#F1EFE8',color:'#5F5E5A'}}>{tag}</span>)}</div>
       <div style={{borderTop:'1px solid #F1EFE8',paddingTop:12,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
-        <span style={{fontSize:11,color:'#888780'}}>{brochure.file_name} · {brochure.file_size} · {brochure.created_at?.split('T')[0]}</span>
+        <span style={{fontSize:11,color:'#888780'}}>{brochure.created_at?.split('T')[0]}</span>
         <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
           <Btn small variant="ghost" onClick={()=>onShare(brochure)}>{t.share}</Btn>
           {brochure.link_url&&<Btn small variant="secondary" onClick={()=>window.open(brochure.link_url,'_blank')}>{t.visit_link}</Btn>}
@@ -305,7 +303,7 @@ function AdminLogin({onLogin}){
   return(
     <div style={{minHeight:'100vh',background:'linear-gradient(135deg,#0F2D5E,#1B4D8E)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',padding:16}}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{background:'var(--color-background-primary)',borderRadius:20,padding:40,width:'100%',maxWidth:380}}>
+      <div style={{background:'#ffffff',borderRadius:20,padding:40,width:'100%',maxWidth:380}}>
         <div style={{textAlign:'center',marginBottom:32}}><div style={{display:'flex',justifyContent:'center',marginBottom:12}}><div style={{background:'#1B4D8E',borderRadius:50,padding:10}}><ColoradoLogo size={40}/></div></div><h2 style={{margin:0,fontSize:22,color:'#1B4D8E'}}>Admin Sign In</h2><p style={{margin:'8px 0 0',color:'#888780',fontSize:14}}>Colorado Victim Resources — Staff Portal</p></div>
         <div style={{display:'flex',flexDirection:'column',gap:14}}>
           <Field label="Email"><Input value={email} onChange={setEmail} type="email" placeholder="admin@covictims.org"/></Field>
