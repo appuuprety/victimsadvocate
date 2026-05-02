@@ -107,9 +107,7 @@ export default function BrochureCard({ brochure, categories, onShare, lang }) {
         flexWrap: 'wrap',
         gap: 8,
       }}>
-        <span style={{ fontSize: 11, color: COLORS.textMuted }}>
-          {brochure.created_at?.split('T')[0]}
-        </span>
+        
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <Btn small variant="ghost" onClick={() => onShare(brochure)}>{t_share}</Btn>
           {brochure.link_url && (
