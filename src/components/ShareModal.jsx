@@ -35,15 +35,19 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   function resetStatus() { setSent(false); setError('') }
 
+  async function invoke(to, item) {
+    const { error } = await supabase.functions.invoke('send-email', {
+      body: { to, brochureTitle: item.title, link: item.link },
+      headers: { Authorization: `Bearer ${ANON_KEY}` },
+    })
+    if (error) throw error
+  }
+
   async function sendEmail() {
     if (!email) return
     setSending(true); resetStatus()
     try {
-      const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: { to: email, brochures: items, brochureTitle: items[0]?.title, link: items[0]?.link },
-        headers: { Authorization: `Bearer ${ANON_KEY}` },
-      })
-      if (fnErr) throw fnErr
+      await Promise.all(items.map(b => invoke(email, b)))
       setSent(true)
       items.forEach(b => logShare(b.id, 'email'))
     } catch (e) {
@@ -55,15 +59,10 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   async function sendSms() {
     if (!phone || !carrier) return
-    const digits = phone.replace(/\D/g, '')
-    const gatewayEmail = `${digits}@${carrier}`
+    const gatewayEmail = `${phone.replace(/\D/g, '')}@${carrier}`
     setSending(true); resetStatus()
     try {
-      const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: { to: gatewayEmail, brochures: items, brochureTitle: items[0]?.title, link: items[0]?.link },
-        headers: { Authorization: `Bearer ${ANON_KEY}` },
-      })
-      if (fnErr) throw fnErr
+      await Promise.all(items.map(b => invoke(gatewayEmail, b)))
       setSent(true)
       items.forEach(b => logShare(b.id, 'sms'))
     } catch (e) {
