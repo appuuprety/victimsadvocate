@@ -26,10 +26,17 @@ serve(async (req) => {
     const { to, brochures, brochureTitle, link } = await req.json()
 
     // Normalize to array — supports both single (legacy) and multi-resource payloads
-    const items: { title: string; link: string }[] = brochures ?? [{ title: brochureTitle ?? '', link }]
+    const raw = Array.isArray(brochures) && brochures.length > 0
+      ? brochures
+      : [{ title: brochureTitle ?? '', link: link ?? '' }]
 
-    if (!to || items.length === 0 || !items[0].link) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+    const items: { title: string; link: string }[] = raw.map((r: any) => ({
+      title: r.title ?? '',
+      link: r.link ?? '',
+    }))
+
+    if (!to) {
+      return new Response(JSON.stringify({ error: 'Missing recipient' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...CORS },
       })

@@ -48,14 +48,14 @@ export default function BrochureCard({ brochure, categories, onShare, lang, sele
           disabled={selectionFull}
           title={selectionFull ? 'Max 5 resources' : isSelected ? 'Deselect' : 'Select to share'}
           style={{
-            position: 'absolute', top: 12, right: 12,
-            width: 22, height: 22, borderRadius: 6,
-            border: `2px solid ${isSelected ? COLORS.primary : '#D3D1C7'}`,
-            background: isSelected ? COLORS.primary : '#fff',
+            position: 'absolute', top: 10, right: 10,
+            width: 16, height: 16, borderRadius: 4,
+            border: `1.5px solid ${isSelected ? COLORS.primary : '#C8C5BC'}`,
+            background: isSelected ? COLORS.primary : 'rgba(255,255,255,0.9)',
             cursor: selectionFull ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: 13, fontWeight: 700,
-            opacity: selectionFull ? 0.35 : 1,
+            color: '#fff', fontSize: 10, fontWeight: 700,
+            opacity: selectionFull ? 0.3 : 1,
             zIndex: 1, padding: 0, lineHeight: 1,
           }}
         >
