@@ -15,7 +15,12 @@ export default function ShareModal({ brochures, onClose, lang }) {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
-  const items = brochures.map(b => ({
+  const seen = new Set()
+  const items = brochures.filter(b => {
+    if (seen.has(b.id)) return false
+    seen.add(b.id)
+    return true
+  }).map(b => ({
     id: b.id,
     title: b.title,
     link: b.link_url || buildShareLink(b),
@@ -156,7 +161,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
             <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 0, marginBottom: 12 }}>
               Sent from the org's address — your personal email stays hidden.
             </p>
-            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ Email sent anonymously!</p>}
+            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ {items.length > 1 ? `${items.length} emails` : 'Email'} sent anonymously!</p>}
             {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
             <Btn style={{ width: '100%' }} onClick={sendEmail} disabled={sending || !email}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
@@ -198,7 +203,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
             <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: -6, marginBottom: 12 }}>
               Sent via email-to-SMS gateway — your number stays hidden.
             </p>
-            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ Text sent anonymously!</p>}
+            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ {items.length > 1 ? `${items.length} texts` : 'Text'} sent anonymously!</p>}
             {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
             <Btn style={{ width: '100%' }} onClick={sendSms} disabled={sending || !phone || !carrier}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
