@@ -1,11 +1,11 @@
 // Shared design tokens
 export const COLORS = {
-  primary: '#1B4D8E',
-  primaryDark: '#0F2D5E',
-  primaryLight: '#E6F1FB',
-  accent: '#C17B2F',
-  accentBg: '#FDF3E3',
-  danger: '#A32D2D',
+  primary: '#003DA5',
+  primaryDark: '#002882',
+  primaryLight: '#E4EBF8',
+  accent: '#C49A00',
+  accentBg: '#FFF8DC',
+  danger: '#BF0A30',
   success: '#0F6E56',
   cardBg: '#FFFFFF',
   pageBg: '#FAFAF7',

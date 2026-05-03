@@ -1,15 +1,29 @@
 export default function ColoradoLogo({ size = 40 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)" />
-      <polygon points="6,29 15,13 24,29" fill="rgba(255,255,255,0.85)" />
-      <polygon points="15,29 24,9 33,29" fill="#fff" />
-      <polygon points="15,13 17.5,18 12.5,18" fill="rgba(180,220,255,0.8)" />
-      <polygon points="24,9 27,15 21,15" fill="rgba(180,220,255,0.9)" />
+      <defs>
+        <clipPath id="coFlagClip">
+          <circle cx="20" cy="20" r="18.5"/>
+        </clipPath>
+      </defs>
+
+      {/* Colorado flag: blue (top) / white (middle) / red (bottom) */}
+      <rect x="1" y="1.5" width="38" height="12.3" fill="#003DA5" clipPath="url(#coFlagClip)"/>
+      <rect x="1" y="13.8" width="38" height="12.4" fill="#FFFFFF" clipPath="url(#coFlagClip)"/>
+      <rect x="1" y="26.2" width="38" height="12.3" fill="#BF0A30" clipPath="url(#coFlagClip)"/>
+
+      {/* Colorado C — thick red arc, opening facing right */}
       <path
-        d="M20 35C20 35 12 29 12 23.5C12 20.5 14.5 18.5 17 19.5C18.2 20 20 21.5 20 21.5C20 21.5 21.8 20 23 19.5C25.5 18.5 28 20.5 28 23.5C28 29 20 35 20 35Z"
-        fill="rgba(255,200,80,0.9)"
+        d="M 27.4,29.5 A 12,12 0 1 0 27.4,10.5 L 24.9,13.7 A 8,8 0 1 1 24.9,26.3 Z"
+        fill="#BF0A30"
+        clipPath="url(#coFlagClip)"
       />
+
+      {/* Gold disc in the C opening */}
+      <circle cx="28" cy="20" r="4.8" fill="#FFC726" clipPath="url(#coFlagClip)"/>
+
+      {/* Outer badge ring */}
+      <circle cx="20" cy="20" r="18.5" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" fill="none"/>
     </svg>
   )
 }
