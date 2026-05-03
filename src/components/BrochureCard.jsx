@@ -139,7 +139,10 @@ export default function BrochureCard({ brochure, categories, onShare, lang, sele
           )}
           {brochure.business_hours && (
             <div style={{ fontSize: 13, color: COLORS.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span aria-hidden="true">🕐</span>
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={COLORS.textSecondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <polyline points="12 7 12 12 15 14" />
+              </svg>
               <span>{brochure.business_hours}</span>
             </div>
           )}

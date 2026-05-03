@@ -48,21 +48,25 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
               </button>
             ))}
           </div>
-          <button onClick={() => setOpen(!open)} style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: 'none',
-            borderRadius: 8,
-            color: '#fff',
-            cursor: 'pointer',
-            fontSize: 20,
-            width: 36,
-            height: 36,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            WebkitTapHighlightColor: 'transparent',
-          }}>
-            {open ? '✕' : '☰'}
+          <button
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            style={{
+              background: 'rgba(255,255,255,0.12)',
+              border: 'none',
+              borderRadius: 8,
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: 20,
+              width: 36,
+              height: 36,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              WebkitTapHighlightColor: 'transparent',
+            }}>
+            <span aria-hidden="true">{open ? '✕' : '☰'}</span>
           </button>
         </div>
       </div>
@@ -86,7 +90,7 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
               textAlign: 'left',
               WebkitTapHighlightColor: 'transparent',
             }}>
-              <span>{icon}</span>{label}
+              <span aria-hidden="true">{icon}</span>{label}
             </button>
           ))}
         </div>
@@ -425,7 +429,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
           {filtered.length === 0
             ? (
               <div style={{ textAlign: 'center', padding: '60px 0', color: COLORS.textSecondary }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+                <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
                 <div style={{ fontSize: 16, lineHeight: 1.6, maxWidth: 340, margin: '0 auto' }}>{t.no_results}</div>
                 <button onClick={() => { setSearch(''); setActiveCat('all') }} style={{
                   marginTop: 16, background: 'none', border: 'none', color: COLORS.primary,
