@@ -44,6 +44,9 @@ export default function BrochureCard({ brochure, categories, onShare, lang, sele
       {/* Select checkbox */}
       {onSelect && (
         <button
+          role="checkbox"
+          aria-checked={isSelected}
+          aria-label={isSelected ? `Deselect ${brochure.title}` : `Select ${brochure.title} for sharing`}
           onClick={() => onSelect(brochure.id)}
           disabled={selectionFull}
           title={selectionFull ? 'Max 5 resources' : isSelected ? 'Deselect' : 'Select to share'}
@@ -122,6 +125,27 @@ export default function BrochureCard({ brochure, categories, onShare, lang, sele
         ))}
       </div>
 
+      {/* Contact info — only shown when filled */}
+      {(brochure.phone_number || brochure.business_hours) && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {brochure.phone_number && (
+            <div style={{ fontSize: 13, color: COLORS.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span aria-hidden="true">📞</span>
+              <a href={`tel:${brochure.phone_number}`} style={{ color: COLORS.primary, textDecoration: 'none', fontWeight: 600 }}
+                aria-label={`Call ${brochure.phone_number}`}>
+                {brochure.phone_number}
+              </a>
+            </div>
+          )}
+          {brochure.business_hours && (
+            <div style={{ fontSize: 13, color: COLORS.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span aria-hidden="true">🕐</span>
+              <span>{brochure.business_hours}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Footer */}
       <div style={{
         borderTop: '1px solid #F0EEE8',
@@ -134,7 +158,7 @@ export default function BrochureCard({ brochure, categories, onShare, lang, sele
       }}>
         
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Btn small variant="ghost" onClick={() => onShare(brochure)}>{t_share}</Btn>
+          <Btn small variant="ghost" onClick={() => onShare(brochure)} aria-label={`Share ${brochure.title}`}>{t_share}</Btn>
           {brochure.link_url && (
             <Btn small variant="secondary" onClick={() => window.open(brochure.link_url, '_blank')}>{t_visit}</Btn>
           )}

@@ -88,24 +88,33 @@ export default function ShareModal({ brochures, onClose, lang }) {
   const isMulti = items.length > 1
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(15,45,94,0.7)',
-      backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
-      zIndex: 1000, display: 'flex', alignItems: 'center',
-      justifyContent: 'center', padding: 16,
-    }}>
-      <div style={{
-        background: '#FFFFFF', borderRadius: 20,
-        padding: '24px 24px 32px', width: '100%', maxWidth: 500,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-        maxHeight: '90vh', overflowY: 'auto',
-      }}>
+    <div
+      role="presentation"
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(15,45,94,0.7)',
+        backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+        zIndex: 1000, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', padding: 16,
+      }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="share-modal-title"
+        style={{
+          background: '#FFFFFF', borderRadius: 20,
+          padding: '24px 24px 32px', width: '100%', maxWidth: 500,
+          boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          maxHeight: '90vh', overflowY: 'auto',
+        }}
+      >
         {/* Drag handle */}
         <div style={{ width: 40, height: 4, background: '#D3D1C7', borderRadius: 4, margin: '0 auto 20px' }} />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <div style={{ flex: 1, paddingRight: 12 }}>
-            <h3 style={{ margin: 0, fontSize: 18, fontFamily: 'Georgia, serif', color: COLORS.primary }}>
+            <h3 id="share-modal-title" style={{ margin: 0, fontSize: 18, fontFamily: 'Georgia, serif', color: COLORS.primary }}>
               {isMulti ? `Share ${items.length} Resources` : t.share_resource}
             </h3>
             {isMulti ? (
@@ -121,7 +130,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
               <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>{items[0]?.title}</p>
             )}
           </div>
-          <button onClick={onClose} style={{
+          <button onClick={onClose} aria-label="Close" style={{
             background: '#F5F3EE', border: 'none', cursor: 'pointer',
             fontSize: 18, color: COLORS.textSecondary, borderRadius: '50%',
             width: 32, height: 32, display: 'flex', alignItems: 'center',
@@ -130,9 +139,9 @@ export default function ShareModal({ brochures, onClose, lang }) {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <div role="tablist" style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
           {['email', 'text', 'link'].map(t2 => (
-            <button key={t2} onClick={() => { setTab(t2); resetStatus() }} style={{
+            <button key={t2} role="tab" aria-selected={tab === t2} onClick={() => { setTab(t2); resetStatus() }} style={{
               flex: 1, padding: '10px 0', borderRadius: 12, border: '1.5px solid',
               borderColor: tab === t2 ? COLORS.primary : '#E8E6DE',
               background: tab === t2 ? COLORS.primaryLight : '#FAFAF7',

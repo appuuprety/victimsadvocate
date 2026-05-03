@@ -12,7 +12,7 @@ export const COLORS = {
   border: '#E8E6DE',
   textPrimary: '#2C2C2A',
   textSecondary: '#6B6866',
-  textMuted: '#9B9895',
+  textMuted: '#767370',
 }
 
 export const inp = {

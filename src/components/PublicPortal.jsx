@@ -144,6 +144,8 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
         fontSize: 16, pointerEvents: 'none',
       }}>🔍</span>
       <input
+        aria-label="Search resources"
+        role="searchbox"
         value={value}
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && onSearch && onSearch()}

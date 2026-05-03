@@ -10,6 +10,8 @@ export default function BrochureForm({ categories, initial = {}, onDone, onCance
   const [tags, setTags] = useState((initial.tags || []).join(', '))
   const [featured, setFeatured] = useState(initial.featured || false)
   const [linkUrl, setLinkUrl] = useState(initial.link_url || '')
+  const [phoneNumber, setPhoneNumber] = useState(initial.phone_number || '')
+  const [businessHours, setBusinessHours] = useState(initial.business_hours || '')
   const [file, setFile] = useState(null)
   const [dragOver, setDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -36,7 +38,9 @@ export default function BrochureForm({ categories, initial = {}, onDone, onCance
       const payload = {
         title: title.trim(), description: description.trim(), category_id: categoryId,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean), featured,
-        link_url: linkUrl.trim() || null, file_name: fileName, file_path: filePath,
+        link_url: linkUrl.trim() || null, phone_number: phoneNumber.trim() || null,
+        business_hours: businessHours.trim() || null,
+        file_name: fileName, file_path: filePath,
         file_size: fileSize, file_type: fileType, updated_at: new Date().toISOString(),
       }
       let data, err
@@ -82,6 +86,12 @@ export default function BrochureForm({ categories, initial = {}, onDone, onCance
             If this resource lives at an external URL, paste it here.
           </p>
         </div>
+        <Field label="Phone Number">
+          <Input value={phoneNumber} onChange={setPhoneNumber} type="tel" placeholder="(303) 555-0100" />
+        </Field>
+        <Field label="Business Hours">
+          <Input value={businessHours} onChange={setBusinessHours} placeholder="Mon–Fri, 8am–5pm" />
+        </Field>
       </div>
 
       <div
