@@ -66,7 +66,7 @@ export default function App() {
     <>
       {shareTarget && (
         <ShareModal
-          brochures={Array.isArray(shareTarget) ? shareTarget : [shareTarget]}
+          brochures={shareTarget}
           onClose={() => setShareTarget(null)}
           lang="en"
         />
@@ -79,13 +79,13 @@ export default function App() {
               categories={categories}
               setCategories={setCategories}
               onLogout={handleLogout}
-              onShare={setShareTarget}
+              onShare={b => setShareTarget(Array.isArray(b) ? b : [b])}
             />
           : <AdminLogin onLogin={() => {}} />
         : <PublicPortal
             brochures={brochures}
             categories={categories}
-            onShare={setShareTarget}
+            onShare={b => setShareTarget(Array.isArray(b) ? b : [b])}
           />
       }
     </>

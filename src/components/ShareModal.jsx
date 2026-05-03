@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Btn, Input, COLORS } from './ui'
 import { buildShareLink, logShare } from '../lib/helpers'
-import { supabase } from '../supabaseClient'
+import { supabase, ANON_KEY } from '../supabaseClient'
 import { T } from '../lib/translations'
 
-export default function ShareModal({ brochure, onClose, lang }) {
+export default function ShareModal({ brochures, onClose, lang }) {
   const t = T[lang]
   const [tab, setTab] = useState('email')
   const [email, setEmail] = useState('')
@@ -14,7 +14,17 @@ export default function ShareModal({ brochure, onClose, lang }) {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
-  const link = brochure.link_url || buildShareLink(brochure)
+
+  const seen = new Set()
+  const items = brochures.filter(b => {
+    if (seen.has(b.id)) return false
+    seen.add(b.id)
+    return true
+  }).map(b => ({
+    id: b.id,
+    title: b.title,
+    link: b.link_url || buildShareLink(b),
+  }))
 
   const CARRIERS = [
     { label: 'T-Mobile',     gateway: 'tmomail.net' },
@@ -30,16 +40,21 @@ export default function ShareModal({ brochure, onClose, lang }) {
 
   function resetStatus() { setSent(false); setError('') }
 
+  async function invoke(to, item) {
+    const { error } = await supabase.functions.invoke('send-email', {
+      body: { to, brochureTitle: item.title, link: item.link },
+      headers: { Authorization: `Bearer ${ANON_KEY}` },
+    })
+    if (error) throw error
+  }
+
   async function sendEmail() {
     if (!email) return
     setSending(true); resetStatus()
     try {
-      const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: { to: email, brochureTitle: brochure.title, link },
-      })
-      if (fnErr) throw fnErr
+      await Promise.all(items.map(b => invoke(email, b)))
       setSent(true)
-      logShare(brochure.id, 'email')
+      items.forEach(b => logShare(b.id, 'email'))
     } catch (e) {
       setError(e?.message || 'Failed to send. Please try again.')
     } finally {
@@ -49,16 +64,12 @@ export default function ShareModal({ brochure, onClose, lang }) {
 
   async function sendSms() {
     if (!phone || !carrier) return
-    const digits = phone.replace(/\D/g, '')
-    const gatewayEmail = `${digits}@${carrier}`
+    const gatewayEmail = `${phone.replace(/\D/g, '')}@${carrier}`
     setSending(true); resetStatus()
     try {
-      const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: { to: gatewayEmail, brochureTitle: brochure.title, link },
-      })
-      if (fnErr) throw fnErr
+      await Promise.all(items.map(b => invoke(gatewayEmail, b)))
       setSent(true)
-      logShare(brochure.id, 'sms')
+      items.forEach(b => logShare(b.id, 'sms'))
     } catch (e) {
       setError(e?.message || 'Failed to send. Please try again.')
     } finally {
@@ -66,12 +77,15 @@ export default function ShareModal({ brochure, onClose, lang }) {
     }
   }
 
-  async function copy() {
-    try { await navigator.clipboard.writeText(link) } catch {}
+  async function copyAll() {
+    const text = items.map(b => `${b.title}\n${b.link}`).join('\n\n')
+    try { await navigator.clipboard.writeText(text) } catch {}
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-    logShare(brochure.id, 'link')
+    items.forEach(b => logShare(b.id, 'link'))
   }
+
+  const isMulti = items.length > 1
 
   return (
     <div style={{
@@ -84,17 +98,28 @@ export default function ShareModal({ brochure, onClose, lang }) {
         background: '#FFFFFF', borderRadius: 20,
         padding: '24px 24px 32px', width: '100%', maxWidth: 500,
         boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+        maxHeight: '90vh', overflowY: 'auto',
       }}>
         {/* Drag handle */}
-        <div style={{
-          width: 40, height: 4, background: '#D3D1C7',
-          borderRadius: 4, margin: '0 auto 20px',
-        }} />
+        <div style={{ width: 40, height: 4, background: '#D3D1C7', borderRadius: 4, margin: '0 auto 20px' }} />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 18, fontFamily: 'Georgia, serif', color: COLORS.primary }}>{t.share_resource}</h3>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>{brochure.title}</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+          <div style={{ flex: 1, paddingRight: 12 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontFamily: 'Georgia, serif', color: COLORS.primary }}>
+              {isMulti ? `Share ${items.length} Resources` : t.share_resource}
+            </h3>
+            {isMulti ? (
+              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {items.map(b => (
+                  <div key={b.id} style={{ fontSize: 12, color: COLORS.textMuted, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                    <span style={{ color: COLORS.primary, fontWeight: 700, flexShrink: 0 }}>·</span>
+                    <span>{b.title}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>{items[0]?.title}</p>
+            )}
           </div>
           <button onClick={onClose} style={{
             background: '#F5F3EE', border: 'none', cursor: 'pointer',
@@ -136,12 +161,8 @@ export default function ShareModal({ brochure, onClose, lang }) {
             <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 0, marginBottom: 12 }}>
               Sent from the org's address — your personal email stays hidden.
             </p>
-            {sent && (
-              <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ Email sent anonymously!</p>
-            )}
-            {error && (
-              <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>
-            )}
+            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ {items.length > 1 ? `${items.length} emails` : 'Email'} sent anonymously!</p>}
+            {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
             <Btn style={{ width: '100%' }} onClick={sendEmail} disabled={sending || !email}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
             </Btn>
@@ -182,12 +203,8 @@ export default function ShareModal({ brochure, onClose, lang }) {
             <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: -6, marginBottom: 12 }}>
               Sent via email-to-SMS gateway — your number stays hidden.
             </p>
-            {sent && (
-              <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ Text sent anonymously!</p>
-            )}
-            {error && (
-              <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>
-            )}
+            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ {items.length > 1 ? `${items.length} texts` : 'Text'} sent anonymously!</p>}
+            {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
             <Btn style={{ width: '100%' }} onClick={sendSms} disabled={sending || !phone || !carrier}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
             </Btn>
@@ -197,21 +214,28 @@ export default function ShareModal({ brochure, onClose, lang }) {
         {tab === 'link' && (
           <div>
             <p style={{ fontSize: 14, color: COLORS.textSecondary, marginTop: 0, marginBottom: 12 }}>{t.link_label}</p>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <input
-                readOnly
-                value={link}
-                style={{
-                  flex: 1, minWidth: 0, padding: '11px 12px', borderRadius: 12,
-                  border: '1.5px solid #E8E6DE', fontSize: 12, fontFamily: 'monospace',
-                  background: '#F5F3EE', color: '#444441', overflow: 'hidden',
-                  textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}
-              />
-              <Btn variant={copied ? 'success' : 'ghost'} small onClick={copy} style={{ flexShrink: 0 }}>
-                {copied ? t.copied : t.copy}
-              </Btn>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+              {items.map(b => (
+                <div key={b.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {isMulti && <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.title}</div>}
+                    <input
+                      readOnly
+                      value={b.link}
+                      style={{
+                        width: '100%', padding: '9px 12px', borderRadius: 10,
+                        border: '1.5px solid #E8E6DE', fontSize: 12, fontFamily: 'monospace',
+                        background: '#F5F3EE', color: '#444441', overflow: 'hidden',
+                        textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
+            <Btn variant={copied ? 'success' : 'ghost'} onClick={copyAll} style={{ width: '100%' }}>
+              {copied ? '✓ Copied!' : isMulti ? 'Copy All Links' : t.copy}
+            </Btn>
           </div>
         )}
       </div>

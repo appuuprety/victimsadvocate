@@ -10,3 +10,4 @@ if (!SUPABASE_URL || !SUPABASE_ANON) {
 }
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON)
+export const ANON_KEY = SUPABASE_ANON
