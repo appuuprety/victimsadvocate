@@ -173,8 +173,24 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const [activeCat, setActiveCat] = useState('all')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState('home')
+  const [selected, setSelected] = useState(new Set())
   const isMobile = useIsMobile()
   const t = T[lang]
+
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) { next.delete(id) }
+      else if (next.size < 5) { next.add(id) }
+      return next
+    })
+  }
+
+  function shareSelected() {
+    const picks = brochures.filter(b => selected.has(b.id))
+    onShare(picks)
+    setSelected(new Set())
+  }
 
   const filtered = brochures.filter(b => {
     const matchCat = activeCat === 'all' || b.category_id === activeCat
@@ -328,7 +344,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             <p style={{ color: COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.featured_sub}</p>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
               {brochures.filter(b => b.featured).map(b => (
-                <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} />
+                <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} />
               ))}
             </div>
           </section>
@@ -410,7 +426,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             )
             : (
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-                {filtered.map(b => <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} />)}
+                {filtered.map(b => <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} />)}
               </div>
             )
           }
@@ -472,6 +488,36 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             <h3 style={{ margin: '0 0 8px', color: COLORS.textPrimary, fontSize: 16 }}>{t.privacy_title}</h3>
             <p style={{ margin: 0, color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{t.privacy_body}</p>
           </div>
+        </div>
+      )}
+
+      {/* Floating multi-share bar */}
+      {selected.size > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+          background: COLORS.primary, color: '#fff', borderRadius: 100,
+          padding: isMobile ? '12px 16px' : '14px 24px',
+          display: 'flex', alignItems: 'center', gap: 12,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.28)', zIndex: 200,
+          fontFamily: 'Georgia, serif', whiteSpace: 'nowrap',
+        }}>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>
+            {selected.size} of 5 selected
+          </span>
+          <button onClick={() => setSelected(new Set())} style={{
+            background: 'rgba(255,255,255,0.18)', border: 'none', color: '#fff',
+            borderRadius: 20, padding: '5px 12px', fontSize: 12, cursor: 'pointer',
+            fontFamily: 'Georgia, serif',
+          }}>
+            Clear
+          </button>
+          <button onClick={shareSelected} style={{
+            background: '#FFC726', border: 'none', color: '#002882',
+            borderRadius: 20, padding: '8px 18px', fontSize: 13,
+            fontWeight: 700, cursor: 'pointer', fontFamily: 'Georgia, serif',
+          }}>
+            Share {selected.size} Resource{selected.size > 1 ? 's' : ''}
+          </button>
         </div>
       )}
 

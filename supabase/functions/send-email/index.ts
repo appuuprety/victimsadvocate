@@ -23,33 +23,48 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    const { to, brochureTitle, link } = await req.json()
+    const { to, brochures, brochureTitle, link } = await req.json()
 
-    if (!to || !link) {
+    // Normalize to array — supports both single (legacy) and multi-resource payloads
+    const items: { title: string; link: string }[] = brochures ?? [{ title: brochureTitle ?? '', link }]
+
+    if (!to || items.length === 0 || !items[0].link) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...CORS },
       })
     }
 
-    const subject = brochureTitle
-      ? `Resource shared with you: ${brochureTitle}`
-      : 'A resource has been shared with you'
+    const isMulti = items.length > 1
+    const subject = isMulti
+      ? `${items.length} resources shared with you`
+      : items[0].title
+        ? `Resource shared with you: ${items[0].title}`
+        : 'A resource has been shared with you'
+
+    const resourcesHtml = items.map(r => `
+      <div style="margin-bottom:16px;padding:16px;background:#f5f5f5;border-radius:8px">
+        ${r.title ? `<p style="margin:0 0 10px;font-weight:600;color:#0F2D5E">${r.title}</p>` : ''}
+        <a href="${r.link}" style="display:inline-block;background:#003DA5;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px">
+          View Resource →
+        </a>
+        <p style="margin:8px 0 0;font-size:11px;color:#888">${r.link}</p>
+      </div>
+    `).join('')
+
+    const resourcesText = items.map(r => `${r.title ?? ''}\n${r.link}`).join('\n\n')
 
     await transporter.sendMail({
-      from: `Victim Services Erie <${GMAIL_USER}>`,
+      from: `Colorado Victim Services <${GMAIL_USER}>`,
       to,
       subject,
-      text: `A resource has been shared with you:\n\n${brochureTitle ?? ''}\n${link}`,
+      text: `Resources shared with you:\n\n${resourcesText}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
-          <h2 style="color:#0F2D5E">A resource has been shared with you</h2>
-          ${brochureTitle ? `<p><strong>${brochureTitle}</strong></p>` : ''}
-          <a href="${link}" style="display:inline-block;background:#0F2D5E;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;margin-top:8px">
-            View Resource
-          </a>
+          <h2 style="color:#003DA5">${isMulti ? `${items.length} resources have been shared with you` : 'A resource has been shared with you'}</h2>
+          ${resourcesHtml}
           <p style="margin-top:24px;font-size:12px;color:#888">
-            If the button doesn't work, copy this link: ${link}
+            Sent anonymously via Colorado Victim Services.
           </p>
         </div>
       `,
