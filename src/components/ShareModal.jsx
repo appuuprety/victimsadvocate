@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Btn, Input, COLORS } from './ui'
 import { buildShareLink, logShare } from '../lib/helpers'
-import { supabase } from '../supabaseClient'
+import { supabase, ANON_KEY } from '../supabaseClient'
 import { T } from '../lib/translations'
 
 export default function ShareModal({ brochures, onClose, lang }) {
@@ -41,6 +41,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
     try {
       const { error: fnErr } = await supabase.functions.invoke('send-email', {
         body: { to: email, brochures: items },
+        headers: { Authorization: `Bearer ${ANON_KEY}` },
       })
       if (fnErr) throw fnErr
       setSent(true)
