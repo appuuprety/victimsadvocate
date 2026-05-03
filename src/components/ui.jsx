@@ -47,7 +47,7 @@ export function Badge({ label, color = COLORS.primary, bg = COLORS.primaryLight 
   )
 }
 
-export function Btn({ children, onClick, variant = 'primary', small, disabled, style = {} }) {
+export function Btn({ children, onClick, variant = 'primary', small, disabled, style = {}, ...rest }) {
   const v = {
     primary: { background: COLORS.primary, color: '#fff', border: 'none' },
     secondary: { background: 'transparent', color: COLORS.primary, border: `1.5px solid ${COLORS.primary}` },
@@ -60,6 +60,7 @@ export function Btn({ children, onClick, variant = 'primary', small, disabled, s
     <button
       onClick={onClick}
       disabled={disabled}
+      {...rest}
       style={{
         ...v[variant],
         padding: small ? '8px 16px' : '11px 24px',
