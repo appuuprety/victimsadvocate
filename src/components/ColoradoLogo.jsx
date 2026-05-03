@@ -1,29 +1,62 @@
 export default function ColoradoLogo({ size = 40 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <clipPath id="coFlagClip">
-          <circle cx="20" cy="20" r="18.5"/>
+        <clipPath id="badgeClip">
+          <circle cx="100" cy="100" r="93"/>
         </clipPath>
+        {/* Arc path for curved bottom text */}
+        <path id="textArc" d="M 22.9,135.9 A 85,85 0 0 1 177.1,135.9"/>
       </defs>
 
-      {/* Colorado flag: blue (top) / white (middle) / red (bottom) */}
-      <rect x="1" y="1.5" width="38" height="12.3" fill="#003DA5" clipPath="url(#coFlagClip)"/>
-      <rect x="1" y="13.8" width="38" height="12.4" fill="#FFFFFF" clipPath="url(#coFlagClip)"/>
-      <rect x="1" y="26.2" width="38" height="12.3" fill="#BF0A30" clipPath="url(#coFlagClip)"/>
+      {/* Cream base circle */}
+      <circle cx="100" cy="100" r="93" fill="#FAE2CC"/>
 
-      {/* Colorado C — thick red arc, opening facing right */}
+      {/* Red Colorado C — opens to the right (±65° gap) */}
       <path
-        d="M 27.4,29.5 A 12,12 0 1 0 27.4,10.5 L 24.9,13.7 A 8,8 0 1 1 24.9,26.3 Z"
-        fill="#BF0A30"
-        clipPath="url(#coFlagClip)"
+        d="M 139.3,15.7 A 93,93 0 1 0 139.3,184.3 L 122.8,148.9 A 54,54 0 1 1 122.8,51.1 Z"
+        fill="#E33030"
+        clipPath="url(#badgeClip)"
       />
 
-      {/* Gold disc in the C opening */}
-      <circle cx="28" cy="20" r="4.8" fill="#FFC726" clipPath="url(#coFlagClip)"/>
+      {/* Gold sun disc */}
+      <circle cx="108" cy="88" r="47" fill="#F5C430" clipPath="url(#badgeClip)"/>
 
-      {/* Outer badge ring */}
-      <circle cx="20" cy="20" r="18.5" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" fill="none"/>
+      {/* Cream mountain zone (lower section) */}
+      <rect x="7" y="112" width="186" height="81" fill="#FAE2CC" clipPath="url(#badgeClip)"/>
+
+      {/* Mountain silhouette — dark navy */}
+      <path
+        d="M 7,172
+           L 22,156 L 35,140 L 48,152
+           L 56,130 L 65,140
+           L 74,118 L 85,130
+           L 100,82
+           L 115,120 L 126,102 L 138,118
+           L 148,108 L 160,125
+           L 174,140 L 188,155 L 193,168
+           L 193,175 L 7,175 Z"
+        fill="#1E306E"
+        clipPath="url(#badgeClip)"
+      />
+
+      {/* Light rock face highlight on center peak */}
+      <path
+        d="M 100,82 L 88,116 L 94,118 L 100,102 L 106,116 L 112,114 Z"
+        fill="#C8B8AA"
+        opacity="0.75"
+        clipPath="url(#badgeClip)"
+      />
+
+      {/* Curved text along the bottom */}
+      <text fill="#1E306E" fontSize="10.5" fontFamily="Georgia, serif" fontWeight="bold" letterSpacing="0.8">
+        <textPath href="#textArc" startOffset="50%" textAnchor="middle">
+          VOLUNTEER VICTIM ADVOCATE
+        </textPath>
+      </text>
+
+      {/* Outer border ring */}
+      <circle cx="100" cy="100" r="93" stroke="#1E306E" strokeWidth="7" fill="none"/>
     </svg>
   )
 }

@@ -430,7 +430,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             {[
               { icon: '📞', label: 'After Hours', detail: '303-441-4444', note: '7 days, 24 hours' },
               { icon: '🏢', label: 'Office', detail: '303-926-2841', note: 'Mon–Fri, 8am–5pm' },
-              { icon: '✉️', label: 'Email', detail: 'victimservices@erieco.gov', note: 'Town of Erie' },
+              { icon: '✉️', label: 'Email', detail: 'victimservices@erieco.gov', note: 'Victim Services' },
               { icon: '⚖️', label: 'Victim Rights', detail: '303-239-4497', note: 'CO Dept of Public Safety' },
             ].map(c => (
               <div key={c.label} style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid #E8E6DE', padding: isMobile ? 16 : 20 }}>
@@ -476,18 +476,54 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       )}
 
       {/* Footer */}
-      <footer style={{ background: '#0F2D5E', padding: isMobile ? '24px 16px' : 32, marginTop: 48 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <ColoradoLogo size={32} />
+      <footer style={{ background: '#002882', marginTop: 48 }}>
+        {/* Main footer content */}
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '32px 20px 24px' : '40px 32px 28px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 28 : 40 }}>
+
+            {/* Brand column */}
             <div>
-              <div style={{ color: '#fff', fontWeight: 700, fontSize: isMobile ? 13 : 15 }}>Colorado Victim Resources</div>
-              <div style={{ color: 'rgba(255,255,255,.55)', fontSize: 11 }}>{t.footer_tag}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                <ColoradoLogo size={36} />
+                <div>
+                  <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
+                  <div style={{ color: 'rgba(255,255,255,.5)', fontSize: 12 }}>Volunteer Victim Advocate</div>
+                </div>
+              </div>
+              <p style={{ color: 'rgba(255,255,255,.55)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
+            </div>
+
+            {/* Contact column */}
+            <div>
+              <div style={{ color: '#FFC726', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
+              <div style={{ color: 'rgba(255,255,255,.8)', fontSize: 13, lineHeight: 2 }}>
+                <div>📞 After Hours: 303-441-4444</div>
+                <div>🏢 Office: 303-926-2841</div>
+                <div>✉️ victimservices@erieco.gov</div>
+              </div>
+            </div>
+
+            {/* Emergency column */}
+            <div>
+              <div style={{ color: '#FFC726', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Emergency</div>
+              <div style={{ color: 'rgba(255,255,255,.8)', fontSize: 13, lineHeight: 2 }}>
+                <div>🚨 Emergency: 911</div>
+                <div>💜 DV Hotline: 1-800-799-7233</div>
+                <div>⚖️ Victim Rights: 303-239-4497</div>
+              </div>
             </div>
           </div>
-          <div style={{ color: 'rgba(255,255,255,.55)', fontSize: 12 }}>
-            <div>Emergency: 911</div>
-            <div>DV Hotline: 1-800-799-7233</div>
+        </div>
+
+        {/* Copyright bar */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,.1)', padding: isMobile ? '14px 20px' : '14px 32px' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+            <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12 }}>
+              © {new Date().getFullYear()} Colorado Victim Resources. All rights reserved.
+            </div>
+            <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12 }}>
+              Services available 7 days a week, 24 hours a day.
+            </div>
           </div>
         </div>
       </footer>
