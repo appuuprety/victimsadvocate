@@ -40,7 +40,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
     setSending(true); resetStatus()
     try {
       const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: { to: email, brochures: items },
+        body: { to: email, brochures: items, brochureTitle: items[0]?.title, link: items[0]?.link },
         headers: { Authorization: `Bearer ${ANON_KEY}` },
       })
       if (fnErr) throw fnErr
@@ -60,7 +60,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
     setSending(true); resetStatus()
     try {
       const { error: fnErr } = await supabase.functions.invoke('send-email', {
-        body: { to: gatewayEmail, brochures: items },
+        body: { to: gatewayEmail, brochures: items, brochureTitle: items[0]?.title, link: items[0]?.link },
+        headers: { Authorization: `Bearer ${ANON_KEY}` },
       })
       if (fnErr) throw fnErr
       setSent(true)
