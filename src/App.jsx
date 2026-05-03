@@ -66,7 +66,7 @@ export default function App() {
     <>
       {shareTarget && (
         <ShareModal
-          brochure={shareTarget}
+          brochures={Array.isArray(shareTarget) ? shareTarget : [shareTarget]}
           onClose={() => setShareTarget(null)}
           lang="en"
         />

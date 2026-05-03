@@ -139,7 +139,7 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
 function GlobalSearch({ value, onChange, placeholder, onSearch }) {
   return (
     <div style={{ position: 'relative', width: '100%' }}>
-      <span style={{
+      <span aria-hidden="true" style={{
         position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
         fontSize: 16, pointerEvents: 'none',
       }}>🔍</span>
@@ -148,6 +148,8 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
         onChange={e => onChange(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && onSearch && onSearch()}
         placeholder={placeholder}
+        aria-label="Search resources"
+        role="searchbox"
         style={{
           width: '100%',
           padding: '14px 14px 14px 42px',
@@ -173,8 +175,24 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const [activeCat, setActiveCat] = useState('all')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState('home')
+  const [selected, setSelected] = useState(new Set())
   const isMobile = useIsMobile()
   const t = T[lang]
+
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else if (next.size < 5) next.add(id)
+      return next
+    })
+  }
+  function shareSelected() {
+    const picks = brochures.filter(b => selected.has(b.id))
+    onShare(picks)
+    setSelected(new Set())
+  }
+  function clearSelection() { setSelected(new Set()) }
 
   const filtered = brochures.filter(b => {
     const matchCat = activeCat === 'all' || b.category_id === activeCat
@@ -194,7 +212,14 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         @keyframes spin { to { transform: rotate(360deg) } }
         ::placeholder { color: rgba(255,255,255,0.6) !important; }
         * { box-sizing: border-box; }
+        .skip-link {
+          position: absolute; left: -9999px; top: 8px; z-index: 9999;
+          background: #003DA5; color: #fff; padding: 10px 16px; border-radius: 8px;
+          font-weight: 600; text-decoration: none;
+        }
+        .skip-link:focus { left: 8px; }
       `}</style>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
 
       {isMobile
         ? <MobileNav page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} />
@@ -202,7 +227,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       }
 
       {/* ─── HOME ─── */}
-      {page === 'home' && <>
+      {page === 'home' && <main id="main-content" aria-label="Home">
         {/* Hero */}
         <section style={{
           background: 'linear-gradient(160deg, #0F2D5E 0%, #1B4D8E 60%, #2563A8 100%)',
@@ -333,11 +358,11 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             </div>
           </section>
         )}
-      </>}
+      </main>}
 
       {/* ─── RESOURCES ─── */}
       {page === 'resources' && (
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: `32px ${px}px` }}>
+        <main id="main-content" aria-label="Resources" style={{ maxWidth: 1100, margin: '0 auto', padding: `32px ${px}px` }}>
           <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.all_resources}</h2>
           <p style={{ color: COLORS.textSecondary, margin: '0 0 20px' }}>{t.resources_label(filtered.length)}</p>
 
@@ -410,16 +435,16 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             )
             : (
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-                {filtered.map(b => <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} />)}
+                {filtered.map(b => <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} />)}
               </div>
             )
           }
-        </div>
+        </main>
       )}
 
       {/* ─── CONTACT ─── */}
       {page === 'contact' && (
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${px}px` }}>
+        <main id="main-content" aria-label="Contact" style={{ maxWidth: 800, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${px}px` }}>
           <h2 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Victim Services</h2>
           <p style={{ color: COLORS.textSecondary, margin: '0 0 32px', fontSize: 16, lineHeight: 1.7 }}>
             Services are available seven days a week, 24 hours a day.
@@ -471,6 +496,32 @@ export default function PublicPortal({ brochures, categories, onShare }) {
           <div style={{ background: '#F5F3EE', borderRadius: 16, padding: 22, borderLeft: `4px solid #C8C6BE` }}>
             <h3 style={{ margin: '0 0 8px', color: COLORS.textPrimary, fontSize: 16 }}>{t.privacy_title}</h3>
             <p style={{ margin: 0, color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{t.privacy_body}</p>
+          </div>
+        </main>
+      )}
+
+      {/* Floating multi-share bar */}
+      {selected.size > 0 && (
+        <div role="region" aria-label="Selected resources" style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0,
+          background: '#FFFFFF', borderTop: `1px solid ${COLORS.border}`,
+          boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
+          padding: '12px 16px', zIndex: 100,
+          display: 'flex', justifyContent: 'center',
+        }}>
+          <div style={{
+            maxWidth: 1100, width: '100%',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
+          }}>
+            <div style={{ fontSize: 14, color: COLORS.textPrimary, fontWeight: 600 }}>
+              {selected.size} of 5 selected
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Btn small variant="ghost" onClick={clearSelection}>Clear</Btn>
+              <Btn small variant="warm" onClick={shareSelected} aria-label={`Share ${selected.size} selected resources`}>
+                Share {selected.size} Resource{selected.size !== 1 ? 's' : ''}
+              </Btn>
+            </div>
           </div>
         </div>
       )}
