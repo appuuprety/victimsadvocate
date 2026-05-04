@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Claude Code worktrees and local config
+.claude/
+
 # Environment variables
 .env
 .env.local
