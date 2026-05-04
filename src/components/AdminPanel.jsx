@@ -15,6 +15,20 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [newCatColor, setNewCatColor] = useState(COLORS.primary)
   const [catError, setCatError] = useState('')
   const [editingCat, setEditingCat] = useState(null) // category being edited
+  const [tutorialSteps, setTutorialSteps] = useState([])
+  const [editingStep, setEditingStep] = useState(null) // tutorial step being edited
+  const [tutorialEditMode, setTutorialEditMode] = useState(false)
+  const [completedSteps, setCompletedSteps] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tutorial_steps') || '[]') } catch { return [] }
+  })
+
+  function toggleStep(id) {
+    setCompletedSteps(prev => {
+      const next = prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+      localStorage.setItem('tutorial_steps', JSON.stringify(next))
+      return next
+    })
+  }
 
   useEffect(() => {
     if (view === 'activity') {
@@ -22,6 +36,40 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         .then(({ data }) => setShareLogs(data || []))
     }
   }, [view])
+
+  useEffect(() => {
+    supabase.from('tutorial_steps').select('*').order('sort_order')
+      .then(({ data }) => setTutorialSteps(data || []))
+  }, [])
+
+  async function saveTutorialStep(step) {
+    if (!step.title?.trim()) return
+    if (step.id) {
+      const { data } = await supabase.from('tutorial_steps').update({
+        icon: step.icon, title: step.title, body: step.body,
+        is_warning: !!step.is_warning, highlight: !!step.highlight,
+        action_label: step.action_label || null, action_view: step.action_view || null,
+        sort_order: step.sort_order,
+      }).eq('id', step.id).select().single()
+      if (data) setTutorialSteps(prev => prev.map(s => s.id === data.id ? data : s))
+    } else {
+      const nextOrder = (tutorialSteps[tutorialSteps.length - 1]?.sort_order || 0) + 10
+      const { data } = await supabase.from('tutorial_steps').insert({
+        icon: step.icon || '📌', title: step.title, body: step.body || '',
+        is_warning: !!step.is_warning, highlight: !!step.highlight,
+        action_label: step.action_label || null, action_view: step.action_view || null,
+        sort_order: nextOrder,
+      }).select().single()
+      if (data) setTutorialSteps(prev => [...prev, data])
+    }
+    setEditingStep(null)
+  }
+
+  async function deleteTutorialStep(step) {
+    if (!window.confirm(`Delete step "${step.title}"?`)) return
+    await supabase.from('tutorial_steps').delete().eq('id', step.id)
+    setTutorialSteps(prev => prev.filter(s => s.id !== step.id))
+  }
 
   function handleFormDone(data, wasEditing) {
     if (wasEditing) setBrochures(prev => prev.map(b => b.id === data.id ? data : b))
@@ -108,6 +156,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     ['categories', 'Categories'],
     ['activity', 'Activity'],
     ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
+    ['tutorial', '🎓 Tutorial'],
   ]
 
   return (
@@ -337,6 +386,21 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             }
           </div>
         </>}
+
+        {view === 'tutorial' && (
+          <TutorialView
+            steps={tutorialSteps}
+            completedSteps={completedSteps}
+            toggleStep={toggleStep}
+            onNavigate={setView}
+            editMode={tutorialEditMode}
+            setEditMode={setTutorialEditMode}
+            editingStep={editingStep}
+            setEditingStep={setEditingStep}
+            onSave={saveTutorialStep}
+            onDelete={deleteTutorialStep}
+          />
+        )}
       </div>
     </div>
   )
@@ -405,6 +469,247 @@ function CategoryEditor({ cat, setCat, onSave, onCancel, onDelete, error }) {
       </div>
       <EmojiPicker onPick={em => setCat({ ...cat, icon: em })} current={cat.icon} />
       {error && <p style={{ color: COLORS.danger, fontSize: 13, marginTop: 10 }}>{error}</p>}
+    </div>
+  )
+}
+
+function TutorialView({ steps, completedSteps, toggleStep, onNavigate, editMode, setEditMode, editingStep, setEditingStep, onSave, onDelete }) {
+  const total = steps.length
+  const done = steps.filter(s => completedSteps.includes(s.id)).length
+  const pct = total ? Math.round((done / total) * 100) : 0
+  const allDone = total > 0 && done === total
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 4px', color: COLORS.textPrimary }}>🎓 Volunteer Tutorial</h2>
+          <p style={{ margin: 0, fontSize: 14, color: COLORS.textMuted }}>
+            {editMode ? 'Add, edit, or remove steps shown to volunteers.' : 'Complete each step to get familiar with the admin portal.'}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          {!editMode && total > 0 && (
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: allDone ? COLORS.success : COLORS.primary }}>{pct}%</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted }}>{done} of {total} completed</div>
+            </div>
+          )}
+          <Btn small variant={editMode ? 'primary' : 'ghost'} onClick={() => { setEditMode(!editMode); setEditingStep(null) }}>
+            {editMode ? 'Done editing' : '✏️ Edit tutorial'}
+          </Btn>
+        </div>
+      </div>
+
+      {!editMode && total > 0 && (
+        <div style={{ background: '#E8E6DE', borderRadius: 8, height: 8, marginBottom: 28, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%', borderRadius: 8,
+            background: allDone ? COLORS.success : COLORS.primary,
+            width: `${pct}%`, transition: 'width 0.4s ease',
+          }} />
+        </div>
+      )}
+
+      {!editMode && allDone && (
+        <div style={{ background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 14, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ fontSize: 32 }}>🎉</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1A6B3A', marginBottom: 2 }}>Tutorial complete!</div>
+            <div style={{ fontSize: 13, color: '#2E7D50', lineHeight: 1.5 }}>You are ready to support victims using this portal.</div>
+          </div>
+        </div>
+      )}
+
+      {editingStep && (
+        <TutorialEditor
+          step={editingStep}
+          setStep={setEditingStep}
+          onSave={() => onSave(editingStep)}
+          onCancel={() => setEditingStep(null)}
+        />
+      )}
+
+      {total === 0 && !editingStep && (
+        <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
+          No tutorial steps yet. {editMode ? 'Click "Add step" below to create one.' : 'An admin can add steps from the edit view.'}
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {steps.map((step, idx) => {
+          const isDone = completedSteps.includes(step.id)
+          const borderColor = step.is_warning ? '#F5C4B3' : isDone ? '#A8D5B5' : '#E8E6DE'
+          const bgColor = step.is_warning ? '#FAECE7' : isDone ? '#F4FBF6' : '#FFFFFF'
+
+          return (
+            <div key={step.id} style={{
+              background: bgColor, borderRadius: 14, border: `1px solid ${borderColor}`,
+              padding: '18px 20px', transition: 'all 0.2s',
+            }}>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                {!editMode && (
+                  <button
+                    onClick={() => toggleStep(step.id)}
+                    title={isDone ? 'Mark incomplete' : 'Mark complete'}
+                    aria-label={isDone ? 'Mark step incomplete' : 'Mark step complete'}
+                    style={{
+                      width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+                      border: `2px solid ${isDone ? COLORS.success : '#C8C6BE'}`,
+                      background: isDone ? COLORS.success : 'transparent',
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, color: '#fff', marginTop: 1,
+                    }}
+                  >
+                    {isDone ? '✓' : ''}
+                  </button>
+                )}
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 16 }} aria-hidden="true">{step.icon}</span>
+                    <span style={{
+                      fontWeight: 700, fontSize: 15,
+                      color: isDone && !editMode ? COLORS.textMuted : step.is_warning ? '#993C1D' : COLORS.textPrimary,
+                      textDecoration: isDone && !editMode ? 'line-through' : 'none',
+                    }}>
+                      Step {idx + 1} — {step.title}
+                    </span>
+                    {step.is_warning && (
+                      <span style={{ fontSize: 11, background: '#F5C4B3', color: '#712B13', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Important</span>
+                    )}
+                    {step.highlight && (
+                      <span style={{ fontSize: 11, background: '#B5D4F4', color: '#0C447C', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Key skill</span>
+                    )}
+                  </div>
+                  <p style={{ margin: '0 0 10px', fontSize: 14, color: COLORS.textSecondary, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{step.body}</p>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {!editMode && step.action_label && step.action_view && (
+                      <button
+                        onClick={() => onNavigate(step.action_view)}
+                        style={{
+                          background: 'none', border: `1px solid ${COLORS.primary}`, borderRadius: 8,
+                          color: COLORS.primary, fontSize: 12, padding: '5px 12px', cursor: 'pointer',
+                          fontFamily: 'Georgia, serif', fontWeight: 600,
+                        }}
+                      >
+                        {step.action_label} →
+                      </button>
+                    )}
+                    {!editMode && (
+                      <button
+                        onClick={() => toggleStep(step.id)}
+                        style={{
+                          background: isDone ? 'transparent' : COLORS.primary,
+                          border: `1px solid ${isDone ? '#C8C6BE' : COLORS.primary}`,
+                          borderRadius: 8, color: isDone ? COLORS.textMuted : '#fff',
+                          fontSize: 12, padding: '5px 12px', cursor: 'pointer',
+                          fontFamily: 'Georgia, serif', fontWeight: 600,
+                        }}
+                      >
+                        {isDone ? 'Undo' : 'Mark complete'}
+                      </button>
+                    )}
+                    {editMode && (
+                      <>
+                        <Btn small variant="ghost" onClick={() => setEditingStep({ ...step })}>Edit</Btn>
+                        <Btn small variant="danger" onClick={() => onDelete(step)}>Delete</Btn>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {editMode && !editingStep && (
+        <div style={{ marginTop: 16 }}>
+          <Btn onClick={() => setEditingStep({ icon: '📌', title: '', body: '', is_warning: false, highlight: false, action_label: '', action_view: '' })}>
+            + Add step
+          </Btn>
+        </div>
+      )}
+
+      {!editMode && (
+        <div style={{ marginTop: 24, background: '#EEF4FB', borderRadius: 14, padding: '16px 20px', borderLeft: `4px solid ${COLORS.primary}` }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.primaryDark, marginBottom: 4 }}>Need help?</div>
+          <div style={{ fontSize: 13, color: COLORS.primary, lineHeight: 1.6 }}>
+            Contact your supervisor any time. Progress saves automatically.
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const ACTION_VIEWS = [
+  { value: '', label: '— None —' },
+  { value: 'dashboard', label: 'Dashboard' },
+  { value: 'brochures', label: 'Brochures' },
+  { value: 'categories', label: 'Categories' },
+  { value: 'activity', label: 'Activity' },
+  { value: 'trash', label: 'Trash' },
+]
+
+function TutorialEditor({ step, setStep, onSave, onCancel }) {
+  return (
+    <div style={{ background: '#FFFFFF', borderRadius: 14, border: `2px solid ${COLORS.primary}`, padding: 24, marginBottom: 16 }}>
+      <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.primary }}>
+        {step.id ? 'Edit step' : 'Add new step'}
+      </h3>
+      <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 12, marginBottom: 12 }}>
+        <Field label="Icon"><Input value={step.icon} onChange={v => setStep({ ...step, icon: v })} placeholder="📌" /></Field>
+        <Field label="Title"><Input value={step.title} onChange={v => setStep({ ...step, title: v })} placeholder="Step title" /></Field>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <Field label="Body">
+          <textarea
+            value={step.body}
+            onChange={e => setStep({ ...step, body: e.target.value })}
+            placeholder="Detailed instructions for the volunteer…"
+            rows={4}
+            style={{
+              width: '100%', padding: '11px 14px', borderRadius: 12,
+              border: `1.5px solid ${COLORS.border}`, fontSize: 15,
+              fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box',
+              background: '#FFFFFF', color: COLORS.textPrimary, resize: 'vertical', lineHeight: 1.6,
+            }}
+          />
+        </Field>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+        <Field label="Button text (optional)">
+          <Input value={step.action_label || ''} onChange={v => setStep({ ...step, action_label: v })} placeholder="e.g. Go to Brochures" />
+        </Field>
+        <Field label="Button goes to">
+          <select
+            value={step.action_view || ''}
+            onChange={e => setStep({ ...step, action_view: e.target.value })}
+            style={{
+              width: '100%', padding: '11px 14px', borderRadius: 12,
+              border: `1.5px solid ${COLORS.border}`, fontSize: 15,
+              fontFamily: 'Georgia, serif', background: '#FFFFFF', color: COLORS.textPrimary,
+            }}
+          >
+            {ACTION_VIEWS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </Field>
+      </div>
+      <div style={{ display: 'flex', gap: 18, marginBottom: 16, flexWrap: 'wrap' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: COLORS.textPrimary, cursor: 'pointer' }}>
+          <input type="checkbox" checked={!!step.is_warning} onChange={e => setStep({ ...step, is_warning: e.target.checked })} />
+          Mark as Important (red)
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: COLORS.textPrimary, cursor: 'pointer' }}>
+          <input type="checkbox" checked={!!step.highlight} onChange={e => setStep({ ...step, highlight: e.target.checked })} />
+          Mark as Key skill (blue)
+        </label>
+      </div>
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+        <Btn variant="ghost" onClick={onCancel}>Cancel</Btn>
+        <Btn onClick={onSave}>{step.id ? 'Save changes' : 'Add step'}</Btn>
+      </div>
     </div>
   )
 }
