@@ -1,0 +1,14 @@
+{
+  "name": "Colorado Victim Resources",
+  "short_name": "CVR",
+  "description": "Confidential resources for survivors across Colorado.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAF7",
+  "theme_color": "#003DA5",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
