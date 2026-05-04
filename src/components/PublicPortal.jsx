@@ -21,80 +21,78 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
         padding: '0 16px',
         height: 60,
       }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => { setPage('home'); setOpen(false) }}>
-          <ColoradoLogo size={36} />
-          <div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>Colorado Victim Resources</div>
-            <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10 }}>{t.tagline}</div>
+        {/* Logo + title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', minWidth: 0, flex: 1 }} onClick={() => { setPage('home'); setOpen(false) }}>
+          <ColoradoLogo size={32} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Colorado Victim Resources
+            </div>
           </div>
         </div>
-        {/* Right side: text-size + lang + hamburger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <TextSizeToggle compact />
-          <select
-            value={lang}
-            onChange={e => setLang(e.target.value)}
-            aria-label="Select language"
-            style={{
-              padding: '5px 22px 5px 8px', borderRadius: 8,
-              background: 'rgba(255,255,255,.15)', color: '#fff',
-              border: '1px solid rgba(255,255,255,.3)', fontSize: 12,
-              fontFamily: 'Georgia, serif', cursor: 'pointer', appearance: 'none',
-              WebkitAppearance: 'none', minHeight: 32,
-              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='1,1 5,5 9,1'/%3E%3C/svg%3E\")",
-              backgroundRepeat: 'no-repeat', backgroundPosition: 'right 6px center',
-            }}
-          >
-            {LANGS.map(l => (
-              <option key={l.code} value={l.code} style={{ color: '#000' }}>{l.label}</option>
-            ))}
-          </select>
-          <button
-            onClick={() => setOpen(!open)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            aria-expanded={open}
-            style={{
-              background: 'rgba(255,255,255,0.12)',
-              border: 'none',
-              borderRadius: 8,
-              color: '#fff',
-              cursor: 'pointer',
-              fontSize: 20,
-              width: 36,
-              height: 36,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-            <span aria-hidden="true">{open ? '✕' : '☰'}</span>
-          </button>
-        </div>
+        {/* Right side: hamburger only */}
+        <button
+          onClick={() => setOpen(!open)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          style={{
+            background: 'rgba(255,255,255,0.12)',
+            border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer',
+            fontSize: 20, width: 40, height: 40, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            WebkitTapHighlightColor: 'transparent',
+          }}>
+          <span aria-hidden="true">{open ? '✕' : '☰'}</span>
+        </button>
       </div>
       {/* Dropdown menu */}
       {open && (
         <div style={{ background: '#0F2D5E', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           {[['home', t.nav_home, '🏠'], ['resources', t.nav_resources, '📋'], ['contact', t.nav_contact, '💬']].map(([id, label, icon]) => (
             <button key={id} onClick={() => { setPage(id); setOpen(false) }} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              width: '100%',
+              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
               padding: '14px 20px',
               background: page === id ? 'rgba(255,255,255,0.1)' : 'transparent',
-              border: 'none',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-              color: '#fff',
-              fontSize: 15,
-              fontFamily: 'Georgia, serif',
-              cursor: 'pointer',
-              textAlign: 'left',
+              border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              color: '#fff', fontSize: 15, fontFamily: 'Georgia, serif',
+              cursor: 'pointer', textAlign: 'left',
               WebkitTapHighlightColor: 'transparent',
             }}>
               <span aria-hidden="true">{icon}</span>{label}
             </button>
           ))}
+          {/* Settings row: text size + language */}
+          <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div>
+              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
+                Text size
+              </div>
+              <TextSizeToggle compact />
+            </div>
+            <div>
+              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
+                Language
+              </div>
+              <select
+                value={lang}
+                onChange={e => setLang(e.target.value)}
+                aria-label="Select language"
+                style={{
+                  width: '100%', padding: '10px 32px 10px 12px', borderRadius: 8,
+                  background: 'rgba(255,255,255,0.15)', color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.3)', fontSize: 14,
+                  fontFamily: 'Georgia, serif', cursor: 'pointer',
+                  appearance: 'none', WebkitAppearance: 'none',
+                  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
+                  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
+                }}
+              >
+                {LANGS.map(l => (
+                  <option key={l.code} value={l.code} style={{ color: '#000' }}>{l.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       )}
     </header>
@@ -103,21 +101,21 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
 
 function TextSizeToggle({ compact }) {
   const [size, setSize] = useTextSize()
-  const sizes = [['sm', 'A', 12], ['md', 'A', 14], ['lg', 'A', 17]]
+  const sizes = [['sm', 'A', 13, 'Default text size'], ['lg', 'A', 18, 'Larger text']]
   return (
     <div role="group" aria-label="Text size" style={{
-      display: 'flex', borderRadius: 8, overflow: 'hidden',
+      display: 'inline-flex', borderRadius: 8, overflow: 'hidden',
       border: '1px solid rgba(255,255,255,.3)',
       marginLeft: compact ? 0 : 8,
     }}>
-      {sizes.map(([key, letter, fs]) => (
+      {sizes.map(([key, letter, fs, label]) => (
         <button
           key={key}
           onClick={() => setSize(key)}
-          aria-label={`Text size ${key === 'sm' ? 'small' : key === 'md' ? 'medium' : 'large'}`}
+          aria-label={label}
           aria-pressed={size === key}
           style={{
-            padding: compact ? '5px 8px' : '6px 10px',
+            padding: compact ? '6px 12px' : '6px 14px',
             background: size === key ? 'rgba(255,255,255,.25)' : 'transparent',
             border: 'none', color: '#fff', cursor: 'pointer',
             fontFamily: 'Georgia, serif', fontWeight: size === key ? 700 : 400,

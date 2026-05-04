@@ -44,10 +44,13 @@ export function isAdmin() {
 }
 
 const TEXT_SIZE_KEY = 'cvr-text-size'
-export const TEXT_SIZES = { sm: 1, md: 1.15, lg: 1.35 }
+export const TEXT_SIZES = { sm: 1, lg: 1.25 }
 
 export function useTextSize() {
-  const [size, setSize] = useState(() => localStorage.getItem(TEXT_SIZE_KEY) || 'sm')
+  const [size, setSize] = useState(() => {
+    const stored = localStorage.getItem(TEXT_SIZE_KEY)
+    return stored && TEXT_SIZES[stored] ? stored : 'sm'
+  })
   useEffect(() => {
     document.documentElement.style.fontSize = `${TEXT_SIZES[size] * 100}%`
     document.documentElement.style.zoom = TEXT_SIZES[size]
