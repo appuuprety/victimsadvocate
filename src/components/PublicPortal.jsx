@@ -512,32 +512,6 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
       {/* Floating multi-share bar */}
       {selected.size > 0 && (
-        <div role="region" aria-label="Selected resources" style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: '#FFFFFF', borderTop: `1px solid ${COLORS.border}`,
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.12)',
-          padding: '12px 16px', zIndex: 100,
-          display: 'flex', justifyContent: 'center',
-        }}>
-          <div style={{
-            maxWidth: 1100, width: '100%',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
-          }}>
-            <div style={{ fontSize: 14, color: COLORS.textPrimary, fontWeight: 600 }}>
-              {selected.size} of 5 selected
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Btn small variant="ghost" onClick={clearSelection}>Clear</Btn>
-              <Btn small variant="warm" onClick={shareSelected} aria-label={`Share ${selected.size} selected resources`}>
-                Share {selected.size} Resource{selected.size !== 1 ? 's' : ''}
-              </Btn>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Floating multi-share bar */}
-      {selected.size > 0 && (
         <div style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
           background: COLORS.primary, color: '#fff', borderRadius: 100,
