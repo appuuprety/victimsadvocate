@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Btn, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
-import { getCategoryBg, useIsMobile } from '../lib/helpers'
+import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS } from '../lib/translations'
 
 function MobileNav({ page, setPage, lang, setLang, t }) {
@@ -29,8 +29,9 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
             <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10 }}>{t.tagline}</div>
           </div>
         </div>
-        {/* Right side: lang + hamburger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Right side: text-size + lang + hamburger */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <TextSizeToggle compact />
           <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.3)' }}>
             {['en', 'es'].map(l => (
               <button key={l} onClick={() => setLang(l)} style={{
@@ -99,6 +100,36 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
   )
 }
 
+function TextSizeToggle({ compact }) {
+  const [size, setSize] = useTextSize()
+  const sizes = [['sm', 'A', 12], ['md', 'A', 14], ['lg', 'A', 17]]
+  return (
+    <div role="group" aria-label="Text size" style={{
+      display: 'flex', borderRadius: 8, overflow: 'hidden',
+      border: '1px solid rgba(255,255,255,.3)',
+      marginLeft: compact ? 0 : 8,
+    }}>
+      {sizes.map(([key, letter, fs]) => (
+        <button
+          key={key}
+          onClick={() => setSize(key)}
+          aria-label={`Text size ${key === 'sm' ? 'small' : key === 'md' ? 'medium' : 'large'}`}
+          aria-pressed={size === key}
+          style={{
+            padding: compact ? '5px 8px' : '6px 10px',
+            background: size === key ? 'rgba(255,255,255,.25)' : 'transparent',
+            border: 'none', color: '#fff', cursor: 'pointer',
+            fontFamily: 'Georgia, serif', fontWeight: size === key ? 700 : 400,
+            fontSize: fs, lineHeight: 1, minHeight: compact ? 32 : 36,
+          }}
+        >
+          {letter}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function DesktopNav({ page, setPage, lang, setLang, t }) {
   return (
     <header style={{ background: 'linear-gradient(135deg, #1B3A6B 0%, #1B4D8E 100%)', padding: '0 32px' }}>
@@ -122,6 +153,7 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
               </button>
             ))}
           </nav>
+          <TextSizeToggle />
           <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,.3)', marginLeft: 8 }}>
             {['en', 'es'].map(l => (
               <button key={l} onClick={() => setLang(l)} style={{

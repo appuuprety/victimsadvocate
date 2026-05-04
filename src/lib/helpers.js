@@ -43,6 +43,19 @@ export function isAdmin() {
   return window.location.pathname.startsWith('/admin')
 }
 
+const TEXT_SIZE_KEY = 'cvr-text-size'
+export const TEXT_SIZES = { sm: 1, md: 1.15, lg: 1.35 }
+
+export function useTextSize() {
+  const [size, setSize] = useState(() => localStorage.getItem(TEXT_SIZE_KEY) || 'sm')
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${TEXT_SIZES[size] * 100}%`
+    document.documentElement.style.zoom = TEXT_SIZES[size]
+    localStorage.setItem(TEXT_SIZE_KEY, size)
+  }, [size])
+  return [size, setSize]
+}
+
 export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   useEffect(() => {
