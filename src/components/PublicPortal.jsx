@@ -3,7 +3,7 @@ import { Btn, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
-import { T, CAT_LABELS } from '../lib/translations'
+import { T, CAT_LABELS, LANGS } from '../lib/translations'
 
 function MobileNav({ page, setPage, lang, setLang, t }) {
   const [open, setOpen] = useState(false)
@@ -32,23 +32,24 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
         {/* Right side: text-size + lang + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <TextSizeToggle compact />
-          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.3)' }}>
-            {['en', 'es'].map(l => (
-              <button key={l} onClick={() => setLang(l)} style={{
-                padding: '5px 10px',
-                background: lang === l ? 'rgba(255,255,255,0.25)' : 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontWeight: lang === l ? 700 : 400,
-                fontSize: 12,
-                cursor: 'pointer',
-                fontFamily: 'Georgia, serif',
-                minHeight: 32,
-              }}>
-                {l.toUpperCase()}
-              </button>
+          <select
+            value={lang}
+            onChange={e => setLang(e.target.value)}
+            aria-label="Select language"
+            style={{
+              padding: '5px 22px 5px 8px', borderRadius: 8,
+              background: 'rgba(255,255,255,.15)', color: '#fff',
+              border: '1px solid rgba(255,255,255,.3)', fontSize: 12,
+              fontFamily: 'Georgia, serif', cursor: 'pointer', appearance: 'none',
+              WebkitAppearance: 'none', minHeight: 32,
+              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='1,1 5,5 9,1'/%3E%3C/svg%3E\")",
+              backgroundRepeat: 'no-repeat', backgroundPosition: 'right 6px center',
+            }}
+          >
+            {LANGS.map(l => (
+              <option key={l.code} value={l.code} style={{ color: '#000' }}>{l.label}</option>
             ))}
-          </div>
+          </select>
           <button
             onClick={() => setOpen(!open)}
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -154,18 +155,24 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
             ))}
           </nav>
           <TextSizeToggle />
-          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,.3)', marginLeft: 8 }}>
-            {['en', 'es'].map(l => (
-              <button key={l} onClick={() => setLang(l)} style={{
-                padding: '6px 14px',
-                background: lang === l ? 'rgba(255,255,255,.25)' : 'transparent',
-                border: 'none', color: '#fff', fontWeight: lang === l ? 700 : 400,
-                fontSize: 13, cursor: 'pointer', fontFamily: 'Georgia, serif',
-              }}>
-                {l.toUpperCase()}
-              </button>
+          <select
+            value={lang}
+            onChange={e => setLang(e.target.value)}
+            aria-label="Select language"
+            style={{
+              marginLeft: 8, padding: '6px 28px 6px 12px', borderRadius: 8,
+              background: 'rgba(255,255,255,.15)', color: '#fff',
+              border: '1px solid rgba(255,255,255,.3)', fontSize: 13,
+              fontFamily: 'Georgia, serif', cursor: 'pointer', appearance: 'none',
+              WebkitAppearance: 'none',
+              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
+              backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center',
+            }}
+          >
+            {LANGS.map(l => (
+              <option key={l.code} value={l.code} style={{ color: '#000' }}>{l.label}</option>
             ))}
-          </div>
+          </select>
         </div>
       </div>
     </header>
@@ -220,6 +227,12 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [page])
+
+  useEffect(() => {
+    const isRTL = LANGS.find(l => l.code === lang)?.rtl
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr'
+    document.documentElement.lang = lang
+  }, [lang])
 
   function toggleSelect(id) {
     setSelected(prev => {

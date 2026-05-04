@@ -83,7 +83,7 @@ export default function App() {
             />
           : <AdminLogin onLogin={() => {}} />
         : <PublicPortal
-            brochures={brochures}
+            brochures={brochures.filter(b => !b.deleted_at)}
             categories={categories}
             onShare={b => setShareTarget(Array.isArray(b) ? b : [b])}
           />
