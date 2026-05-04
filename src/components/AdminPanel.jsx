@@ -30,7 +30,22 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   }
 
   async function handleDelete(brochure) {
-    if (!window.confirm(`Delete "${brochure.title}"?`)) return
+    if (!window.confirm(`Move "${brochure.title}" to Trash?`)) return
+    const { data } = await supabase.from('brochures')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', brochure.id).select().single()
+    if (data) setBrochures(prev => prev.map(b => b.id === data.id ? data : b))
+  }
+
+  async function handleRestore(brochure) {
+    const { data } = await supabase.from('brochures')
+      .update({ deleted_at: null })
+      .eq('id', brochure.id).select().single()
+    if (data) setBrochures(prev => prev.map(b => b.id === data.id ? data : b))
+  }
+
+  async function handlePurge(brochure) {
+    if (!window.confirm(`Permanently delete "${brochure.title}"? This cannot be undone.`)) return
     if (brochure.file_path && brochure.file_path.length > 2) await supabase.storage.from('brochures').remove([brochure.file_path])
     await supabase.from('brochures').delete().eq('id', brochure.id)
     setBrochures(prev => prev.filter(b => b.id !== brochure.id))
@@ -52,14 +67,23 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     setCatError('')
   }
 
+  const activeBrochures = brochures.filter(b => !b.deleted_at)
+  const trashedBrochures = brochures.filter(b => b.deleted_at)
+
   const stats = {
-    total: brochures.length,
-    featured: brochures.filter(b => b.featured).length,
+    total: activeBrochures.length,
+    featured: activeBrochures.filter(b => b.featured).length,
     categories: categories.length,
     shares: shareLogs.length,
   }
 
-  const navItems = [['dashboard', 'Dashboard'], ['brochures', 'Brochures'], ['categories', 'Categories'], ['activity', 'Activity']]
+  const navItems = [
+    ['dashboard', 'Dashboard'],
+    ['brochures', 'Brochures'],
+    ['categories', 'Categories'],
+    ['activity', 'Activity'],
+    ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
+  ]
 
   return (
     <div style={{ fontFamily: 'Georgia, serif', background: '#FAFAF7', minHeight: '100vh', colorScheme: 'light' }}>
@@ -117,7 +141,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             <Btn small onClick={() => { setView('brochures'); setShowForm(true); setEditTarget(null) }}>+ Add Brochure</Btn>
           </div>
           <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
-            {brochures.slice(0, 6).map((b, i) => {
+            {activeBrochures.slice(0, 6).map((b, i) => {
               const cat = categories.find(c => c.id === b.category_id)
               return (
                 <div key={b.id} style={{
@@ -156,7 +180,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             </div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
-            {brochures.map(b => (
+            {activeBrochures.map(b => (
               <div key={b.id}>
                 <BrochureCard brochure={b} categories={categories} onShare={onShare} lang="en" />
                 <div style={{ marginTop: 8, display: 'flex', gap: 12, paddingLeft: 4 }}>
@@ -167,6 +191,43 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
               </div>
             ))}
           </div>
+        </>}
+
+        {view === 'trash' && <>
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Trash</h2>
+          <p style={{ color: COLORS.textMuted, marginTop: 0, marginBottom: 24, fontSize: 14 }}>
+            Deleted brochures stay here until you permanently remove them.
+          </p>
+          {trashedBrochures.length === 0 ? (
+            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 48, textAlign: 'center', color: COLORS.textMuted }}>
+              Trash is empty.
+            </div>
+          ) : (
+            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
+              {trashedBrochures.map((b, i) => {
+                const cat = categories.find(c => c.id === b.category_id)
+                const deletedDate = b.deleted_at?.split('T')[0]
+                return (
+                  <div key={b.id} style={{
+                    padding: '14px 20px',
+                    borderBottom: i < trashedBrochures.length - 1 ? '1px solid #F0EEE8' : 'none',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+                  }}>
+                    <div style={{ flex: 1, minWidth: 200 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.textPrimary }}>{b.title}</div>
+                      <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>
+                        {cat?.label || b.category_id} · deleted {deletedDate}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Btn small variant="ghost" onClick={() => handleRestore(b)}>Restore</Btn>
+                      <Btn small variant="danger" onClick={() => handlePurge(b)}>Delete forever</Btn>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </>}
 
         {view === 'categories' && <>
