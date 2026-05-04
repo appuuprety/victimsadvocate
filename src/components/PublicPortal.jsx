@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Btn, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
@@ -184,6 +184,10 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const [selected, setSelected] = useState(new Set())
   const isMobile = useIsMobile()
   const t = T[lang]
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [page])
 
   function toggleSelect(id) {
     setSelected(prev => {
