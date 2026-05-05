@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Btn, Input, COLORS } from './ui'
+import { Btn, Input, Textarea, COLORS } from './ui'
 import { buildShareLink, logShare } from '../lib/helpers'
 import { supabase, ANON_KEY } from '../supabaseClient'
 import { T } from '../lib/translations'
@@ -10,6 +10,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [carrier, setCarrier] = useState('')
+  const [message, setMessage] = useState('')
   const [copied, setCopied] = useState(false)
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
@@ -40,10 +41,13 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   function resetStatus() { setSent(false); setError('') }
 
-  async function invoke(to, item) {
+  async function invoke(to) {
     const { error } = await supabase.functions.invoke('send-email', {
-      body: { to, brochureTitle: item.title, link: item.link },
-      headers: { Authorization: `Bearer ${ANON_KEY}` },
+      body: { to, brochures: items, message: message.trim() },
+      headers: {
+        authorization: `Bearer ${ANON_KEY}`,
+        apikey: ANON_KEY,
+      },
     })
     if (error) throw error
   }
@@ -52,7 +56,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
     if (!email) return
     setSending(true); resetStatus()
     try {
-      await Promise.all(items.map(b => invoke(email, b)))
+      await invoke(email)
       setSent(true)
       items.forEach(b => logShare(b.id, 'email'))
     } catch (e) {
@@ -67,7 +71,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
     const gatewayEmail = `${phone.replace(/\D/g, '')}@${carrier}`
     setSending(true); resetStatus()
     try {
-      await Promise.all(items.map(b => invoke(gatewayEmail, b)))
+      await invoke(gatewayEmail)
       setSent(true)
       items.forEach(b => logShare(b.id, 'sms'))
     } catch (e) {
@@ -78,8 +82,13 @@ export default function ShareModal({ brochures, onClose, lang }) {
   }
 
   async function copyAll() {
-    const text = items.map(b => `${b.title}\n${b.link}`).join('\n\n')
-    try { await navigator.clipboard.writeText(text) } catch {}
+    const resourcesText = items.map(b => `${b.title}\n${b.link}`).join('\n\n')
+    const text = [message.trim(), resourcesText].filter(Boolean).join('\n\n')
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      setError('Copy failed. Please copy the link manually.')
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
     items.forEach(b => logShare(b.id, 'link'))
@@ -153,6 +162,18 @@ export default function ShareModal({ brochures, onClose, lang }) {
               {t2 === 'email' ? `🔒 ${t.email_tab}` : t2 === 'text' ? `🔒 ${t.text_tab}` : t.link_tab}
             </button>
           ))}
+        </div>
+
+        <div style={{ marginBottom: 18 }}>
+          <p style={{ fontSize: 14, color: COLORS.textSecondary, marginTop: 0, marginBottom: 6 }}>
+            Add a message
+          </p>
+          <Textarea
+            value={message}
+            onChange={v => { setMessage(v); resetStatus(); setCopied(false) }}
+            placeholder="Optional note to include with the shared resource."
+            rows={3}
+          />
         </div>
 
         {tab === 'email' && (
