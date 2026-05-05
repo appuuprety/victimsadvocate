@@ -44,10 +44,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
   async function invoke(to) {
     const { error } = await supabase.functions.invoke('send-email', {
       body: { to, brochures: items, message: message.trim() },
-      headers: {
-        authorization: `Bearer ${ANON_KEY}`,
-        apikey: ANON_KEY,
-      },
+      headers: { Authorization: `Bearer ${ANON_KEY}` },
     })
     if (error) throw error
   }
