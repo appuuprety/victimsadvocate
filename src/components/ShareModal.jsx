@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Btn, Input, Textarea, COLORS } from './ui'
 import { buildShareLink, logShare } from '../lib/helpers'
-import { supabase, ANON_KEY } from '../supabaseClient'
+import { ANON_KEY, SUPABASE_URL } from '../supabaseClient'
 import { T } from '../lib/translations'
 
 export default function ShareModal({ brochures, onClose, lang }) {
@@ -41,12 +41,31 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   function resetStatus() { setSent(false); setError('') }
 
+  async function getFunctionErrorMessage(response) {
+    const text = await response.text()
+    if (text) {
+      try {
+        const body = JSON.parse(text)
+        if (body?.error) return body.error
+        if (body?.message) return body.message
+      } catch {
+        return text
+      }
+    }
+    return `Send failed with status ${response.status}.`
+  }
+
   async function invoke(to) {
-    const { error } = await supabase.functions.invoke('send-email', {
-      body: { to, brochures: items, message: message.trim() },
-      headers: { Authorization: `Bearer ${ANON_KEY}` },
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+      method: 'POST',
+      body: JSON.stringify({ to, brochures: items, message: message.trim() }),
+      headers: {
+        Authorization: `Bearer ${ANON_KEY}`,
+        apikey: ANON_KEY,
+        'Content-Type': 'application/json',
+      },
     })
-    if (error) throw error
+    if (!response.ok) throw new Error(await getFunctionErrorMessage(response))
   }
 
   async function sendEmail() {
