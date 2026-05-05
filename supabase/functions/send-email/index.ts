@@ -19,11 +19,24 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function nl2br(value: string) {
+  return escapeHtml(value).replace(/\n/g, '<br>')
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    const { to, brochures, brochureTitle, link } = await req.json()
+    const { to, brochures, brochureTitle, link, message } = await req.json()
 
     // Normalize to array — supports both single (legacy) and multi-resource payloads
     const raw = Array.isArray(brochures) && brochures.length > 0
@@ -60,15 +73,21 @@ serve(async (req) => {
     `).join('')
 
     const resourcesText = items.map(r => `${r.title ?? ''}\n${r.link}`).join('\n\n')
+    const shareMessage = typeof message === 'string' ? message.trim() : ''
+    const textParts = [
+      shareMessage,
+      `Resources shared with you:\n\n${resourcesText}`,
+    ].filter(Boolean)
 
     await transporter.sendMail({
       from: `Colorado Victim Services <${GMAIL_USER}>`,
       to,
       subject,
-      text: `Resources shared with you:\n\n${resourcesText}`,
+      text: textParts.join('\n\n'),
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px">
           <h2 style="color:#003DA5">${isMulti ? `${items.length} resources have been shared with you` : 'A resource has been shared with you'}</h2>
+          ${shareMessage ? `<div style="margin:0 0 18px;padding:14px 16px;background:#fff8dc;border-left:4px solid #c49a00;color:#333;line-height:1.5">${nl2br(shareMessage)}</div>` : ''}
           ${resourcesHtml}
           <p style="margin-top:24px;font-size:12px;color:#888">
             Sent anonymously via Colorado Victim Services.
