@@ -50,11 +50,13 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   async function sendEmail() {
     if (!email) return
+    const item = items[0]
+    if (!item) return
     setSending(true); resetStatus()
     try {
-      await Promise.all(items.map(b => invoke(email, b)))
+      await invoke(email, item)
       setSent(true)
-      items.forEach(b => logShare(b.id, 'email'))
+      logShare(item.id, 'email')
     } catch (e) {
       setError(e?.message || 'Failed to send. Please try again.')
     } finally {
@@ -64,12 +66,14 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   async function sendSms() {
     if (!phone || !carrier) return
+    const item = items[0]
+    if (!item) return
     const gatewayEmail = `${phone.replace(/\D/g, '')}@${carrier}`
     setSending(true); resetStatus()
     try {
-      await Promise.all(items.map(b => invoke(gatewayEmail, b)))
+      await invoke(gatewayEmail, item)
       setSent(true)
-      items.forEach(b => logShare(b.id, 'sms'))
+      logShare(item.id, 'sms')
     } catch (e) {
       setError(e?.message || 'Failed to send. Please try again.')
     } finally {
