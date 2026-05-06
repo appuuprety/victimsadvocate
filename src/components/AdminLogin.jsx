@@ -3,8 +3,10 @@ import { supabase } from '../supabaseClient'
 import { Btn, Field, Input, Spinner, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 
-export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswordUpdated }) {
+export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswordUpdated, onCancelPasswordRecovery }) {
+  const [mode, setMode] = useState('signIn')
   const [email, setEmail] = useState('')
+  const [resetEmail, setResetEmail] = useState('')
   const [password, setPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -14,21 +16,24 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
   const [notice, setNotice] = useState('')
   const [resetSent, setResetSent] = useState(false)
 
+  function clearStatus() {
+    setError('')
+    setNotice('')
+  }
+
   async function signIn() {
     if (!email || !password) return setError('Email and password are required.')
     setLoading(true)
-    setError('')
-    setNotice('')
+    clearStatus()
     const { error: err } = await supabase.auth.signInWithPassword({ email, password })
     if (err) { setError(err.message); setLoading(false) } else onLogin()
   }
 
   async function sendResetEmail() {
-    if (!email) return setError('Enter your staff email first.')
+    if (!resetEmail) return setError('Enter your staff email.')
     setLoading(true)
-    setError('')
-    setNotice('')
-    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+    clearStatus()
+    const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: `${window.location.origin}/admin`,
     })
     setLoading(false)
@@ -37,13 +42,26 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
     setNotice('Password reset email sent. Check your inbox and follow the link to set a new password.')
   }
 
+  function openResetRequest() {
+    setMode('requestReset')
+    setResetEmail('')
+    setResetSent(false)
+    clearStatus()
+  }
+
+  function cancelResetRequest() {
+    setMode('signIn')
+    setResetEmail('')
+    setResetSent(false)
+    clearStatus()
+  }
+
   async function updatePassword() {
     if (!newPassword || !confirmPassword) return setError('Enter and confirm your new password.')
     if (newPassword.length < 6) return setError('Password must be at least 6 characters.')
     if (newPassword !== confirmPassword) return setError('Passwords do not match.')
     setLoading(true)
-    setError('')
-    setNotice('')
+    clearStatus()
     const { error: err } = await supabase.auth.updateUser({ password: newPassword })
     setLoading(false)
     if (err) return setError(err.message)
@@ -51,6 +69,14 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
     setConfirmPassword('')
     setNotice('Password updated. You can now sign in with your new password.')
     onPasswordUpdated?.()
+  }
+
+  async function cancelPasswordRecovery() {
+    setNewPassword('')
+    setConfirmPassword('')
+    clearStatus()
+    await supabase.auth.signOut()
+    onCancelPasswordRecovery?.()
   }
 
   if (passwordRecovery) return (
@@ -77,10 +103,10 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Field label="New Password">
-            <Input value={newPassword} onChange={setNewPassword} type="password" placeholder="New password" />
+            <Input value={newPassword} onChange={setNewPassword} type="password" placeholder="New password" autoComplete="new-password" />
           </Field>
           <Field label="Confirm Password">
-            <Input value={confirmPassword} onChange={setConfirmPassword} type="password" placeholder="Confirm password" />
+            <Input value={confirmPassword} onChange={setConfirmPassword} type="password" placeholder="Confirm password" autoComplete="new-password" />
           </Field>
           {error && <p style={{ color: COLORS.danger, fontSize: 13, margin: 0 }}>{error}</p>}
           {notice && <p style={{ color: COLORS.success, fontSize: 13, margin: 0 }}>{notice}</p>}
@@ -89,6 +115,57 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
               ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><Spinner />Updating…</span>
               : 'Update Password'
             }
+          </Btn>
+          <Btn variant="ghost" onClick={cancelPasswordRecovery} disabled={loading} style={{ width: '100%' }}>
+            Cancel and Return to Sign In
+          </Btn>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (mode === 'requestReset') return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0F2D5E, #1B4D8E)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: 'Georgia, serif',
+      padding: 16,
+      colorScheme: 'light',
+    }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      <div style={{ background: '#FFFFFF', borderRadius: 20, padding: 40, width: '100%', maxWidth: 380 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+            <div style={{ background: COLORS.primary, borderRadius: 50, padding: 10 }}>
+              <ColoradoLogo size={40} />
+            </div>
+          </div>
+          <h2 style={{ margin: 0, fontSize: 22, color: COLORS.primary }}>Forgot Password</h2>
+          <p style={{ margin: '8px 0 0', color: COLORS.textMuted, fontSize: 14 }}>Enter your staff email to receive a reset link.</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <Field label="Staff Email">
+            <Input
+              value={resetEmail}
+              onChange={v => { setResetEmail(v); clearStatus(); setResetSent(false) }}
+              type="email"
+              placeholder="admin@covictims.org"
+              autoComplete="email"
+            />
+          </Field>
+          {error && <p style={{ color: COLORS.danger, fontSize: 13, margin: 0 }}>{error}</p>}
+          {notice && <p style={{ color: COLORS.success, fontSize: 13, margin: 0 }}>{notice}</p>}
+          <Btn onClick={sendResetEmail} disabled={loading || resetSent} style={{ width: '100%', marginTop: 4 }}>
+            {loading
+              ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><Spinner />Sending…</span>
+              : resetSent ? 'Reset Email Sent' : 'Send Reset Email'
+            }
+          </Btn>
+          <Btn variant="ghost" onClick={cancelResetRequest} disabled={loading} style={{ width: '100%' }}>
+            Cancel
           </Btn>
         </div>
       </div>
@@ -119,7 +196,7 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Field label="Email">
-            <Input value={email} onChange={setEmail} type="email" placeholder="admin@covictims.org" />
+            <Input value={email} onChange={setEmail} type="email" placeholder="admin@covictims.org" autoComplete="username" />
           </Field>
           <Field label="Password">
             <div style={{ position: 'relative' }}>
@@ -128,6 +205,7 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
                 onChange={setPassword}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
+                autoComplete="current-password"
                 style={{ paddingRight: 44 }}
               />
               <button
@@ -171,13 +249,13 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
           </Btn>
           <button
             type="button"
-            onClick={sendResetEmail}
-            disabled={loading || resetSent}
+            onClick={openResetRequest}
+            disabled={loading}
             style={{
               background: 'transparent',
               border: 'none',
-              color: loading || resetSent ? COLORS.textMuted : COLORS.primary,
-              cursor: loading || resetSent ? 'not-allowed' : 'pointer',
+              color: loading ? COLORS.textMuted : COLORS.primary,
+              cursor: loading ? 'not-allowed' : 'pointer',
               fontFamily: 'Georgia, serif',
               fontSize: 13,
               padding: 4,

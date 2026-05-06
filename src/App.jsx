@@ -47,6 +47,11 @@ export default function App() {
     setSession(null)
   }
 
+  function handlePasswordRecoveryCancel() {
+    setPasswordRecovery(false)
+    setSession(null)
+  }
+
   if (loading) return (
     <div style={{
       display: 'flex',
@@ -88,6 +93,7 @@ export default function App() {
               passwordRecovery
               onLogin={() => {}}
               onPasswordUpdated={handlePasswordUpdated}
+              onCancelPasswordRecovery={handlePasswordRecoveryCancel}
             />
           : session
           ? <AdminPanel
