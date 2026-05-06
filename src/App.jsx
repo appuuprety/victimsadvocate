@@ -12,11 +12,15 @@ export default function App() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [shareTarget, setShareTarget] = useState(null)
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
   const admin = isAdmin()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+      setSession(s)
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+    })
     return () => subscription.unsubscribe()
   }, [])
 
@@ -32,6 +36,13 @@ export default function App() {
   }, [])
 
   async function handleLogout() {
+    await supabase.auth.signOut()
+    setSession(null)
+    setPasswordRecovery(false)
+  }
+
+  async function handlePasswordUpdated() {
+    setPasswordRecovery(false)
     await supabase.auth.signOut()
     setSession(null)
   }
@@ -72,7 +83,13 @@ export default function App() {
         />
       )}
       {admin
-        ? session
+        ? passwordRecovery
+          ? <AdminLogin
+              passwordRecovery
+              onLogin={() => {}}
+              onPasswordUpdated={handlePasswordUpdated}
+            />
+          : session
           ? <AdminPanel
               brochures={brochures}
               setBrochures={setBrochures}
