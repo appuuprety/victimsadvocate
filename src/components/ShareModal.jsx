@@ -43,7 +43,10 @@ export default function ShareModal({ brochures, onClose, lang }) {
   async function invoke(to, item) {
     const { error } = await supabase.functions.invoke('send-email', {
       body: { to, brochureTitle: item.title, link: item.link },
-      headers: { Authorization: `Bearer ${ANON_KEY}` },
+      headers: {
+        Authorization: `Bearer ${ANON_KEY}`,
+        apikey: ANON_KEY,
+      },
     })
     if (error) throw error
   }
@@ -55,8 +58,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
     setSending(true); resetStatus()
     try {
       await invoke(email, item)
+      await logShare(item.id, 'email')
       setSent(true)
-      logShare(item.id, 'email')
     } catch (e) {
       setError(e?.message || 'Failed to send. Please try again.')
     } finally {
@@ -72,8 +75,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
     setSending(true); resetStatus()
     try {
       await invoke(gatewayEmail, item)
+      await logShare(item.id, 'sms')
       setSent(true)
-      logShare(item.id, 'sms')
     } catch (e) {
       setError(e?.message || 'Failed to send. Please try again.')
     } finally {
@@ -159,6 +162,26 @@ export default function ShareModal({ brochures, onClose, lang }) {
           ))}
         </div>
 
+        {sent && (
+          <div style={{
+            padding: 16,
+            borderRadius: 12,
+            background: '#E1F5EE',
+            border: '1.5px solid #B8E1CF',
+            marginBottom: 16,
+          }}>
+            <p style={{ margin: '0 0 4px', fontSize: 15, color: COLORS.success, fontWeight: 700 }}>
+              {tab === 'text' ? 'Text sent anonymously.' : 'Email sent anonymously.'}
+            </p>
+            <p style={{ margin: '0 0 12px', fontSize: 13, color: COLORS.textSecondary }}>
+              You can close this window to return to the resources page.
+            </p>
+            <Btn variant="success" onClick={onClose} style={{ width: '100%' }}>
+              Close and Return to Resources.
+            </Btn>
+          </div>
+        )}
+
         {tab === 'email' && (
           <div>
             <p style={{ fontSize: 14, color: COLORS.textSecondary, marginTop: 0, marginBottom: 4 }}>
@@ -174,7 +197,6 @@ export default function ShareModal({ brochures, onClose, lang }) {
             <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 0, marginBottom: 12 }}>
               Sent from the org's address — your personal email stays hidden.
             </p>
-            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ {items.length > 1 ? `${items.length} emails` : 'Email'} sent anonymously!</p>}
             {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
             <Btn style={{ width: '100%' }} onClick={sendEmail} disabled={sending || !email}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
@@ -216,7 +238,6 @@ export default function ShareModal({ brochures, onClose, lang }) {
             <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: -6, marginBottom: 12 }}>
               Sent via email-to-SMS gateway — your number stays hidden.
             </p>
-            {sent && <p style={{ fontSize: 13, color: '#2E7D4F', marginBottom: 10, fontWeight: 600 }}>✓ {items.length > 1 ? `${items.length} texts` : 'Text'} sent anonymously!</p>}
             {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
             <Btn style={{ width: '100%' }} onClick={sendSms} disabled={sending || !phone || !carrier}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
