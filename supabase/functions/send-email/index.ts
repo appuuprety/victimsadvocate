@@ -23,7 +23,17 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    const { to, brochures, brochureTitle, link } = await req.json()
+    let payload: any
+    try {
+      payload = await req.json()
+    } catch {
+      return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...CORS },
+      })
+    }
+
+    const { to, brochures, brochureTitle, link } = payload
 
     // Normalize to array — supports both single (legacy) and multi-resource payloads
     const raw = Array.isArray(brochures) && brochures.length > 0
