@@ -7,6 +7,10 @@ import { T, CAT_LABELS, LANGS } from '../lib/translations'
 
 function MobileNav({ page, setPage, lang, setLang, t }) {
   const [open, setOpen] = useState(false)
+  function goAdmin() {
+    window.location.assign('/admin')
+  }
+
   return (
     <header style={{
       background: 'linear-gradient(135deg, #1B3A6B 0%, #1B4D8E 100%)',
@@ -61,6 +65,17 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
               <span aria-hidden="true">{icon}</span>{label}
             </button>
           ))}
+          <button onClick={goAdmin} style={{
+            display: 'flex', alignItems: 'center', gap: 12, width: '100%',
+            padding: '14px 20px',
+            background: 'transparent',
+            border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)',
+            color: '#fff', fontSize: 15, fontFamily: 'Georgia, serif',
+            cursor: 'pointer', textAlign: 'left',
+            WebkitTapHighlightColor: 'transparent',
+          }}>
+            <span aria-hidden="true">🔐</span>Admin
+          </button>
           {/* Settings row: text size + language */}
           <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <div>
@@ -130,6 +145,10 @@ function TextSizeToggle({ compact }) {
 }
 
 function DesktopNav({ page, setPage, lang, setLang, t }) {
+  function goAdmin() {
+    window.location.assign('/admin')
+  }
+
   return (
     <header style={{ background: 'linear-gradient(135deg, #1B3A6B 0%, #1B4D8E 100%)', padding: '0 32px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 68 }}>
@@ -151,6 +170,19 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
                 {label}
               </button>
             ))}
+            <button onClick={goAdmin} style={{
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,.35)',
+              color: '#fff',
+              padding: '6px 14px',
+              borderRadius: 8,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'Georgia, serif',
+            }}>
+              Admin
+            </button>
           </nav>
           <TextSizeToggle />
           <select

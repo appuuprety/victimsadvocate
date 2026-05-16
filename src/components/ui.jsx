@@ -104,13 +104,14 @@ export function Field({ label, children }) {
   )
 }
 
-export function Input({ value, onChange, placeholder, type = 'text', style = {} }) {
+export function Input({ value, onChange, placeholder, type = 'text', style = {}, ...rest }) {
   return (
     <input
       type={type}
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
+      {...rest}
       style={{ ...inp, ...style }}
     />
   )

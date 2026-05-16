@@ -13,6 +13,9 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [shareTarget, setShareTarget] = useState(null)
   const [passwordRecovery, setPasswordRecovery] = useState(false)
+  const [adminProfile, setAdminProfile] = useState(null)
+  const [adminProfileLoading, setAdminProfileLoading] = useState(false)
+  const [adminError, setAdminError] = useState('')
   const admin = isAdmin()
 
   useEffect(() => {
@@ -23,6 +26,37 @@ export default function App() {
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  useEffect(() => {
+    async function loadAdminProfile() {
+      setAdminProfile(null)
+      setAdminError('')
+      if (!admin || !session) {
+        setAdminProfileLoading(false)
+        return
+      }
+      setAdminProfileLoading(true)
+
+      const inviteToken = new URLSearchParams(window.location.search).get('invite')
+      if (inviteToken) {
+        const { data, error } = await supabase.rpc('accept_admin_invite', { invite_token: inviteToken })
+        if (!error && data) {
+          setAdminProfile(data)
+          window.history.replaceState({}, '', '/admin')
+          setAdminProfileLoading(false)
+          return
+        }
+        setAdminError(error?.message || 'Unable to accept admin invite.')
+      }
+
+      const { data, error } = await supabase.rpc('current_admin_profile')
+      if (error) setAdminError(error.message)
+      setAdminProfile(data || null)
+      setAdminProfileLoading(false)
+    }
+
+    loadAdminProfile()
+  }, [admin, session])
 
   useEffect(() => {
     Promise.all([
@@ -38,6 +72,7 @@ export default function App() {
   async function handleLogout() {
     await supabase.auth.signOut()
     setSession(null)
+    setAdminProfile(null)
     setPasswordRecovery(false)
   }
 
@@ -45,6 +80,20 @@ export default function App() {
     setPasswordRecovery(false)
     await supabase.auth.signOut()
     setSession(null)
+    setAdminProfile(null)
+  }
+
+  function handlePasswordRecoveryCancel() {
+    setPasswordRecovery(false)
+    setSession(null)
+    setAdminProfile(null)
+  }
+
+  async function handleSuperAdminClaim() {
+    const { data, error } = await supabase.rpc('claim_initial_super_admin')
+    if (error) return setAdminError(error.message)
+    setAdminProfile(data)
+    setAdminError('')
   }
 
   if (loading) return (
@@ -88,17 +137,33 @@ export default function App() {
               passwordRecovery
               onLogin={() => {}}
               onPasswordUpdated={handlePasswordUpdated}
+              onCancelPasswordRecovery={handlePasswordRecoveryCancel}
             />
-          : session
+          : session && adminProfileLoading
+          ? <div style={{
+              minHeight: '100vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'Georgia, serif',
+              color: '#1B4D8E',
+              background: '#FAFAF7',
+            }}>Loading admin access…</div>
+          : session && adminProfile
           ? <AdminPanel
               brochures={brochures}
               setBrochures={setBrochures}
               categories={categories}
               setCategories={setCategories}
+              adminProfile={adminProfile}
               onLogout={handleLogout}
               onShare={b => setShareTarget(Array.isArray(b) ? b : [b])}
             />
-          : <AdminLogin onLogin={() => {}} />
+          : <AdminLogin
+              onLogin={() => {}}
+              adminError={adminError}
+              onClaimSuperAdmin={session ? handleSuperAdminClaim : null}
+            />
         : <PublicPortal
             brochures={brochures.filter(b => !b.deleted_at)}
             categories={categories}
