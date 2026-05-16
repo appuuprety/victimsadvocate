@@ -3,10 +3,14 @@ import { supabase } from '../supabaseClient'
 import { Btn, Field, Input, Spinner, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 
-export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswordUpdated, onCancelPasswordRecovery }) {
-  const [mode, setMode] = useState('signIn')
+export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswordUpdated, onCancelPasswordRecovery, adminError = '', onClaimSuperAdmin }) {
+  const [mode, setMode] = useState(() => new URLSearchParams(window.location.search).get('invite') ? 'register' : 'signIn')
   const [email, setEmail] = useState('')
   const [resetEmail, setResetEmail] = useState('')
+  const [registerEmail, setRegisterEmail] = useState('')
+  const [inviteToken, setInviteToken] = useState(() => new URLSearchParams(window.location.search).get('invite') || '')
+  const [registerPassword, setRegisterPassword] = useState('')
+  const [confirmRegisterPassword, setConfirmRegisterPassword] = useState('')
   const [password, setPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -54,6 +58,52 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
     setResetEmail('')
     setResetSent(false)
     clearStatus()
+  }
+
+  function openRegistration() {
+    setMode('register')
+    setRegisterEmail('')
+    setInviteToken(new URLSearchParams(window.location.search).get('invite') || '')
+    setRegisterPassword('')
+    setConfirmRegisterPassword('')
+    clearStatus()
+  }
+
+  function cancelRegistration() {
+    setMode('signIn')
+    setRegisterEmail('')
+    setInviteToken('')
+    setRegisterPassword('')
+    setConfirmRegisterPassword('')
+    clearStatus()
+  }
+
+  async function registerUser() {
+    if (!registerEmail || !inviteToken || !registerPassword || !confirmRegisterPassword) return setError('Invite token, email, and password are required.')
+    if (registerPassword.length < 6) return setError('Password must be at least 6 characters.')
+    if (registerPassword !== confirmRegisterPassword) return setError('Passwords do not match.')
+    setLoading(true)
+    clearStatus()
+    const { data, error: err } = await supabase.auth.signUp({
+      email: registerEmail,
+      password: registerPassword,
+      options: {
+        emailRedirectTo: `${window.location.origin}/admin?invite=${encodeURIComponent(inviteToken)}`,
+      },
+    })
+    setLoading(false)
+    if (err) return setError(err.message)
+
+    setRegisterPassword('')
+    setConfirmRegisterPassword('')
+    if (data.session) {
+      const { error: inviteError } = await supabase.rpc('accept_admin_invite', { invite_token: inviteToken })
+      if (inviteError) return setError(inviteError.message)
+      setNotice('Account created. You are signed in.')
+      onLogin()
+    } else {
+      setNotice('Account created. Check your email to confirm your account, then sign in from the invite link.')
+    }
   }
 
   async function updatePassword() {
@@ -172,6 +222,80 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
     </div>
   )
 
+  if (mode === 'register') return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0F2D5E, #1B4D8E)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: 'Georgia, serif',
+      padding: 16,
+      colorScheme: 'light',
+    }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      <div style={{ background: '#FFFFFF', borderRadius: 20, padding: 40, width: '100%', maxWidth: 380 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+            <div style={{ background: COLORS.primary, borderRadius: 50, padding: 10 }}>
+              <ColoradoLogo size={40} />
+            </div>
+          </div>
+          <h2 style={{ margin: 0, fontSize: 22, color: COLORS.primary }}>Accept Admin Invite</h2>
+          <p style={{ margin: '8px 0 0', color: COLORS.textMuted, fontSize: 14 }}>Use your invite token to register for admin access.</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <Field label="Invite Token">
+            <Input
+              value={inviteToken}
+              onChange={v => { setInviteToken(v); clearStatus() }}
+              placeholder="Paste invite token"
+              autoComplete="off"
+            />
+          </Field>
+          <Field label="Staff Email">
+            <Input
+              value={registerEmail}
+              onChange={v => { setRegisterEmail(v); clearStatus() }}
+              type="email"
+              placeholder="staff@example.org"
+              autoComplete="email"
+            />
+          </Field>
+          <Field label="Password">
+            <Input
+              value={registerPassword}
+              onChange={v => { setRegisterPassword(v); clearStatus() }}
+              type="password"
+              placeholder="Create password"
+              autoComplete="new-password"
+            />
+          </Field>
+          <Field label="Confirm Password">
+            <Input
+              value={confirmRegisterPassword}
+              onChange={v => { setConfirmRegisterPassword(v); clearStatus() }}
+              type="password"
+              placeholder="Confirm password"
+              autoComplete="new-password"
+            />
+          </Field>
+          {error && <p style={{ color: COLORS.danger, fontSize: 13, margin: 0 }}>{error}</p>}
+          {notice && <p style={{ color: COLORS.success, fontSize: 13, margin: 0 }}>{notice}</p>}
+          <Btn onClick={registerUser} disabled={loading} style={{ width: '100%', marginTop: 4 }}>
+            {loading
+              ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><Spinner />Creating…</span>
+              : 'Create Account from Invite'
+            }
+          </Btn>
+          <Btn variant="ghost" onClick={cancelRegistration} disabled={loading} style={{ width: '100%' }}>
+            Cancel
+          </Btn>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -240,7 +364,18 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
             </div>
           </Field>
           {error && <p style={{ color: COLORS.danger, fontSize: 13, margin: 0 }}>{error}</p>}
+          {adminError && <p style={{ color: COLORS.danger, fontSize: 13, margin: 0 }}>{adminError}</p>}
           {notice && <p style={{ color: COLORS.success, fontSize: 13, margin: 0 }}>{notice}</p>}
+          {onClaimSuperAdmin && (
+            <div style={{ background: '#FFF8DC', border: '1px solid #E8D48B', borderRadius: 12, padding: 12 }}>
+              <p style={{ color: COLORS.textSecondary, fontSize: 13, margin: '0 0 10px', lineHeight: 1.5 }}>
+                No approved admin profile is attached to this session. If this is the first admin account, claim the initial super admin role.
+              </p>
+              <Btn variant="warm" onClick={onClaimSuperAdmin} style={{ width: '100%' }}>
+                Claim Initial Super Admin
+              </Btn>
+            </div>
+          )}
           <Btn onClick={signIn} disabled={loading} style={{ width: '100%', marginTop: 4 }}>
             {loading
               ? <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><Spinner />Signing in…</span>
@@ -264,9 +399,26 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
           >
             Forgot your password?
           </button>
+          <button
+            type="button"
+            onClick={openRegistration}
+            disabled={loading}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: loading ? COLORS.textMuted : COLORS.primary,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontFamily: 'Georgia, serif',
+              fontSize: 13,
+              padding: 4,
+              textDecoration: 'underline',
+            }}
+          >
+            Accept an admin invite
+          </button>
         </div>
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: COLORS.textMuted }}>
-          Create accounts in Supabase → Authentication → Users
+          Staff access is managed through Supabase Authentication.
         </p>
       </div>
     </div>
