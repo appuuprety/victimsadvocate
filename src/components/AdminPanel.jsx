@@ -427,6 +427,13 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           background: #F4F7FB;
           border-color: #E2E8F0;
         }
+        .admin-drawer-row:focus-visible,
+        .admin-drawer-close:focus-visible,
+        .admin-menu-toggle:focus-visible,
+        .admin-signout-row:focus-visible {
+          outline: 3px solid #FFC726;
+          outline-offset: 2px;
+        }
         .admin-drawer-row.active {
           background: #E6F1FB;
           border-color: #C7DFF4;

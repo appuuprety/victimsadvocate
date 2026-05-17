@@ -8,11 +8,11 @@ import { T, CAT_LABELS, LANGS } from '../lib/translations'
 function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, setSearch, onSearchSubmit }) {
   const navGroups = [
     {
-      title: '',
+      title: 'Browse',
       items: [
-        ['home', t.nav_home],
-        ['resources', t.nav_resources],
-        ['contact', t.nav_contact],
+        ['home', t.nav_home, 'H'],
+        ['resources', t.nav_resources, 'R'],
+        ['contact', t.nav_contact, 'C'],
       ],
     },
   ]
@@ -42,7 +42,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0, 0, 0, .36)',
+          background: 'rgba(10, 24, 43, .38)',
           border: 'none',
           zIndex: 180,
           cursor: 'default',
@@ -55,163 +55,201 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           top: 0,
           right: 0,
           bottom: 0,
-          width: 'min(500px, 88vw)',
-          background: '#09251F',
+          width: 'min(390px, 88vw)',
+          background: '#FFFFFF',
           boxShadow: '-18px 0 42px rgba(9, 20, 38, .28)',
           zIndex: 190,
           display: 'flex',
           flexDirection: 'column',
-          color: '#FFFFFF',
+          color: '#1E293B',
         }}
       >
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           gap: 12,
-          padding: '24px 28px 12px',
+          padding: '18px 18px 14px',
+          borderBottom: '1px solid #E8E6DE',
+          background: '#F7F8FA',
         }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <ColoradoLogo size={42} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 700, color: '#0F2D5E' }}>Colorado Victim Resources</div>
+              <div style={{ color: '#475569', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {t.tagline}
+              </div>
+            </div>
+          </div>
           <button
             type="button"
             aria-label="Close menu"
             onClick={onClose}
+            className="public-drawer-close"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              border: 'none',
-              background: 'transparent',
-              color: '#FFFFFF',
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              border: '1px solid #D8D5CB',
+              background: '#fff',
+              color: '#1B3A6B',
               cursor: 'pointer',
-              fontSize: 22,
-              fontWeight: 700,
-              fontFamily: 'Georgia, serif',
+              fontSize: 20,
+              flex: '0 0 auto',
             }}
           >
-            <span aria-hidden="true" style={{ fontSize: 34, lineHeight: 1, fontWeight: 300 }}>×</span>
-            Close
+            ×
           </button>
         </div>
 
-        <div style={{ padding: '24px 32px 28px', overflow: 'auto', flex: 1 }}>
-          <form onSubmit={submitMenuSearch} style={{ position: 'relative', marginBottom: 32 }}>
-            <input
-              value={search}
-              onChange={event => setSearch(event.target.value)}
-              placeholder="Search ..."
-              aria-label="Search resources"
-              style={{
-                width: '100%',
-                height: 74,
-                border: 'none',
-                borderRadius: 0,
-                background: '#FFFFFF',
-                color: '#1F2933',
-                fontSize: 34,
-                fontFamily: 'Georgia, serif',
-                padding: '0 72px 0 22px',
-                outline: 'none',
-              }}
-            />
-            <button
-              type="submit"
-              aria-label="Search"
-              style={{
-                position: 'absolute',
-                right: 16,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                border: 'none',
-                background: 'transparent',
-                color: '#111111',
-                fontSize: 36,
-                cursor: 'pointer',
-              }}
-            >
-              ⌕
-            </button>
-          </form>
-
+        <div style={{ padding: 14, overflow: 'auto', flex: 1 }}>
           {navGroups.map(group => (
             <div key={group.title} style={{ padding: '8px 0 14px' }}>
-              {group.title && (
-                <div style={{
-                  color: 'rgba(255,255,255,.72)',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: '.06em',
-                  textTransform: 'uppercase',
-                  padding: '0 0 8px',
-                }}>
-                  {group.title}
-                </div>
-              )}
-              {group.items.map(([id, label]) => (
+              <div style={{
+                color: '#64748B',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '.06em',
+                textTransform: 'uppercase',
+                padding: '0 8px 8px',
+              }}>
+                {group.title}
+              </div>
+              {group.items.map(([id, label, icon]) => (
                 <button
                   key={id}
                   type="button"
                   onClick={() => goPage(id)}
+                  className={`public-drawer-row${page === id ? ' active' : ''}`}
                   style={{
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    border: 'none',
-                    borderRadius: 0,
-                    background: 'transparent',
-                    padding: '12px 0',
-                    color: '#FFFFFF',
+                    gap: 12,
+                    border: page === id ? '1px solid #C7DFF4' : '1px solid transparent',
+                    borderRadius: 8,
+                    background: page === id ? '#E6F1FB' : 'transparent',
+                    padding: '10px',
+                    color: page === id ? '#0F2D5E' : '#1E293B',
                     fontFamily: 'Georgia, serif',
-                    fontSize: 24,
-                    fontWeight: page === id ? 700 : 500,
-                    textTransform: 'uppercase',
+                    fontSize: 15,
+                    fontWeight: 600,
                     textAlign: 'left',
                     cursor: 'pointer',
                   }}
                 >
+                  <span aria-hidden="true" style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: page === id ? '#1B4D8E' : '#EEF2F7',
+                    color: page === id ? '#fff' : '#1B4D8E',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    flex: '0 0 auto',
+                  }}>{icon}</span>
                   <span>{label}</span>
                 </button>
               ))}
             </div>
           ))}
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,.72)', marginTop: 20, padding: '28px 0 14px' }}>
+          <div style={{ padding: '8px 0 14px' }}>
             <div style={{
-              color: '#FFFFFF',
-              fontSize: 22,
+              color: '#64748B',
+              fontSize: 11,
               fontWeight: 700,
+              letterSpacing: '.06em',
               textTransform: 'uppercase',
-              marginBottom: 18,
+              padding: '0 8px 8px',
+            }}>
+              Find Resources
+            </div>
+            <form onSubmit={submitMenuSearch} style={{ position: 'relative', padding: '0 8px' }}>
+              <input
+                value={search}
+                onChange={event => setSearch(event.target.value)}
+                placeholder={t.search_placeholder}
+                aria-label="Search resources"
+                style={{
+                  width: '100%',
+                  minHeight: 44,
+                  border: '1px solid #D8D5CB',
+                  borderRadius: 8,
+                  background: '#FFFFFF',
+                  color: '#1F2933',
+                  fontSize: 15,
+                  fontFamily: 'Georgia, serif',
+                  padding: '10px 44px 10px 12px',
+                  outline: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                aria-label="Search resources"
+                className="public-search-submit"
+                style={{
+                  position: 'absolute',
+                  right: 14,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 32,
+                  height: 32,
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#0F2D5E',
+                  fontSize: 20,
+                  cursor: 'pointer',
+                }}
+              >
+                ⌕
+              </button>
+            </form>
+          </div>
+
+          <div style={{ padding: '8px 0 14px' }}>
+            <div style={{
+              color: '#64748B',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '.06em',
+              textTransform: 'uppercase',
+              padding: '0 8px 8px',
             }}>
               Display
             </div>
-            <div style={{ marginBottom: 18 }}>
-              <TextSizeToggle compact tone="menu" />
+            <div style={{ padding: '0 8px 12px' }}>
+              <TextSizeToggle compact tone="light" />
             </div>
-            <div>
-              <label style={{ display: 'block', color: '#FFFFFF', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+            <div style={{ padding: '0 8px' }}>
+              <label style={{ display: 'block', color: '#64748B', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
                 Language
               </label>
               <select
                 value={lang}
                 onChange={e => setLang(e.target.value)}
                 aria-label="Select language"
-                style={{
-                  width: '100%',
-                  padding: '14px 42px 14px 14px',
-                  borderRadius: 0,
-                  background: '#FFFFFF',
-                  color: '#1F2933',
-                  border: 'none',
-                  fontSize: 18,
-                  fontFamily: 'Georgia, serif',
-                  cursor: 'pointer',
-                  appearance: 'none',
-                  WebkitAppearance: 'none',
-                  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%231B3A6B' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 10px center',
-                }}
-              >
+              style={{
+                width: '100%',
+                padding: '10px 32px 10px 12px',
+                borderRadius: 8,
+                background: '#FFFFFF',
+                color: '#1F2933',
+                border: '1px solid #D8D5CB',
+                fontSize: 14,
+                fontFamily: 'Georgia, serif',
+                cursor: 'pointer',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%231B3A6B' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 10px center',
+              }}
+            >
                 {LANGS.map(l => (
                   <option key={l.code} value={l.code}>{l.label}</option>
                 ))}
@@ -220,21 +258,21 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,.72)', padding: '20px 32px 28px' }}>
+        <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA' }}>
           <button
             type="button"
             onClick={goAdmin}
+            className="public-admin-row"
             style={{
               width: '100%',
-              border: 'none',
-              borderRadius: 0,
-              background: 'transparent',
-              color: '#FFFFFF',
-              padding: 0,
+              border: '1px solid #C7DFF4',
+              borderRadius: 8,
+              background: '#E6F1FB',
+              color: '#0F2D5E',
+              padding: '10px 12px',
               fontFamily: 'Georgia, serif',
-              fontSize: 24,
+              fontSize: 14,
               fontWeight: 700,
-              textTransform: 'uppercase',
               textAlign: 'left',
               cursor: 'pointer',
             }}
@@ -463,6 +501,22 @@ export default function PublicPortal({ brochures, categories, onShare }) {
           font-weight: 600; text-decoration: none;
         }
         .skip-link:focus { left: 8px; }
+        .public-drawer-row:hover,
+        .public-admin-row:hover {
+          background: #F4F7FB !important;
+          border-color: #E2E8F0 !important;
+        }
+        .public-drawer-row.active:hover {
+          background: #E6F1FB !important;
+          border-color: #C7DFF4 !important;
+        }
+        .public-drawer-row:focus-visible,
+        .public-admin-row:focus-visible,
+        .public-drawer-close:focus-visible,
+        .public-search-submit:focus-visible {
+          outline: 3px solid #FFC726;
+          outline-offset: 2px;
+        }
       `}</style>
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
