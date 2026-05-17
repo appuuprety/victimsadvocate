@@ -21,6 +21,8 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [inviteRole, setInviteRole] = useState('admin')
   const [inviteLink, setInviteLink] = useState('')
   const [inviteError, setInviteError] = useState('')
+  const [inviteNotice, setInviteNotice] = useState('')
+  const [inviteSending, setInviteSending] = useState(false)
   const [editingStep, setEditingStep] = useState(null) // tutorial step being edited
   const [tutorialEditMode, setTutorialEditMode] = useState(false)
   const [completedSteps, setCompletedSteps] = useState(() => {
@@ -62,22 +64,43 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
 
   async function createInvite() {
     if (!inviteEmail.trim()) return setInviteError('Email is required.')
+    const email = inviteEmail.trim().toLowerCase()
+    const role = inviteRole
     setInviteError('')
+    setInviteNotice('')
     setInviteLink('')
+    setInviteSending(true)
     const token = makeInviteToken()
     const { data, error } = await supabase.from('admin_invites').insert({
-      email: inviteEmail.trim().toLowerCase(),
-      role: inviteRole,
+      email,
+      role,
       token,
       invited_by: adminProfile.user_id,
     }).select().single()
-    if (error) return setInviteError(error.message)
-    const link = `${window.location.origin}/admin?invite=${encodeURIComponent(token)}`
-    setInviteLink(link)
-    setInviteEmail('')
-    setInviteRole('admin')
-    setInvites(prev => [data, ...prev])
-    try { await navigator.clipboard.writeText(link) } catch {}
+    if (error) {
+      setInviteSending(false)
+      return setInviteError(error.message)
+    }
+    try {
+      const link = `${window.location.origin}/admin?invite=${encodeURIComponent(token)}`
+      setInviteLink(link)
+      setInviteEmail('')
+      setInviteRole('admin')
+      setInvites(prev => [data, ...prev])
+      try { await navigator.clipboard.writeText(link) } catch {}
+
+      const { error: sendError } = await supabase.functions.invoke('send-invite', {
+        body: { to: email, inviteLink: link, role },
+      })
+      if (sendError) {
+        setInviteNotice('Invite link created and copied, but the email could not be sent.')
+        setInviteError(`Email failed: ${sendError.message}`)
+        return
+      }
+      setInviteNotice('Invite email sent and link copied.')
+    } finally {
+      setInviteSending(false)
+    }
   }
 
   async function saveTutorialStep(step) {
@@ -468,12 +491,14 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                   <option value="super_admin">Super Admin</option>
                 </select>
               </Field>
-              <Btn onClick={createInvite}>Create Invite</Btn>
+              <Btn onClick={createInvite} disabled={inviteSending}>{inviteSending ? 'Sending...' : 'Create Invite'}</Btn>
             </div>
             {inviteError && <p style={{ color: COLORS.danger, fontSize: 13, marginBottom: 0 }}>{inviteError}</p>}
             {inviteLink && (
               <div style={{ marginTop: 16, background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 13, color: COLORS.success, fontWeight: 700, marginBottom: 6 }}>Invite link copied</div>
+                <div style={{ fontSize: 13, color: COLORS.success, fontWeight: 700, marginBottom: 6 }}>
+                  {inviteNotice || 'Invite link copied'}
+                </div>
                 <input readOnly value={inviteLink} style={{
                   width: '100%', padding: '9px 12px', borderRadius: 8,
                   border: '1.5px solid #C8E4D3', fontSize: 12,

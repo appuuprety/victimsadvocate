@@ -58,7 +58,7 @@ async function ensureCategory() {
   return data
 }
 
-async function createApprovedAdminUser() {
+async function createApprovedAdminUser(role = 'admin') {
   const suffix = randomUUID()
   const email = `e2e-${suffix}@example.com`
   const password = `Test-${suffix}!a1`
@@ -74,7 +74,7 @@ async function createApprovedAdminUser() {
   const { error: profileError } = await service.from('admin_profiles').insert({
     user_id: userId,
     email,
-    role: 'admin',
+    role,
     status: 'approved',
   })
   if (profileError) throw profileError
@@ -174,4 +174,37 @@ test('public share email function sends an email', async () => {
   const body = await response.json().catch(() => ({}))
   assert.equal(response.status, 200, JSON.stringify(body))
   assert.equal(body.success, true)
+})
+
+test('super admin can send an admin invite email', async () => {
+  const adminUser = await createApprovedAdminUser('super_admin')
+  const client = makeUserClient()
+
+  try {
+    const { data: signIn, error: signInError } = await client.auth.signInWithPassword({
+      email: adminUser.email,
+      password: adminUser.password,
+    })
+    assert.ifError(signInError)
+
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/send-invite`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        authorization: `Bearer ${signIn.session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: EMAIL_RECIPIENT,
+        inviteLink: `https://example.com/admin?invite=e2e-${randomUUID()}`,
+        role: 'admin',
+      }),
+    })
+
+    const body = await response.json().catch(() => ({}))
+    assert.equal(response.status, 200, JSON.stringify(body))
+    assert.equal(body.success, true)
+  } finally {
+    await cleanup({ userId: adminUser.userId })
+  }
 })
