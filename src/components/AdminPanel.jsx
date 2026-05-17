@@ -220,7 +220,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
     ['tutorial', '🎓 Tutorial'],
   ]
-  if (adminProfile?.role === 'super_admin') navItems.push(['users', 'Invites'])
+  navItems.push(['users', 'Invites'])
 
   return (
     <div style={{ fontFamily: 'Georgia, serif', background: '#FAFAF7', minHeight: '100vh', colorScheme: 'light' }}>
@@ -530,72 +530,83 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           />
         )}
 
-        {view === 'users' && adminProfile?.role === 'super_admin' && <>
+        {view === 'users' && <>
           <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Send Invites</h2>
-          <p style={{ color: COLORS.textMuted, marginTop: 0, marginBottom: 24, fontSize: 14 }}>
-            Send invite links for staff accounts. Only invited users can register for admin access.
-          </p>
-          <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 24, marginBottom: 24 }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.textPrimary }}>Send Invite</h3>
-            <div className="invite-form-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px auto', gap: 12, alignItems: 'end' }}>
-              <Field label="Staff Email">
-                <Input value={inviteEmail} onChange={setInviteEmail} type="email" placeholder="staff@example.org" />
-              </Field>
-              <Field label="Role">
-                <select
-                  value={inviteRole}
-                  onChange={e => setInviteRole(e.target.value)}
-                  style={{
-                    width: '100%', padding: '11px 14px', borderRadius: 12,
-                    border: `1.5px solid ${COLORS.border}`, fontSize: 15,
-                    fontFamily: 'Georgia, serif', background: '#FFFFFF', color: COLORS.textPrimary,
-                  }}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="super_admin">Super Admin</option>
-                </select>
-              </Field>
-              <Btn onClick={createInvite} disabled={inviteSending}>{inviteSending ? 'Sending...' : 'Send Invite'}</Btn>
-            </div>
-            {inviteError && <p style={{ color: COLORS.danger, fontSize: 13, marginBottom: 0 }}>{inviteError}</p>}
-            {inviteLink && (
-              <div style={{ marginTop: 16, background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 13, color: COLORS.success, fontWeight: 700, marginBottom: 6 }}>
-                  {inviteNotice || 'Invite link copied'}
-                </div>
-                <input readOnly value={inviteLink} style={{
-                  width: '100%', padding: '9px 12px', borderRadius: 8,
-                  border: '1.5px solid #C8E4D3', fontSize: 12,
-                  fontFamily: 'monospace', color: COLORS.textPrimary,
-                }} />
+          {adminProfile?.role !== 'super_admin' ? (
+            <div style={{ background: '#FFF8E8', border: '1px solid #E7C46A', borderRadius: 14, padding: 20, color: '#704E00' }}>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Super admin access required</div>
+              <div style={{ fontSize: 14, lineHeight: 1.6 }}>
+                Your current admin role is <strong>{adminProfile?.role || 'unknown'}</strong>. Only approved super admins can send invite links.
               </div>
-            )}
-          </div>
-
-          <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
-            {invites.length === 0
-              ? <div style={{ padding: 32, textAlign: 'center', color: COLORS.textMuted }}>No invites yet.</div>
-              : invites.map((invite, i) => (
-                <div key={invite.id} style={{
-                  padding: '14px 20px',
-                  borderBottom: i < invites.length - 1 ? '1px solid #F0EEE8' : 'none',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap',
-                }}>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.textPrimary }}>{invite.email}</div>
-                    <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>
-                      {invite.accepted_at ? `Accepted ${new Date(invite.accepted_at).toLocaleString()}` : `Expires ${new Date(invite.expires_at).toLocaleDateString()}`}
-                    </div>
-                  </div>
-                  <Badge
-                    label={invite.role === 'super_admin' ? 'Super Admin' : 'Admin'}
-                    color={invite.role === 'super_admin' ? '#8B5E0A' : COLORS.primary}
-                    bg={invite.role === 'super_admin' ? '#FDF3E3' : '#E6F1FB'}
-                  />
+            </div>
+          ) : (
+            <>
+              <p style={{ color: COLORS.textMuted, marginTop: 0, marginBottom: 24, fontSize: 14 }}>
+                Send invite links for staff accounts. Only invited users can register for admin access.
+              </p>
+              <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 24, marginBottom: 24 }}>
+                <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.textPrimary }}>Send Invite</h3>
+                <div className="invite-form-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px auto', gap: 12, alignItems: 'end' }}>
+                  <Field label="Staff Email">
+                    <Input value={inviteEmail} onChange={setInviteEmail} type="email" placeholder="staff@example.org" />
+                  </Field>
+                  <Field label="Role">
+                    <select
+                      value={inviteRole}
+                      onChange={e => setInviteRole(e.target.value)}
+                      style={{
+                        width: '100%', padding: '11px 14px', borderRadius: 12,
+                        border: `1.5px solid ${COLORS.border}`, fontSize: 15,
+                        fontFamily: 'Georgia, serif', background: '#FFFFFF', color: COLORS.textPrimary,
+                      }}
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="super_admin">Super Admin</option>
+                    </select>
+                  </Field>
+                  <Btn onClick={createInvite} disabled={inviteSending}>{inviteSending ? 'Sending...' : 'Send Invite'}</Btn>
                 </div>
-              ))
-            }
-          </div>
+                {inviteError && <p style={{ color: COLORS.danger, fontSize: 13, marginBottom: 0 }}>{inviteError}</p>}
+                {inviteLink && (
+                  <div style={{ marginTop: 16, background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 12, padding: 14 }}>
+                    <div style={{ fontSize: 13, color: COLORS.success, fontWeight: 700, marginBottom: 6 }}>
+                      {inviteNotice || 'Invite link copied'}
+                    </div>
+                    <input readOnly value={inviteLink} style={{
+                      width: '100%', padding: '9px 12px', borderRadius: 8,
+                      border: '1.5px solid #C8E4D3', fontSize: 12,
+                      fontFamily: 'monospace', color: COLORS.textPrimary,
+                    }} />
+                  </div>
+                )}
+              </div>
+
+              <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
+                {invites.length === 0
+                  ? <div style={{ padding: 32, textAlign: 'center', color: COLORS.textMuted }}>No invites yet.</div>
+                  : invites.map((invite, i) => (
+                    <div key={invite.id} style={{
+                      padding: '14px 20px',
+                      borderBottom: i < invites.length - 1 ? '1px solid #F0EEE8' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.textPrimary }}>{invite.email}</div>
+                        <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>
+                          {invite.accepted_at ? `Accepted ${new Date(invite.accepted_at).toLocaleString()}` : `Expires ${new Date(invite.expires_at).toLocaleDateString()}`}
+                        </div>
+                      </div>
+                      <Badge
+                        label={invite.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                        color={invite.role === 'super_admin' ? '#8B5E0A' : COLORS.primary}
+                        bg={invite.role === 'super_admin' ? '#FDF3E3' : '#E6F1FB'}
+                      />
+                    </div>
+                  ))
+                }
+              </div>
+            </>
+          )}
         </>}
       </div>
     </div>
