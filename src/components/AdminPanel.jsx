@@ -266,11 +266,9 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     shares: shareLogs.length,
   }
 
-  const primaryNavItems = [
+  const menuNavItems = [
     ['dashboard', 'Dashboard'],
     ['tutorial', 'Volunteer Resources'],
-  ]
-  const menuNavItems = [
     ['brochures', 'Brochures'],
     ['categories', 'Categories'],
     ['activity', 'Activity'],
@@ -342,17 +340,6 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           .admin-header-top { width: 100%; }
           .admin-brand { min-width: 0; }
           .admin-role-badge { display: none; }
-          .admin-nav {
-            display: flex !important;
-            width: 100%;
-            gap: 6px !important;
-            padding-bottom: 6px;
-          }
-          .admin-nav button {
-            width: 100%;
-            margin-left: 0 !important;
-            padding: 10px 12px !important;
-          }
           .admin-overflow-inner { padding: 10px 16px 14px; grid-template-columns: 1fr; }
           .admin-content { padding: 20px 16px !important; }
           .invite-form-grid { grid-template-columns: 1fr !important; }
@@ -384,17 +371,6 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                 {mobileNavOpen ? '×' : '☰'}
               </button>
             </div>
-          </div>
-          <div className="admin-nav" style={{ display: 'flex', gap: 4 }}>
-            {primaryNavItems.map(([id, label]) => (
-              <button key={id} onClick={() => { setView(id); setMobileNavOpen(false) }} style={{
-                background: view === id ? 'rgba(255,255,255,.15)' : 'transparent',
-                border: 'none', color: '#fff', padding: '6px 14px', borderRadius: 8,
-                fontSize: 13, fontWeight: view === id ? 600 : 400, cursor: 'pointer', fontFamily: 'Georgia, serif',
-              }}>
-                {label}
-              </button>
-            ))}
           </div>
         </div>
         {mobileNavOpen && (
@@ -907,12 +883,16 @@ function TutorialView({
   const guideSections = [...new Set(fieldGuideEntries.map(entry => entry.section || 'General'))]
   const selectedSection = activeFieldSection || guideSections[0] || ''
   const query = fieldGuideQuery.trim().toLowerCase()
-  const filteredGuideEntries = fieldGuideEntries.filter(entry => {
-    if (selectedSection && (entry.section || 'General') !== selectedSection) return false
+  const matchingGuideEntries = fieldGuideEntries.filter(entry => {
     if (!query) return true
     const tags = Array.isArray(entry.tags) ? entry.tags.join(' ') : ''
     return `${entry.section} ${entry.title} ${entry.body} ${tags}`.toLowerCase().includes(query)
   })
+  const entriesBySection = guideSections.map(section => ({
+    section,
+    entries: matchingGuideEntries.filter(entry => (entry.section || 'General') === section),
+  })).filter(group => group.entries.length > 0)
+  const filteredGuideEntries = matchingGuideEntries.filter(entry => (entry.section || 'General') === selectedSection)
   const activeFieldEntry = filteredGuideEntries.find(entry => entry.id === activeFieldEntryId) || filteredGuideEntries[0]
 
   return (
@@ -997,61 +977,61 @@ function TutorialView({
             <div style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #E8E6DE' }}>
               Table of Contents
             </div>
-            {guideSections.map(section => (
-              <button
-                key={section}
-                type="button"
-                onClick={() => { setActiveFieldSection(section); setActiveFieldEntryId('') }}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  display: 'block',
-                  padding: '11px 14px',
-                  border: 'none',
-                  borderBottom: '1px solid #E8E6DE',
-                  background: selectedSection === section ? '#E6F1FB' : 'transparent',
-                  color: selectedSection === section ? COLORS.primary : COLORS.textSecondary,
-                  fontFamily: 'Georgia, serif',
-                  fontWeight: selectedSection === section ? 700 : 500,
-                  cursor: 'pointer',
-                }}
-              >
-                {section}
-              </button>
+            {entriesBySection.length === 0 ? (
+              <div style={{ padding: 14, color: COLORS.textMuted, fontSize: 13 }}>No matching sections.</div>
+            ) : entriesBySection.map(({ section, entries }) => (
+              <div key={section} style={{ borderBottom: '1px solid #E8E6DE' }}>
+                <button
+                  type="button"
+                  onClick={() => { setActiveFieldSection(section); setActiveFieldEntryId(entries[0]?.id || '') }}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                    padding: '11px 14px',
+                    border: 'none',
+                    background: selectedSection === section ? '#E6F1FB' : 'transparent',
+                    color: selectedSection === section ? COLORS.primary : COLORS.textSecondary,
+                    fontFamily: 'Georgia, serif',
+                    fontWeight: selectedSection === section ? 700 : 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span>{section}</span>
+                  <span style={{ color: COLORS.textMuted, fontSize: 12 }}>{entries.length}</span>
+                </button>
+                {selectedSection === section && entries.length > 1 && (
+                  <div style={{ background: '#FFFFFF', borderTop: '1px solid #E8E6DE' }}>
+                    {entries.map(entry => (
+                      <button
+                        key={entry.id}
+                        type="button"
+                        onClick={() => setActiveFieldEntryId(entry.id)}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '9px 14px 9px 26px',
+                          border: 'none',
+                          borderBottom: '1px solid #F0EEE8',
+                          background: activeFieldEntry?.id === entry.id ? '#F7FBFF' : 'transparent',
+                          color: activeFieldEntry?.id === entry.id ? COLORS.primary : COLORS.textSecondary,
+                          fontFamily: 'Georgia, serif',
+                          fontSize: 13,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {entry.title}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </aside>
 
           <div style={{ minWidth: 0 }}>
-            <div style={{ border: '1px solid #E8E6DE', borderRadius: 12, background: '#FAFAF7', overflow: 'hidden', marginBottom: 12 }}>
-              {filteredGuideEntries.length === 0 ? (
-                <div style={{ padding: 24, textAlign: 'center', color: COLORS.textMuted }}>
-                  No field guide entries found.
-                </div>
-              ) : filteredGuideEntries.map((entry, index) => (
-                <button
-                  key={entry.id}
-                  type="button"
-                  onClick={() => setActiveFieldEntryId(entry.id)}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '12px 14px',
-                    border: 'none',
-                    borderBottom: index < filteredGuideEntries.length - 1 ? '1px solid #E8E6DE' : 'none',
-                    background: activeFieldEntry?.id === entry.id ? '#FFFFFF' : 'transparent',
-                    color: COLORS.textPrimary,
-                    fontFamily: 'Georgia, serif',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div style={{ fontWeight: 700, fontSize: 14 }}>{entry.title}</div>
-                  {Array.isArray(entry.tags) && entry.tags.length > 0 && (
-                    <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 3 }}>{entry.tags.slice(0, 4).join(', ')}</div>
-                  )}
-                </button>
-              ))}
-            </div>
-
             {activeFieldEntry && (
               <article style={{ border: '1px solid #E8E6DE', borderRadius: 12, padding: 18, background: '#FFFFFF' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.primary, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
