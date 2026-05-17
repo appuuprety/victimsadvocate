@@ -104,6 +104,59 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
         </div>
 
         <div style={{ padding: 14, overflow: 'auto', flex: 1 }}>
+          <div style={{ padding: '8px 0 18px' }}>
+            <div style={{
+              color: '#64748B',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '.06em',
+              textTransform: 'uppercase',
+              padding: '0 8px 8px',
+            }}>
+              Find Resources
+            </div>
+            <form onSubmit={submitMenuSearch} style={{ position: 'relative', padding: '0 8px' }}>
+              <input
+                value={search}
+                onChange={event => setSearch(event.target.value)}
+                placeholder={t.search_placeholder}
+                aria-label="Search resources"
+                style={{
+                  width: '100%',
+                  minHeight: 44,
+                  border: '1px solid #D8D5CB',
+                  borderRadius: 8,
+                  background: '#FFFFFF',
+                  color: '#1F2933',
+                  fontSize: 15,
+                  fontFamily: 'Georgia, serif',
+                  padding: '10px 44px 10px 12px',
+                  outline: 'none',
+                }}
+              />
+              <button
+                type="submit"
+                aria-label="Search resources"
+                className="public-search-submit"
+                style={{
+                  position: 'absolute',
+                  right: 14,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 32,
+                  height: 32,
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#0F2D5E',
+                  fontSize: 20,
+                  cursor: 'pointer',
+                }}
+              >
+                ⌕
+              </button>
+            </form>
+          </div>
+
           {navGroups.map(group => (
             <div key={group.title} style={{ padding: '8px 0 14px' }}>
               <div style={{
@@ -157,108 +210,37 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
               ))}
             </div>
           ))}
+        </div>
 
-          <div style={{ padding: '8px 0 14px' }}>
-            <div style={{
-              color: '#64748B',
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '.06em',
-              textTransform: 'uppercase',
-              padding: '0 8px 8px',
-            }}>
-              Find Resources
-            </div>
-            <form onSubmit={submitMenuSearch} style={{ position: 'relative', padding: '0 8px' }}>
-              <input
-                value={search}
-                onChange={event => setSearch(event.target.value)}
-                placeholder={t.search_placeholder}
-                aria-label="Search resources"
-                style={{
-                  width: '100%',
-                  minHeight: 44,
-                  border: '1px solid #D8D5CB',
-                  borderRadius: 8,
-                  background: '#FFFFFF',
-                  color: '#1F2933',
-                  fontSize: 15,
-                  fontFamily: 'Georgia, serif',
-                  padding: '10px 44px 10px 12px',
-                  outline: 'none',
-                }}
-              />
-              <button
-                type="submit"
-                aria-label="Search resources"
-                className="public-search-submit"
-                style={{
-                  position: 'absolute',
-                  right: 14,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 32,
-                  height: 32,
-                  border: 'none',
-                  background: 'transparent',
-                  color: '#0F2D5E',
-                  fontSize: 20,
-                  cursor: 'pointer',
-                }}
-              >
-                ⌕
-              </button>
-            </form>
-          </div>
-
-          <div style={{ padding: '8px 0 14px' }}>
-            <div style={{
-              color: '#64748B',
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '.06em',
-              textTransform: 'uppercase',
-              padding: '0 8px 8px',
-            }}>
-              Display
-            </div>
-            <div style={{ padding: '0 8px 12px' }}>
-              <TextSizeToggle compact tone="light" />
-            </div>
-            <div style={{ padding: '0 8px' }}>
-              <label style={{ display: 'block', color: '#64748B', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
-                Language
-              </label>
-              <select
-                value={lang}
-                onChange={e => setLang(e.target.value)}
-                aria-label="Select language"
+        <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA', display: 'grid', gap: 10 }}>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, color: '#64748B', fontSize: 12, fontWeight: 700 }}>
+            Language
+            <select
+              value={lang}
+              onChange={e => setLang(e.target.value)}
+              aria-label="Select language"
               style={{
-                width: '100%',
-                padding: '10px 32px 10px 12px',
+                width: 132,
+                padding: '7px 28px 7px 10px',
                 borderRadius: 8,
                 background: '#FFFFFF',
                 color: '#1F2933',
                 border: '1px solid #D8D5CB',
-                fontSize: 14,
+                fontSize: 13,
                 fontFamily: 'Georgia, serif',
                 cursor: 'pointer',
                 appearance: 'none',
                 WebkitAppearance: 'none',
                 backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%231B3A6B' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
                 backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 10px center',
+                backgroundPosition: 'right 9px center',
               }}
             >
-                {LANGS.map(l => (
-                  <option key={l.code} value={l.code}>{l.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA' }}>
+              {LANGS.map(l => (
+                <option key={l.code} value={l.code}>{l.label}</option>
+              ))}
+            </select>
+          </label>
           <button
             type="button"
             onClick={goAdmin}
@@ -290,7 +272,7 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
 
   return (
     <header style={{
-      background: '#FFFFFF',
+      background: '#F3F8FD',
       position: 'sticky',
       top: 0,
       zIndex: 100,
@@ -312,20 +294,22 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
             </div>
           </div>
         </div>
-        {/* Right side: hamburger only */}
-        <button
-          onClick={() => setOpen(!open)}
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid #D8D5CB', borderRadius: 8, color: '#0F2D5E', cursor: 'pointer',
-            fontSize: 20, width: 40, height: 40, flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            WebkitTapHighlightColor: 'transparent',
-          }}>
-          <span aria-hidden="true">{open ? '✕' : '☰'}</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <TextSizeToggle compact tone="light" />
+          <button
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #D8D5CB', borderRadius: 8, color: '#0F2D5E', cursor: 'pointer',
+              fontSize: 20, width: 40, height: 40, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              WebkitTapHighlightColor: 'transparent',
+            }}>
+            <span aria-hidden="true">{open ? '✕' : '☰'}</span>
+          </button>
+        </div>
       </div>
       {open && (
         <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} search={search} setSearch={setSearch} onSearchSubmit={doSearch} />
@@ -349,6 +333,7 @@ function TextSizeToggle({ compact, tone = 'dark' }) {
         <button
           key={key}
           onClick={() => setSize(key)}
+          className="public-header-control"
           aria-label={label}
           aria-pressed={size === key}
           style={{
@@ -370,7 +355,7 @@ function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSear
   const [open, setOpen] = useState(false)
 
   return (
-    <header style={{ background: '#FFFFFF', padding: '0 32px', borderBottom: '1px solid #E8E6DE' }}>
+    <header style={{ background: '#F3F8FD', padding: '0 32px', borderBottom: '1px solid #D8E6F2' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 68 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }} onClick={() => setPage('home')}>
           <ColoradoLogo size={44} />
@@ -379,26 +364,29 @@ function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSear
             <div style={{ color: '#667085', fontSize: 11 }}>{t.tagline}</div>
           </div>
         </div>
-        <button
-          onClick={() => setOpen(!open)}
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid #D8D5CB',
-            borderRadius: 8,
-            color: '#0F2D5E',
-            cursor: 'pointer',
-            fontSize: 20,
-            width: 42,
-            height: 40,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <span aria-hidden="true">{open ? '✕' : '☰'}</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <TextSizeToggle compact tone="light" />
+          <button
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #D8D5CB',
+              borderRadius: 8,
+              color: '#0F2D5E',
+              cursor: 'pointer',
+              fontSize: 20,
+              width: 42,
+              height: 40,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span aria-hidden="true">{open ? '✕' : '☰'}</span>
+          </button>
+        </div>
       </div>
       {open && (
         <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} search={search} setSearch={setSearch} onSearchSubmit={doSearch} />
@@ -490,7 +478,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const px = isMobile ? 16 : 32
 
   return (
-    <div style={{ fontFamily: 'Georgia, serif', background: '#FFFFFF', minHeight: '100vh', colorScheme: 'light' }}>
+    <div style={{ fontFamily: 'Georgia, serif', background: '#F4F8FC', minHeight: '100vh', colorScheme: 'light' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         ::placeholder { color: rgba(31,41,51,0.55) !important; }
@@ -513,7 +501,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         .public-drawer-row:focus-visible,
         .public-admin-row:focus-visible,
         .public-drawer-close:focus-visible,
-        .public-search-submit:focus-visible {
+        .public-search-submit:focus-visible,
+        .public-header-control:focus-visible {
           outline: 3px solid #FFC726;
           outline-offset: 2px;
         }
@@ -529,9 +518,9 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       {page === 'home' && <main id="main-content" aria-label="Home">
         {/* Hero */}
         <section style={{
-          background: '#FFFFFF',
+          background: 'linear-gradient(180deg, #EAF4FF 0%, #F7FBFF 58%, #FFFFFF 100%)',
           padding: isMobile ? '48px 16px 40px' : '72px 32px 64px',
-          borderBottom: '1px solid #E8E6DE',
+          borderBottom: '1px solid #D8E6F2',
         }}>
           <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
             <div style={{
@@ -615,7 +604,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         </div>
 
         {/* Categories */}
-        <section style={{ padding: `${isMobile ? 36 : 56}px ${px}px`, maxWidth: 1100, margin: '0 auto' }}>
+        <section style={{ padding: `${isMobile ? 36 : 56}px ${px}px`, maxWidth: 1100, margin: '0 auto', background: '#FFFFFF' }}>
           <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.categories}</h2>
           <p style={{ color: COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.categories_sub}</p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(190px, 1fr))', gap: 12 }}>
@@ -649,7 +638,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
         {/* Featured */}
         {brochures.filter(b => b.featured).length > 0 && (
-          <section style={{ padding: `0 ${px}px ${isMobile ? 40 : 56}px`, maxWidth: 1100, margin: '0 auto' }}>
+          <section style={{ padding: `0 ${px}px ${isMobile ? 40 : 56}px`, maxWidth: 1100, margin: '0 auto', background: '#FFFFFF' }}>
             <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.featured}</h2>
             <p style={{ color: COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.featured_sub}</p>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
@@ -663,7 +652,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
       {/* ─── RESOURCES ─── */}
       {page === 'resources' && (
-        <main id="main-content" aria-label="Resources" style={{ maxWidth: 1100, margin: '0 auto', padding: `32px ${px}px` }}>
+        <main id="main-content" aria-label="Resources" style={{ maxWidth: 1100, margin: '0 auto', padding: `32px ${px}px`, background: '#FFFFFF' }}>
           <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.all_resources}</h2>
           <p style={{ color: COLORS.textSecondary, margin: '0 0 20px' }}>{t.resources_label(filtered.length)}</p>
 
@@ -746,7 +735,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
       {/* ─── CONTACT ─── */}
       {page === 'contact' && (
-        <main id="main-content" aria-label="Contact" style={{ maxWidth: 800, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${px}px` }}>
+        <main id="main-content" aria-label="Contact" style={{ maxWidth: 800, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${px}px`, background: '#FFFFFF' }}>
           <h2 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Victim Services</h2>
           <p style={{ color: COLORS.textSecondary, margin: '0 0 32px', fontSize: 16, lineHeight: 1.7 }}>
             Services are available seven days a week, 24 hours a day.
