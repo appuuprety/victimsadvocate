@@ -5,14 +5,14 @@ import BrochureCard from './BrochureCard'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS, LANGS } from '../lib/translations'
 
-function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
+function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, setSearch, onSearchSubmit }) {
   const navGroups = [
     {
-      title: 'Main',
+      title: '',
       items: [
-        ['home', t.nav_home, 'H'],
-        ['resources', t.nav_resources, 'R'],
-        ['contact', t.nav_contact, 'C'],
+        ['home', t.nav_home],
+        ['resources', t.nav_resources],
+        ['contact', t.nav_contact],
       ],
     },
   ]
@@ -27,6 +27,12 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
     window.location.assign('/admin')
   }
 
+  function submitMenuSearch(event) {
+    event.preventDefault()
+    onSearchSubmit()
+    onClose()
+  }
+
   return (
     <>
       <button
@@ -36,7 +42,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(10, 24, 43, .38)',
+          background: 'rgba(0, 0, 0, .36)',
           border: 'none',
           zIndex: 180,
           cursor: 'default',
@@ -49,67 +55,98 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
           top: 0,
           right: 0,
           bottom: 0,
-          width: 'min(390px, 88vw)',
-          background: '#FFFFFF',
+          width: 'min(500px, 88vw)',
+          background: '#09251F',
           boxShadow: '-18px 0 42px rgba(9, 20, 38, .28)',
           zIndex: 190,
           display: 'flex',
           flexDirection: 'column',
-          color: '#1E293B',
+          color: '#FFFFFF',
         }}
       >
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           gap: 12,
-          padding: '18px 18px 14px',
-          borderBottom: '1px solid #E8E6DE',
-          background: '#F7F8FA',
+          padding: '24px 28px 12px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-            <ColoradoLogo size={42} />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 700, color: '#0F2D5E' }}>Colorado Victim Resources</div>
-              <div style={{ color: '#475569', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {t.tagline}
-              </div>
-            </div>
-          </div>
           <button
             type="button"
             aria-label="Close menu"
             onClick={onClose}
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 8,
-              border: '1px solid #D8D5CB',
-              background: '#fff',
-              color: '#1B3A6B',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 10,
+              border: 'none',
+              background: 'transparent',
+              color: '#FFFFFF',
               cursor: 'pointer',
-              fontSize: 20,
-              flex: '0 0 auto',
+              fontSize: 22,
+              fontWeight: 700,
+              fontFamily: 'Georgia, serif',
             }}
           >
-            ×
+            <span aria-hidden="true" style={{ fontSize: 34, lineHeight: 1, fontWeight: 300 }}>×</span>
+            Close
           </button>
         </div>
 
-        <div style={{ padding: 14, overflow: 'auto', flex: 1 }}>
+        <div style={{ padding: '24px 32px 28px', overflow: 'auto', flex: 1 }}>
+          <form onSubmit={submitMenuSearch} style={{ position: 'relative', marginBottom: 32 }}>
+            <input
+              value={search}
+              onChange={event => setSearch(event.target.value)}
+              placeholder="Search ..."
+              aria-label="Search resources"
+              style={{
+                width: '100%',
+                height: 74,
+                border: 'none',
+                borderRadius: 0,
+                background: '#FFFFFF',
+                color: '#1F2933',
+                fontSize: 34,
+                fontFamily: 'Georgia, serif',
+                padding: '0 72px 0 22px',
+                outline: 'none',
+              }}
+            />
+            <button
+              type="submit"
+              aria-label="Search"
+              style={{
+                position: 'absolute',
+                right: 16,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                border: 'none',
+                background: 'transparent',
+                color: '#111111',
+                fontSize: 36,
+                cursor: 'pointer',
+              }}
+            >
+              ⌕
+            </button>
+          </form>
+
           {navGroups.map(group => (
             <div key={group.title} style={{ padding: '8px 0 14px' }}>
-              <div style={{
-                color: '#64748B',
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '.06em',
-                textTransform: 'uppercase',
-                padding: '0 8px 8px',
-              }}>
-                {group.title}
-              </div>
-              {group.items.map(([id, label, icon]) => (
+              {group.title && (
+                <div style={{
+                  color: 'rgba(255,255,255,.72)',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '.06em',
+                  textTransform: 'uppercase',
+                  padding: '0 0 8px',
+                }}>
+                  {group.title}
+                </div>
+              )}
+              {group.items.map(([id, label]) => (
                 <button
                   key={id}
                   type="button"
@@ -118,54 +155,40 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 12,
-                    border: page === id ? '1px solid #C7DFF4' : '1px solid transparent',
-                    borderRadius: 8,
-                    background: page === id ? '#E6F1FB' : 'transparent',
-                    padding: '10px',
-                    color: page === id ? '#0F2D5E' : '#1E293B',
+                    border: 'none',
+                    borderRadius: 0,
+                    background: 'transparent',
+                    padding: '12px 0',
+                    color: '#FFFFFF',
                     fontFamily: 'Georgia, serif',
-                    fontSize: 14,
-                    fontWeight: 600,
+                    fontSize: 24,
+                    fontWeight: page === id ? 700 : 500,
+                    textTransform: 'uppercase',
                     textAlign: 'left',
                     cursor: 'pointer',
                   }}
                 >
-                  <span aria-hidden="true" style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: page === id ? '#1B4D8E' : '#EEF2F7',
-                    color: page === id ? '#fff' : '#1B4D8E',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    flex: '0 0 auto',
-                  }}>{icon}</span>
                   <span>{label}</span>
                 </button>
               ))}
             </div>
           ))}
 
-          <div style={{ padding: '8px 0 14px' }}>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,.72)', marginTop: 20, padding: '28px 0 14px' }}>
             <div style={{
-              color: '#64748B',
-              fontSize: 11,
+              color: '#FFFFFF',
+              fontSize: 22,
               fontWeight: 700,
-              letterSpacing: '.06em',
               textTransform: 'uppercase',
-              padding: '0 8px 8px',
+              marginBottom: 18,
             }}>
               Display
             </div>
-            <div style={{ padding: '0 8px 12px' }}>
-              <TextSizeToggle compact tone="light" />
+            <div style={{ marginBottom: 18 }}>
+              <TextSizeToggle compact tone="menu" />
             </div>
-            <div style={{ padding: '0 8px' }}>
-              <label style={{ display: 'block', color: '#64748B', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
+            <div>
+              <label style={{ display: 'block', color: '#FFFFFF', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
                 Language
               </label>
               <select
@@ -174,12 +197,12 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
                 aria-label="Select language"
                 style={{
                   width: '100%',
-                  padding: '10px 32px 10px 12px',
-                  borderRadius: 8,
+                  padding: '14px 42px 14px 14px',
+                  borderRadius: 0,
                   background: '#FFFFFF',
-                  color: '#1E293B',
-                  border: '1px solid #D8D5CB',
-                  fontSize: 14,
+                  color: '#1F2933',
+                  border: 'none',
+                  fontSize: 18,
                   fontFamily: 'Georgia, serif',
                   cursor: 'pointer',
                   appearance: 'none',
@@ -197,20 +220,21 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA' }}>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,.72)', padding: '20px 32px 28px' }}>
           <button
             type="button"
             onClick={goAdmin}
             style={{
               width: '100%',
-              border: '1px solid #C7DFF4',
-              borderRadius: 8,
-              background: '#E6F1FB',
-              color: '#0F2D5E',
-              padding: '10px 12px',
+              border: 'none',
+              borderRadius: 0,
+              background: 'transparent',
+              color: '#FFFFFF',
+              padding: 0,
               fontFamily: 'Georgia, serif',
-              fontSize: 14,
+              fontSize: 24,
               fontWeight: 700,
+              textTransform: 'uppercase',
               textAlign: 'left',
               cursor: 'pointer',
             }}
@@ -223,15 +247,16 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
   )
 }
 
-function MobileNav({ page, setPage, lang, setLang, t }) {
+function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearch }) {
   const [open, setOpen] = useState(false)
 
   return (
     <header style={{
-      background: 'linear-gradient(135deg, #1B3A6B 0%, #1B4D8E 100%)',
+      background: '#FFFFFF',
       position: 'sticky',
       top: 0,
       zIndex: 100,
+      borderBottom: '1px solid #E8E6DE',
     }}>
       <div style={{
         display: 'flex',
@@ -244,7 +269,7 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', minWidth: 0, flex: 1 }} onClick={() => { setPage('home'); setOpen(false) }}>
           <ColoradoLogo size={32} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Colorado Victim Resources
             </div>
           </div>
@@ -255,8 +280,8 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer',
+            background: '#FFFFFF',
+            border: '1px solid #D8D5CB', borderRadius: 8, color: '#0F2D5E', cursor: 'pointer',
             fontSize: 20, width: 40, height: 40, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             WebkitTapHighlightColor: 'transparent',
@@ -265,7 +290,7 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
         </button>
       </div>
       {open && (
-        <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} />
+        <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} search={search} setSearch={setSearch} onSearchSubmit={doSearch} />
       )}
     </header>
   )
@@ -275,10 +300,11 @@ function TextSizeToggle({ compact, tone = 'dark' }) {
   const [size, setSize] = useTextSize()
   const sizes = [['sm', 'A', 13, 'Default text size'], ['lg', 'A', 18, 'Larger text']]
   const light = tone === 'light'
+  const menu = tone === 'menu'
   return (
     <div role="group" aria-label="Text size" style={{
       display: 'inline-flex', borderRadius: 8, overflow: 'hidden',
-      border: light ? '1px solid #D8D5CB' : '1px solid rgba(255,255,255,.3)',
+      border: light ? '1px solid #D8D5CB' : menu ? '1px solid rgba(255,255,255,.65)' : '1px solid rgba(255,255,255,.3)',
       marginLeft: compact ? 0 : 8,
     }}>
       {sizes.map(([key, letter, fs, label]) => (
@@ -289,7 +315,7 @@ function TextSizeToggle({ compact, tone = 'dark' }) {
           aria-pressed={size === key}
           style={{
             padding: compact ? '6px 12px' : '6px 14px',
-            background: size === key ? (light ? '#E6F1FB' : 'rgba(255,255,255,.25)') : 'transparent',
+            background: size === key ? (light ? '#E6F1FB' : menu ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.25)') : 'transparent',
             border: 'none', color: light ? '#0F2D5E' : '#fff', cursor: 'pointer',
             fontFamily: 'Georgia, serif', fontWeight: size === key ? 700 : 400,
             fontSize: fs, lineHeight: 1, minHeight: compact ? 32 : 36,
@@ -302,17 +328,17 @@ function TextSizeToggle({ compact, tone = 'dark' }) {
   )
 }
 
-function DesktopNav({ page, setPage, lang, setLang, t }) {
+function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSearch }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <header style={{ background: 'linear-gradient(135deg, #1B3A6B 0%, #1B4D8E 100%)', padding: '0 32px' }}>
+    <header style={{ background: '#FFFFFF', padding: '0 32px', borderBottom: '1px solid #E8E6DE' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 68 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }} onClick={() => setPage('home')}>
           <ColoradoLogo size={44} />
           <div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 17 }}>Colorado Victim Resources</div>
-            <div style={{ color: 'rgba(255,255,255,.65)', fontSize: 11 }}>{t.tagline}</div>
+            <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 17 }}>Colorado Victim Resources</div>
+            <div style={{ color: '#667085', fontSize: 11 }}>{t.tagline}</div>
           </div>
         </div>
         <button
@@ -320,10 +346,10 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,.28)',
+            background: '#FFFFFF',
+            border: '1px solid #D8D5CB',
             borderRadius: 8,
-            color: '#fff',
+            color: '#0F2D5E',
             cursor: 'pointer',
             fontSize: 20,
             width: 42,
@@ -337,7 +363,7 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
         </button>
       </div>
       {open && (
-        <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} />
+        <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} search={search} setSearch={setSearch} onSearchSubmit={doSearch} />
       )}
     </header>
   )
@@ -348,8 +374,8 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
     <div style={{ position: 'relative', width: '100%' }}>
       <span aria-hidden="true" style={{
         position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
-        fontSize: 16, pointerEvents: 'none',
-      }}>🔍</span>
+        fontSize: 22, pointerEvents: 'none', color: '#111111',
+      }}>⌕</span>
       <input
         aria-label="Search resources"
         role="searchbox"
@@ -362,18 +388,18 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
         style={{
           width: '100%',
           padding: '14px 14px 14px 42px',
-          borderRadius: 14,
-          border: '2px solid rgba(255,255,255,0.3)',
+          borderRadius: 0,
+          border: '1px solid #D8D5CB',
           fontSize: 16,
           fontFamily: 'Georgia, serif',
-          background: 'rgba(255,255,255,0.15)',
-          color: '#fff',
+          background: '#FFFFFF',
+          color: '#1F2933',
           outline: 'none',
           boxSizing: 'border-box',
           WebkitAppearance: 'none',
         }}
-        onFocus={e => { e.target.style.background = 'rgba(255,255,255,0.22)'; e.target.style.borderColor = 'rgba(255,255,255,0.6)' }}
-        onBlur={e => { e.target.style.background = 'rgba(255,255,255,0.15)'; e.target.style.borderColor = 'rgba(255,255,255,0.3)' }}
+        onFocus={e => { e.target.style.borderColor = '#0F2D5E' }}
+        onBlur={e => { e.target.style.borderColor = '#D8D5CB' }}
       />
     </div>
   )
@@ -426,10 +452,10 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const px = isMobile ? 16 : 32
 
   return (
-    <div style={{ fontFamily: 'Georgia, serif', background: '#FAFAF7', minHeight: '100vh', colorScheme: 'light' }}>
+    <div style={{ fontFamily: 'Georgia, serif', background: '#FFFFFF', minHeight: '100vh', colorScheme: 'light' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
-        ::placeholder { color: rgba(255,255,255,0.6) !important; }
+        ::placeholder { color: rgba(31,41,51,0.55) !important; }
         * { box-sizing: border-box; }
         .skip-link {
           position: absolute; left: -9999px; top: 8px; z-index: 9999;
@@ -441,25 +467,27 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       <a href="#main-content" className="skip-link">Skip to main content</a>
 
       {isMobile
-        ? <MobileNav page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} />
-        : <DesktopNav page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} />
+        ? <MobileNav page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} search={search} setSearch={setSearch} doSearch={doSearch} />
+        : <DesktopNav page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} search={search} setSearch={setSearch} doSearch={doSearch} />
       }
 
       {/* ─── HOME ─── */}
       {page === 'home' && <main id="main-content" aria-label="Home">
         {/* Hero */}
         <section style={{
-          background: 'linear-gradient(160deg, #0F2D5E 0%, #1B4D8E 60%, #2563A8 100%)',
+          background: '#FFFFFF',
           padding: isMobile ? '48px 16px 40px' : '72px 32px 64px',
+          borderBottom: '1px solid #E8E6DE',
         }}>
           <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
             <div style={{
               display: 'inline-block',
-              background: 'rgba(255,255,255,.14)',
+              background: '#F4F7FB',
+              border: '1px solid #E8E6DE',
               borderRadius: 20,
               padding: '6px 18px',
               fontSize: 12,
-              color: 'rgba(255,255,255,.9)',
+              color: '#0F2D5E',
               marginBottom: 16,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -467,7 +495,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               {t.hero_label}
             </div>
             <h1 style={{
-              color: '#fff',
+              color: '#0F2D5E',
               fontSize: isMobile ? 28 : 40,
               fontWeight: 700,
               margin: '0 0 14px',
@@ -476,7 +504,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               {t.hero_title}
             </h1>
             <p style={{
-              color: 'rgba(255,255,255,.85)',
+              color: '#475569',
               fontSize: isMobile ? 15 : 17,
               lineHeight: 1.7,
               margin: '0 0 28px',
@@ -494,8 +522,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Btn onClick={() => { doSearch(); if (!search.trim()) setPage('resources') }} style={{
-                background: '#fff',
-                color: COLORS.primary,
+                background: COLORS.primary,
+                color: '#FFFFFF',
                 padding: isMobile ? '12px 20px' : '12px 28px',
                 fontSize: 15,
                 flex: isMobile ? 1 : 'none',
@@ -503,8 +531,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
                 {t.browse}
               </Btn>
               <Btn onClick={() => setPage('contact')} variant="ghost" style={{
-                borderColor: 'rgba(255,255,255,.5)',
-                color: '#fff',
+                borderColor: COLORS.primary,
+                color: COLORS.primary,
                 padding: isMobile ? '12px 20px' : '12px 28px',
                 fontSize: 15,
                 flex: isMobile ? 1 : 'none',
@@ -587,8 +615,9 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
           {/* Search */}
           <div style={{
-            background: COLORS.primary,
-            borderRadius: 16,
+            background: '#FFFFFF',
+            border: '1px solid #E8E6DE',
+            borderRadius: 0,
             padding: 16,
             marginBottom: 20,
           }}>
@@ -750,7 +779,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       )}
 
       {/* Footer */}
-      <footer style={{ background: '#002882', marginTop: 48 }}>
+      <footer style={{ background: '#FFFFFF', marginTop: 48, borderTop: '1px solid #E8E6DE' }}>
         {/* Main footer content */}
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '32px 20px 24px' : '40px 32px 28px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 28 : 40 }}>
@@ -760,17 +789,17 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <ColoradoLogo size={36} />
                 <div>
-                  <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
-                  <div style={{ color: 'rgba(255,255,255,.5)', fontSize: 12 }}>Volunteer Victim Advocate</div>
+                  <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
+                  <div style={{ color: '#667085', fontSize: 12 }}>Volunteer Victim Advocate</div>
                 </div>
               </div>
-              <p style={{ color: 'rgba(255,255,255,.55)', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
+              <p style={{ color: '#667085', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
             </div>
 
             {/* Contact column */}
             <div>
-              <div style={{ color: '#FFC726', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
-              <div style={{ color: 'rgba(255,255,255,.8)', fontSize: 13, lineHeight: 2 }}>
+              <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
+              <div style={{ color: '#475569', fontSize: 13, lineHeight: 2 }}>
                 <div>📞 After Hours: 303-441-4444</div>
                 <div>🏢 Office: 303-926-2841</div>
                 <div>✉️ victimservices@erieco.gov</div>
@@ -779,8 +808,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
             {/* Emergency column */}
             <div>
-              <div style={{ color: '#FFC726', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Emergency</div>
-              <div style={{ color: 'rgba(255,255,255,.8)', fontSize: 13, lineHeight: 2 }}>
+              <div style={{ color: '#A32D2D', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Emergency</div>
+              <div style={{ color: '#475569', fontSize: 13, lineHeight: 2 }}>
                 <div>🚨 Emergency: 911</div>
                 <div>💜 DV Hotline: 1-800-799-7233</div>
                 <div>⚖️ Victim Rights: 303-239-4497</div>
@@ -790,12 +819,12 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         </div>
 
         {/* Copyright bar */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,.1)', padding: isMobile ? '14px 20px' : '14px 32px' }}>
+        <div style={{ borderTop: '1px solid #E8E6DE', padding: isMobile ? '14px 20px' : '14px 32px' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-            <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12 }}>
+            <div style={{ color: '#667085', fontSize: 12 }}>
               © {new Date().getFullYear()} Colorado Victim Resources. All rights reserved.
             </div>
-            <div style={{ color: 'rgba(255,255,255,.4)', fontSize: 12 }}>
+            <div style={{ color: '#667085', fontSize: 12 }}>
               Services available 7 days a week, 24 hours a day.
             </div>
           </div>
