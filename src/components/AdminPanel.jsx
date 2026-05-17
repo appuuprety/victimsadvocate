@@ -17,8 +17,12 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [catError, setCatError] = useState('')
   const [editingCat, setEditingCat] = useState(null) // category being edited
   const [tutorialSteps, setTutorialSteps] = useState([])
+  const [fieldGuideEntries, setFieldGuideEntries] = useState([])
+  const [fieldGuideQuery, setFieldGuideQuery] = useState('')
+  const [editingFieldGuideEntry, setEditingFieldGuideEntry] = useState(null)
   const [invites, setInvites] = useState([])
   const [inviteAttempts, setInviteAttempts] = useState([])
+  const [adminProfiles, setAdminProfiles] = useState([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('admin')
   const [inviteLink, setInviteLink] = useState('')
@@ -49,10 +53,14 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   useEffect(() => {
     supabase.from('tutorial_steps').select('*').order('sort_order')
       .then(({ data }) => setTutorialSteps(data || []))
+    supabase.from('field_guide_entries').select('*').order('sort_order').order('title')
+      .then(({ data }) => setFieldGuideEntries(data || []))
   }, [])
 
   useEffect(() => {
     if (view === 'users' && adminProfile?.role === 'super_admin') {
+      supabase.from('admin_profiles').select('*').order('created_at', { ascending: false })
+        .then(({ data }) => setAdminProfiles(data || []))
       supabase.from('admin_invites').select('*').order('created_at', { ascending: false })
         .then(({ data }) => setInvites(data || []))
       supabase.from('admin_invite_attempts').select('*').order('created_at', { ascending: false }).limit(50)
@@ -135,6 +143,47 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     if (!window.confirm(`Delete step "${step.title}"?`)) return
     await supabase.from('tutorial_steps').delete().eq('id', step.id)
     setTutorialSteps(prev => prev.filter(s => s.id !== step.id))
+  }
+
+  async function saveFieldGuideEntry(entry) {
+    if (!entry.title?.trim()) return
+    const tags = typeof entry.tags === 'string'
+      ? entry.tags.split(',').map(t => t.trim()).filter(Boolean)
+      : entry.tags || []
+    const payload = {
+      section: entry.section?.trim() || 'General',
+      title: entry.title.trim(),
+      body: entry.body || '',
+      tags,
+      sort_order: Number(entry.sort_order) || 100,
+      published: entry.published !== false,
+      updated_at: new Date().toISOString(),
+    }
+    if (entry.id) {
+      const { data, error } = await supabase.from('field_guide_entries').update(payload).eq('id', entry.id).select().single()
+      if (error) return alert(error.message)
+      setFieldGuideEntries(prev => prev.map(item => item.id === data.id ? data : item))
+    } else {
+      const { data, error } = await supabase.from('field_guide_entries').insert(payload).select().single()
+      if (error) return alert(error.message)
+      setFieldGuideEntries(prev => [...prev, data].sort((a, b) => (a.sort_order - b.sort_order) || a.title.localeCompare(b.title)))
+    }
+    setEditingFieldGuideEntry(null)
+  }
+
+  async function deleteFieldGuideEntry(entry) {
+    if (!window.confirm(`Delete field guide entry "${entry.title}"?`)) return
+    const { error } = await supabase.from('field_guide_entries').delete().eq('id', entry.id)
+    if (error) return alert(error.message)
+    setFieldGuideEntries(prev => prev.filter(item => item.id !== entry.id))
+  }
+
+  async function deleteAdminProfile(profile) {
+    if (profile.user_id === adminProfile.user_id) return alert('You cannot delete your own admin access.')
+    if (!window.confirm(`Remove admin access for ${profile.email}?`)) return
+    const { error } = await supabase.rpc('delete_admin_profile', { target_user_id: profile.user_id })
+    if (error) return alert(error.message)
+    setAdminProfiles(prev => prev.filter(item => item.user_id !== profile.user_id))
   }
 
   function handleFormDone(data, wasEditing) {
@@ -222,7 +271,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     ['categories', 'Categories'],
     ['activity', 'Activity'],
     ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
-    ['tutorial', '🎓 Tutorial'],
+    ['tutorial', 'Volunteer Resources'],
   ]
   navItems.push(['users', 'Invites'])
 
@@ -522,6 +571,11 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         {view === 'tutorial' && (
           <TutorialView
             steps={tutorialSteps}
+            fieldGuideEntries={fieldGuideEntries}
+            fieldGuideQuery={fieldGuideQuery}
+            setFieldGuideQuery={setFieldGuideQuery}
+            editingFieldGuideEntry={editingFieldGuideEntry}
+            setEditingFieldGuideEntry={setEditingFieldGuideEntry}
             completedSteps={completedSteps}
             toggleStep={toggleStep}
             onNavigate={setView}
@@ -531,6 +585,8 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             setEditingStep={setEditingStep}
             onSave={saveTutorialStep}
             onDelete={deleteTutorialStep}
+            onSaveFieldGuideEntry={saveFieldGuideEntry}
+            onDeleteFieldGuideEntry={deleteFieldGuideEntry}
           />
         )}
 
@@ -548,6 +604,46 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
               <p style={{ color: COLORS.textMuted, marginTop: 0, marginBottom: 24, fontSize: 14 }}>
                 Send invite links for staff accounts. Only invited users can register for admin access.
               </p>
+              <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden', marginBottom: 24 }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #F0EEE8', display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <h3 style={{ margin: 0, fontSize: 16, color: COLORS.textPrimary }}>Current Admins</h3>
+                  <Badge label={`${adminProfiles.length} active`} color={COLORS.primary} bg="#E6F1FB" />
+                </div>
+                {adminProfiles.length === 0
+                  ? <div style={{ padding: 24, color: COLORS.textMuted, textAlign: 'center' }}>No admin profiles found.</div>
+                  : adminProfiles.map((profile, i) => (
+                    <div key={profile.user_id} style={{
+                      padding: '14px 20px',
+                      borderBottom: i < adminProfiles.length - 1 ? '1px solid #F0EEE8' : 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      flexWrap: 'wrap',
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.textPrimary }}>{profile.email}</div>
+                        <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>{profile.user_id}</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <Badge
+                          label={profile.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                          color={profile.role === 'super_admin' ? '#8B5E0A' : COLORS.primary}
+                          bg={profile.role === 'super_admin' ? '#FDF3E3' : '#E6F1FB'}
+                        />
+                        <Btn
+                          small
+                          variant="danger"
+                          disabled={profile.user_id === adminProfile.user_id}
+                          onClick={() => deleteAdminProfile(profile)}
+                        >
+                          Delete Admin
+                        </Btn>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
               <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 24, marginBottom: 24 }}>
                 <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.textPrimary }}>Send Invite</h3>
                 <div className="invite-form-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px auto', gap: 12, alignItems: 'end' }}>
@@ -718,19 +814,43 @@ function CategoryEditor({ cat, setCat, onSave, onCancel, onDelete, error }) {
   )
 }
 
-function TutorialView({ steps, completedSteps, toggleStep, onNavigate, editMode, setEditMode, editingStep, setEditingStep, onSave, onDelete }) {
+function TutorialView({
+  steps,
+  fieldGuideEntries,
+  fieldGuideQuery,
+  setFieldGuideQuery,
+  editingFieldGuideEntry,
+  setEditingFieldGuideEntry,
+  completedSteps,
+  toggleStep,
+  onNavigate,
+  editMode,
+  setEditMode,
+  editingStep,
+  setEditingStep,
+  onSave,
+  onDelete,
+  onSaveFieldGuideEntry,
+  onDeleteFieldGuideEntry,
+}) {
   const total = steps.length
   const done = steps.filter(s => completedSteps.includes(s.id)).length
   const pct = total ? Math.round((done / total) * 100) : 0
   const allDone = total > 0 && done === total
+  const query = fieldGuideQuery.trim().toLowerCase()
+  const filteredGuideEntries = fieldGuideEntries.filter(entry => {
+    if (!query) return true
+    const tags = Array.isArray(entry.tags) ? entry.tags.join(' ') : ''
+    return `${entry.section} ${entry.title} ${entry.body} ${tags}`.toLowerCase().includes(query)
+  })
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 4px', color: COLORS.textPrimary }}>🎓 Volunteer Tutorial</h2>
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 4px', color: COLORS.textPrimary }}>Volunteer Advocate Resources</h2>
           <p style={{ margin: 0, fontSize: 14, color: COLORS.textMuted }}>
-            {editMode ? 'Add, edit, or remove steps shown to volunteers.' : 'Complete each step to get familiar with the admin portal.'}
+            {editMode ? 'Add, edit, or remove checklist items and field guide entries.' : 'Use the checklist and searchable field guide during volunteer advocate work.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -741,8 +861,64 @@ function TutorialView({ steps, completedSteps, toggleStep, onNavigate, editMode,
             </div>
           )}
           <Btn small variant={editMode ? 'primary' : 'ghost'} onClick={() => { setEditMode(!editMode); setEditingStep(null) }}>
-            {editMode ? 'Done editing' : '✏️ Edit tutorial'}
+            {editMode ? 'Done editing' : 'Edit resources'}
           </Btn>
+        </div>
+      </div>
+
+      <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 18, marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 17, color: COLORS.textPrimary }}>Field Guide</h3>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>Search quick-reference guidance on mobile or desktop.</p>
+          </div>
+          {editMode && (
+            <Btn small onClick={() => setEditingFieldGuideEntry({ section: 'General', title: '', body: '', tags: '', sort_order: 100, published: true })}>
+              Add Field Guide Entry
+            </Btn>
+          )}
+        </div>
+        <Input
+          value={fieldGuideQuery}
+          onChange={setFieldGuideQuery}
+          placeholder="Search the field guide..."
+          type="search"
+        />
+
+        {editingFieldGuideEntry && (
+          <FieldGuideEditor
+            entry={editingFieldGuideEntry}
+            setEntry={setEditingFieldGuideEntry}
+            onSave={() => onSaveFieldGuideEntry(editingFieldGuideEntry)}
+            onCancel={() => setEditingFieldGuideEntry(null)}
+          />
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, marginTop: 16 }}>
+          {filteredGuideEntries.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', padding: 24, textAlign: 'center', color: COLORS.textMuted, background: '#FAFAF7', borderRadius: 12 }}>
+              No field guide entries found.
+            </div>
+          ) : filteredGuideEntries.map(entry => (
+            <article key={entry.id} style={{ border: '1px solid #E8E6DE', borderRadius: 12, padding: 16, background: '#FAFAF7' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.primary, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
+                {entry.section}
+              </div>
+              <h4 style={{ margin: '0 0 8px', color: COLORS.textPrimary, fontSize: 16 }}>{entry.title}</h4>
+              <p style={{ margin: 0, whiteSpace: 'pre-wrap', color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.6 }}>{entry.body}</p>
+              {Array.isArray(entry.tags) && entry.tags.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 12 }}>
+                  {entry.tags.map(tag => <Badge key={tag} label={tag} color={COLORS.textSecondary} bg="#F0EEE8" />)}
+                </div>
+              )}
+              {editMode && (
+                <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                  <Btn small variant="ghost" onClick={() => setEditingFieldGuideEntry({ ...entry, tags: Array.isArray(entry.tags) ? entry.tags.join(', ') : '' })}>Edit</Btn>
+                  <Btn small variant="danger" onClick={() => onDeleteFieldGuideEntry(entry)}>Delete</Btn>
+                </div>
+              )}
+            </article>
+          ))}
         </div>
       </div>
 
@@ -760,7 +936,7 @@ function TutorialView({ steps, completedSteps, toggleStep, onNavigate, editMode,
         <div style={{ background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 14, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ fontSize: 32 }}>🎉</div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#1A6B3A', marginBottom: 2 }}>Tutorial complete!</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1A6B3A', marginBottom: 2 }}>Resource checklist complete!</div>
             <div style={{ fontSize: 13, color: '#2E7D50', lineHeight: 1.5 }}>You are ready to support victims using this portal.</div>
           </div>
         </div>
@@ -777,7 +953,7 @@ function TutorialView({ steps, completedSteps, toggleStep, onNavigate, editMode,
 
       {total === 0 && !editingStep && (
         <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
-          No tutorial steps yet. {editMode ? 'Click "Add step" below to create one.' : 'An admin can add steps from the edit view.'}
+          No resource checklist items yet. {editMode ? 'Click "Add step" below to create one.' : 'An admin can add checklist items from the edit view.'}
         </div>
       )}
 
@@ -871,7 +1047,7 @@ function TutorialView({ steps, completedSteps, toggleStep, onNavigate, editMode,
       {editMode && !editingStep && (
         <div style={{ marginTop: 16 }}>
           <Btn onClick={() => setEditingStep({ icon: '📌', title: '', body: '', is_warning: false, highlight: false, action_label: '', action_view: '' })}>
-            + Add step
+            + Add checklist item
           </Btn>
         </div>
       )}
@@ -897,11 +1073,57 @@ const ACTION_VIEWS = [
   { value: 'trash', label: 'Trash' },
 ]
 
+function FieldGuideEditor({ entry, setEntry, onSave, onCancel }) {
+  return (
+    <div style={{ marginTop: 16, background: '#FFFFFF', borderRadius: 12, border: `2px solid ${COLORS.primary}`, padding: 18 }}>
+      <h4 style={{ margin: '0 0 14px', fontSize: 15, color: COLORS.primary }}>{entry.id ? 'Edit field guide entry' : 'Add field guide entry'}</h4>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 12 }}>
+        <Field label="Section">
+          <Input value={entry.section || ''} onChange={v => setEntry({ ...entry, section: v })} placeholder="Safety Planning" />
+        </Field>
+        <Field label="Title">
+          <Input value={entry.title || ''} onChange={v => setEntry({ ...entry, title: v })} placeholder="Guide title" />
+        </Field>
+        <Field label="Order">
+          <Input value={String(entry.sort_order ?? 100)} onChange={v => setEntry({ ...entry, sort_order: v })} type="number" />
+        </Field>
+      </div>
+      <Field label="Guide Content">
+        <textarea
+          value={entry.body || ''}
+          onChange={e => setEntry({ ...entry, body: e.target.value })}
+          placeholder="Write searchable mobile-friendly field guide content..."
+          rows={7}
+          style={{
+            width: '100%', padding: '11px 14px', borderRadius: 12,
+            border: `1.5px solid ${COLORS.border}`, fontSize: 15,
+            fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box',
+            background: '#FFFFFF', color: COLORS.textPrimary, resize: 'vertical', lineHeight: 1.6,
+          }}
+        />
+      </Field>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, alignItems: 'end', marginTop: 12 }}>
+        <Field label="Search Tags">
+          <Input value={Array.isArray(entry.tags) ? entry.tags.join(', ') : entry.tags || ''} onChange={v => setEntry({ ...entry, tags: v })} placeholder="trauma, court, safety" />
+        </Field>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center', color: COLORS.textPrimary, fontSize: 14, minHeight: 44 }}>
+          <input type="checkbox" checked={entry.published !== false} onChange={e => setEntry({ ...entry, published: e.target.checked })} />
+          Published
+        </label>
+      </div>
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
+        <Btn variant="ghost" onClick={onCancel}>Cancel</Btn>
+        <Btn onClick={onSave}>{entry.id ? 'Save entry' : 'Add entry'}</Btn>
+      </div>
+    </div>
+  )
+}
+
 function TutorialEditor({ step, setStep, onSave, onCancel }) {
   return (
     <div style={{ background: '#FFFFFF', borderRadius: 14, border: `2px solid ${COLORS.primary}`, padding: 24, marginBottom: 16 }}>
       <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.primary }}>
-        {step.id ? 'Edit step' : 'Add new step'}
+        {step.id ? 'Edit checklist item' : 'Add checklist item'}
       </h3>
       <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 12, marginBottom: 12 }}>
         <Field label="Icon"><Input value={step.icon} onChange={v => setStep({ ...step, icon: v })} placeholder="📌" /></Field>

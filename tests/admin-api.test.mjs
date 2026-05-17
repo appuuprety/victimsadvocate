@@ -267,3 +267,88 @@ test('admin invite attempts require exact email match and are logged', async () 
     await cleanup({ userId: adminUser.userId })
   }
 })
+
+test('super admin can remove another admin profile', async () => {
+  const superAdmin = await createApprovedAdminUser('super_admin')
+  const adminUser = await createApprovedAdminUser('admin')
+  const client = makeUserClient()
+
+  try {
+    const { error: signInError } = await client.auth.signInWithPassword({
+      email: superAdmin.email,
+      password: superAdmin.password,
+    })
+    assert.ifError(signInError)
+
+    const { error: deleteError } = await client.rpc('delete_admin_profile', {
+      target_user_id: adminUser.userId,
+    })
+    assert.ifError(deleteError)
+
+    const { data: profile } = await service
+      .from('admin_profiles')
+      .select('user_id')
+      .eq('user_id', adminUser.userId)
+      .maybeSingle()
+    assert.equal(profile, null)
+  } finally {
+    await cleanup({ userId: adminUser.userId })
+    await cleanup({ userId: superAdmin.userId })
+  }
+})
+
+test('approved admin can create, search, edit, and delete field guide entries', async () => {
+  const adminUser = await createApprovedAdminUser('admin')
+  const client = makeUserClient()
+  let entryId = null
+
+  try {
+    const { error: signInError } = await client.auth.signInWithPassword({
+      email: adminUser.email,
+      password: adminUser.password,
+    })
+    assert.ifError(signInError)
+
+    const title = `E2E Field Guide ${randomUUID()}`
+    const { data: inserted, error: insertError } = await client
+      .from('field_guide_entries')
+      .insert({
+        section: 'E2E',
+        title,
+        body: 'Searchable mobile field guide content.',
+        tags: ['e2e', 'field-guide'],
+        sort_order: 9999,
+      })
+      .select()
+      .single()
+    assert.ifError(insertError)
+    entryId = inserted.id
+
+    const { data: found, error: searchError } = await client
+      .from('field_guide_entries')
+      .select('id,title,body')
+      .ilike('title', `%${title}%`)
+      .single()
+    assert.ifError(searchError)
+    assert.equal(found.id, entryId)
+
+    const { data: updated, error: updateError } = await client
+      .from('field_guide_entries')
+      .update({ body: 'Edited field guide content.', updated_at: new Date().toISOString() })
+      .eq('id', entryId)
+      .select()
+      .single()
+    assert.ifError(updateError)
+    assert.equal(updated.body, 'Edited field guide content.')
+
+    const { error: deleteError } = await client
+      .from('field_guide_entries')
+      .delete()
+      .eq('id', entryId)
+    assert.ifError(deleteError)
+    entryId = null
+  } finally {
+    if (entryId) await service.from('field_guide_entries').delete().eq('id', entryId)
+    await cleanup({ userId: adminUser.userId })
+  }
+})
