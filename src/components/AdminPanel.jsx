@@ -266,14 +266,27 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     shares: shareLogs.length,
   }
 
-  const menuNavItems = [
-    ['dashboard', 'Dashboard'],
-    ['tutorial', 'Volunteer Resources'],
-    ['brochures', 'Brochures'],
-    ['categories', 'Categories'],
-    ['activity', 'Activity'],
-    ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
-    ['users', 'Invites'],
+  const menuGroups = [
+    {
+      title: 'Main',
+      items: [['dashboard', 'Dashboard', 'D']],
+    },
+    {
+      title: 'Content',
+      items: [
+        ['tutorial', 'Volunteer Resources', 'V'],
+        ['brochures', 'Brochures', 'B'],
+        ['categories', 'Categories', 'C'],
+      ],
+    },
+    {
+      title: 'Admin',
+      items: [
+        ['activity', 'Activity', 'A'],
+        ['users', 'Invites', 'I'],
+        ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`, 'T'],
+      ],
+    },
   ]
   const profileInitial = (adminProfile?.email || 'A').trim().charAt(0).toUpperCase()
 
@@ -314,18 +327,145 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           gap: 12px;
           flex: 1;
         }
-        .admin-overflow-menu {
-          background: #0F2D5E;
-          border-top: 1px solid rgba(255,255,255,.12);
-          box-shadow: 0 10px 24px rgba(0,0,0,.18);
+        .admin-menu-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(10, 24, 43, .38);
+          z-index: 50;
         }
-        .admin-overflow-inner {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 10px 32px 14px;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 8px;
+        .admin-drawer {
+          position: fixed;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: min(390px, 88vw);
+          background: #FFFFFF;
+          box-shadow: -18px 0 42px rgba(9, 20, 38, .28);
+          z-index: 60;
+          display: flex;
+          flex-direction: column;
+          color: #1E293B;
+        }
+        .admin-drawer-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 18px 18px 14px;
+          border-bottom: 1px solid #E8E6DE;
+          background: #F7F8FA;
+        }
+        .admin-drawer-profile {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+        }
+        .admin-drawer-avatar {
+          width: 42px;
+          height: 42px;
+          border-radius: 999px;
+          background: #1B4D8E;
+          color: #fff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          flex: 0 0 auto;
+        }
+        .admin-drawer-email {
+          color: #475569;
+          font-size: 12px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 225px;
+        }
+        .admin-drawer-close {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          border: 1px solid #D8D5CB;
+          background: #fff;
+          color: #1B3A6B;
+          cursor: pointer;
+          font-size: 20px;
+        }
+        .admin-drawer-body {
+          padding: 14px;
+          overflow: auto;
+          flex: 1;
+        }
+        .admin-menu-section {
+          padding: 8px 0 14px;
+        }
+        .admin-menu-section-title {
+          color: #64748B;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: .06em;
+          text-transform: uppercase;
+          padding: 0 8px 8px;
+        }
+        .admin-drawer-row {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border: 1px solid transparent;
+          border-radius: 8px;
+          background: transparent;
+          padding: 10px 10px;
+          color: #1E293B;
+          font-family: Georgia, serif;
+          font-size: 14px;
+          font-weight: 600;
+          text-align: left;
+          cursor: pointer;
+        }
+        .admin-drawer-row:hover {
+          background: #F4F7FB;
+          border-color: #E2E8F0;
+        }
+        .admin-drawer-row.active {
+          background: #E6F1FB;
+          border-color: #C7DFF4;
+          color: #0F2D5E;
+        }
+        .admin-drawer-icon {
+          width: 28px;
+          height: 28px;
+          border-radius: 8px;
+          background: #EEF2F7;
+          color: #1B4D8E;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 700;
+          flex: 0 0 auto;
+        }
+        .admin-drawer-row.active .admin-drawer-icon {
+          background: #1B4D8E;
+          color: #fff;
+        }
+        .admin-drawer-footer {
+          border-top: 1px solid #E8E6DE;
+          padding: 14px;
+          background: #F7F8FA;
+        }
+        .admin-signout-row {
+          width: 100%;
+          border: 1px solid #F0C9C9;
+          border-radius: 8px;
+          background: #FFF5F5;
+          color: #9F2D2D;
+          padding: 10px 12px;
+          font-family: Georgia, serif;
+          font-size: 14px;
+          font-weight: 700;
+          text-align: left;
+          cursor: pointer;
         }
           @media (max-width: 820px) {
           .admin-header { padding: 0 16px !important; }
@@ -340,7 +480,6 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           .admin-header-top { width: 100%; }
           .admin-brand { min-width: 0; }
           .admin-role-badge { display: none; }
-          .admin-overflow-inner { padding: 10px 16px 14px; grid-template-columns: 1fr; }
           .admin-content { padding: 20px 16px !important; }
           .invite-form-grid { grid-template-columns: 1fr !important; }
           .field-guide-layout { grid-template-columns: 1fr !important; }
@@ -373,40 +512,58 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             </div>
           </div>
         </div>
-        {mobileNavOpen && (
-          <div className="admin-overflow-menu">
-            <div className="admin-overflow-inner">
-              {menuNavItems.map(([id, label]) => (
-                <button key={id} onClick={() => { setView(id); setMobileNavOpen(false) }} style={{
-                  background: view === id ? 'rgba(255,255,255,.15)' : 'rgba(255,255,255,.06)',
-                  border: '1px solid rgba(255,255,255,.12)',
-                  color: '#fff',
-                  padding: '10px 12px',
-                  borderRadius: 8,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                  fontFamily: 'Georgia, serif',
-                  textAlign: 'left',
-                }}>
-                  {label}
-                </button>
+        {mobileNavOpen && <>
+          <button
+            type="button"
+            className="admin-menu-backdrop"
+            aria-label="Close admin menu"
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <aside className="admin-drawer" aria-label="Admin menu">
+            <div className="admin-drawer-head">
+              <div className="admin-drawer-profile">
+                <div className="admin-drawer-avatar" aria-hidden="true">{profileInitial}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, color: '#0F2D5E' }}>
+                    {adminProfile?.role === 'super_admin' ? 'Super Admin' : 'Staff'}
+                  </div>
+                  <div className="admin-drawer-email">{adminProfile?.email || 'Admin'}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="admin-drawer-close"
+                aria-label="Close admin menu"
+                onClick={() => setMobileNavOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="admin-drawer-body">
+              {menuGroups.map(group => (
+                <div className="admin-menu-section" key={group.title}>
+                  <div className="admin-menu-section-title">{group.title}</div>
+                  {group.items.map(([id, label, icon]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      className={`admin-drawer-row${view === id ? ' active' : ''}`}
+                      onClick={() => { setView(id); setMobileNavOpen(false) }}
+                    >
+                      <span className="admin-drawer-icon" aria-hidden="true">{icon}</span>
+                      <span>{label}</span>
+                    </button>
+                  ))}
+                </div>
               ))}
-              <button onClick={onLogout} style={{
-                background: 'rgba(163,45,45,.45)',
-                border: '1px solid rgba(255,255,255,.12)',
-                color: '#fff',
-                padding: '10px 12px',
-                borderRadius: 8,
-                fontSize: 13,
-                cursor: 'pointer',
-                fontFamily: 'Georgia, serif',
-                textAlign: 'left',
-              }}>
+            </div>
+            <div className="admin-drawer-footer">
+              <button type="button" className="admin-signout-row" onClick={onLogout}>
                 Sign Out
               </button>
             </div>
-          </div>
-        )}
+          </aside>
+        </>}
       </header>
 
       <div className="admin-content" style={{ maxWidth: 1200, margin: '0 auto', padding: 32 }}>
