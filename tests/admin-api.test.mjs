@@ -91,6 +91,12 @@ async function cleanup({ userId, brochureId, filePath }) {
   }
 }
 
+async function cleanupInvite({ inviteId }) {
+  if (!inviteId) return
+  await service.from('admin_invite_attempts').delete().eq('invite_id', inviteId)
+  await service.from('admin_invites').delete().eq('id', inviteId)
+}
+
 test('admin can upload a document and edit the brochure record', async () => {
   const category = await ensureCategory()
   const adminUser = await createApprovedAdminUser()
@@ -205,6 +211,59 @@ test('super admin can send an admin invite email', async () => {
     assert.equal(response.status, 200, JSON.stringify(body))
     assert.equal(body.success, true)
   } finally {
+    await cleanup({ userId: adminUser.userId })
+  }
+})
+
+test('admin invite attempts require exact email match and are logged', async () => {
+  const adminUser = await createApprovedAdminUser('super_admin')
+  const invitedEmail = `invite-${randomUUID()}@example.com`
+  const token = `token-${randomUUID()}`
+  let inviteId = null
+
+  try {
+    const { data: invite, error: inviteError } = await service
+      .from('admin_invites')
+      .insert({
+        email: invitedEmail,
+        role: 'admin',
+        token,
+        invited_by: adminUser.userId,
+      })
+      .select()
+      .single()
+    assert.ifError(inviteError)
+    inviteId = invite.id
+
+    const anon = makeUserClient()
+    const { data: mismatch, error: mismatchError } = await anon.rpc('log_admin_invite_attempt', {
+      invite_token: token,
+      entered_email: invitedEmail.toUpperCase(),
+    })
+    assert.ifError(mismatchError)
+    assert.equal(mismatch, false)
+
+    const { data: matched, error: matchedError } = await anon.rpc('log_admin_invite_attempt', {
+      invite_token: token,
+      entered_email: invitedEmail,
+    })
+    assert.ifError(matchedError)
+    assert.equal(matched, true)
+
+    const { data: attempts, error: attemptsError } = await service
+      .from('admin_invite_attempts')
+      .select('entered_email,invite_email,matched')
+      .eq('invite_id', inviteId)
+      .order('created_at', { ascending: true })
+    assert.ifError(attemptsError)
+    assert.equal(attempts.length, 2)
+    assert.equal(attempts[0].entered_email, invitedEmail.toUpperCase())
+    assert.equal(attempts[0].matched, false)
+    assert.equal(attempts[1].entered_email, invitedEmail)
+    assert.equal(attempts[1].invite_email, invitedEmail)
+    assert.equal(attempts[1].matched, true)
+  } finally {
+    await cleanupInvite({ inviteId })
     await cleanup({ userId: adminUser.userId })
   }
 })

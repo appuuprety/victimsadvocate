@@ -18,6 +18,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [editingCat, setEditingCat] = useState(null) // category being edited
   const [tutorialSteps, setTutorialSteps] = useState([])
   const [invites, setInvites] = useState([])
+  const [inviteAttempts, setInviteAttempts] = useState([])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('admin')
   const [inviteLink, setInviteLink] = useState('')
@@ -54,6 +55,8 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     if (view === 'users' && adminProfile?.role === 'super_admin') {
       supabase.from('admin_invites').select('*').order('created_at', { ascending: false })
         .then(({ data }) => setInvites(data || []))
+      supabase.from('admin_invite_attempts').select('*').order('created_at', { ascending: false }).limit(50)
+        .then(({ data }) => setInviteAttempts(data || []))
     }
   }, [view, adminProfile])
 
@@ -99,6 +102,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         return
       }
       setInviteNotice('Invite email sent and link copied.')
+      await onLogout?.()
     } finally {
       setInviteSending(false)
     }
@@ -604,6 +608,40 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                     </div>
                   ))
                 }
+              </div>
+
+              <div style={{ marginTop: 24 }}>
+                <h3 style={{ margin: '0 0 12px', fontSize: 16, color: COLORS.textPrimary }}>Invite Attempt Log</h3>
+                <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
+                  {inviteAttempts.length === 0
+                    ? <div style={{ padding: 24, textAlign: 'center', color: COLORS.textMuted }}>No invite attempts yet.</div>
+                    : inviteAttempts.map((attempt, i) => (
+                      <div key={attempt.id} style={{
+                        padding: '14px 20px',
+                        borderBottom: i < inviteAttempts.length - 1 ? '1px solid #F0EEE8' : 'none',
+                        display: 'grid',
+                        gridTemplateColumns: 'minmax(180px, 1fr) minmax(180px, 1fr) auto',
+                        gap: 12,
+                        alignItems: 'center',
+                      }}>
+                        <div>
+                          <div style={{ fontSize: 11, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Entered Email</div>
+                          <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.textPrimary }}>{attempt.entered_email}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 11, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Invite Email</div>
+                          <div style={{ fontSize: 14, color: COLORS.textSecondary }}>{attempt.invite_email || 'Unknown invite'}</div>
+                          <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>{new Date(attempt.created_at).toLocaleString()}</div>
+                        </div>
+                        <Badge
+                          label={attempt.matched ? 'Matched' : 'Mismatch'}
+                          color={attempt.matched ? COLORS.success : COLORS.danger}
+                          bg={attempt.matched ? '#EAF6EE' : '#FCEBE8'}
+                        />
+                      </div>
+                    ))
+                  }
+                </div>
               </div>
             </>
           )}

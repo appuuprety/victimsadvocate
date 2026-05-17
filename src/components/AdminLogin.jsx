@@ -82,10 +82,24 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
     if (!registerEmail || !inviteToken || !registerPassword || !confirmRegisterPassword) return setError('Invite token, email, and password are required.')
     if (registerPassword.length < 6) return setError('Password must be at least 6 characters.')
     if (registerPassword !== confirmRegisterPassword) return setError('Passwords do not match.')
+    const enteredEmail = registerEmail.trim()
     setLoading(true)
     clearStatus()
+    const { data: emailMatchesInvite, error: inviteCheckError } = await supabase.rpc('log_admin_invite_attempt', {
+      invite_token: inviteToken,
+      entered_email: enteredEmail,
+    })
+    if (inviteCheckError) {
+      setLoading(false)
+      return setError(inviteCheckError.message)
+    }
+    if (!emailMatchesInvite) {
+      setLoading(false)
+      return setError('The email entered does not exactly match the email address this invite was sent to.')
+    }
+
     const { data, error: err } = await supabase.auth.signUp({
-      email: registerEmail,
+      email: enteredEmail,
       password: registerPassword,
       options: {
         emailRedirectTo: `${window.location.origin}/admin?invite=${encodeURIComponent(inviteToken)}`,
