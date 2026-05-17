@@ -5,11 +5,226 @@ import BrochureCard from './BrochureCard'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS, LANGS } from '../lib/translations'
 
-function MobileNav({ page, setPage, lang, setLang, t }) {
-  const [open, setOpen] = useState(false)
+function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose }) {
+  const navGroups = [
+    {
+      title: 'Main',
+      items: [
+        ['home', t.nav_home, 'H'],
+        ['resources', t.nav_resources, 'R'],
+        ['contact', t.nav_contact, 'C'],
+      ],
+    },
+  ]
+
+  function goPage(id) {
+    setPage(id)
+    onClose()
+  }
+
   function goAdmin() {
+    onClose()
     window.location.assign('/admin')
   }
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Close menu"
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(10, 24, 43, .38)',
+          border: 'none',
+          zIndex: 180,
+          cursor: 'default',
+        }}
+      />
+      <aside
+        aria-label="Site menu"
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: 'min(390px, 88vw)',
+          background: '#FFFFFF',
+          boxShadow: '-18px 0 42px rgba(9, 20, 38, .28)',
+          zIndex: 190,
+          display: 'flex',
+          flexDirection: 'column',
+          color: '#1E293B',
+        }}
+      >
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: '18px 18px 14px',
+          borderBottom: '1px solid #E8E6DE',
+          background: '#F7F8FA',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <ColoradoLogo size={42} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 700, color: '#0F2D5E' }}>Colorado Victim Resources</div>
+              <div style={{ color: '#475569', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {t.tagline}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={onClose}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              border: '1px solid #D8D5CB',
+              background: '#fff',
+              color: '#1B3A6B',
+              cursor: 'pointer',
+              fontSize: 20,
+              flex: '0 0 auto',
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        <div style={{ padding: 14, overflow: 'auto', flex: 1 }}>
+          {navGroups.map(group => (
+            <div key={group.title} style={{ padding: '8px 0 14px' }}>
+              <div style={{
+                color: '#64748B',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '.06em',
+                textTransform: 'uppercase',
+                padding: '0 8px 8px',
+              }}>
+                {group.title}
+              </div>
+              {group.items.map(([id, label, icon]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => goPage(id)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    border: page === id ? '1px solid #C7DFF4' : '1px solid transparent',
+                    borderRadius: 8,
+                    background: page === id ? '#E6F1FB' : 'transparent',
+                    padding: '10px',
+                    color: page === id ? '#0F2D5E' : '#1E293B',
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span aria-hidden="true" style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: page === id ? '#1B4D8E' : '#EEF2F7',
+                    color: page === id ? '#fff' : '#1B4D8E',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    flex: '0 0 auto',
+                  }}>{icon}</span>
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          ))}
+
+          <div style={{ padding: '8px 0 14px' }}>
+            <div style={{
+              color: '#64748B',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '.06em',
+              textTransform: 'uppercase',
+              padding: '0 8px 8px',
+            }}>
+              Display
+            </div>
+            <div style={{ padding: '0 8px 12px' }}>
+              <TextSizeToggle compact tone="light" />
+            </div>
+            <div style={{ padding: '0 8px' }}>
+              <label style={{ display: 'block', color: '#64748B', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
+                Language
+              </label>
+              <select
+                value={lang}
+                onChange={e => setLang(e.target.value)}
+                aria-label="Select language"
+                style={{
+                  width: '100%',
+                  padding: '10px 32px 10px 12px',
+                  borderRadius: 8,
+                  background: '#FFFFFF',
+                  color: '#1E293B',
+                  border: '1px solid #D8D5CB',
+                  fontSize: 14,
+                  fontFamily: 'Georgia, serif',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%231B3A6B' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 10px center',
+                }}
+              >
+                {LANGS.map(l => (
+                  <option key={l.code} value={l.code}>{l.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA' }}>
+          <button
+            type="button"
+            onClick={goAdmin}
+            style={{
+              width: '100%',
+              border: '1px solid #C7DFF4',
+              borderRadius: 8,
+              background: '#E6F1FB',
+              color: '#0F2D5E',
+              padding: '10px 12px',
+              fontFamily: 'Georgia, serif',
+              fontSize: 14,
+              fontWeight: 700,
+              textAlign: 'left',
+              cursor: 'pointer',
+            }}
+          >
+            Admin
+          </button>
+        </div>
+      </aside>
+    </>
+  )
+}
+
+function MobileNav({ page, setPage, lang, setLang, t }) {
+  const [open, setOpen] = useState(false)
 
   return (
     <header style={{
@@ -49,78 +264,21 @@ function MobileNav({ page, setPage, lang, setLang, t }) {
           <span aria-hidden="true">{open ? '✕' : '☰'}</span>
         </button>
       </div>
-      {/* Dropdown menu */}
       {open && (
-        <div style={{ background: '#0F2D5E', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          {[['home', t.nav_home, '🏠'], ['resources', t.nav_resources, '📋'], ['contact', t.nav_contact, '💬']].map(([id, label, icon]) => (
-            <button key={id} onClick={() => { setPage(id); setOpen(false) }} style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '14px 20px',
-              background: page === id ? 'rgba(255,255,255,0.1)' : 'transparent',
-              border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)',
-              color: '#fff', fontSize: 15, fontFamily: 'Georgia, serif',
-              cursor: 'pointer', textAlign: 'left',
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-              <span aria-hidden="true">{icon}</span>{label}
-            </button>
-          ))}
-          <button onClick={goAdmin} style={{
-            display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-            padding: '14px 20px',
-            background: 'transparent',
-            border: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)',
-            color: '#fff', fontSize: 15, fontFamily: 'Georgia, serif',
-            cursor: 'pointer', textAlign: 'left',
-            WebkitTapHighlightColor: 'transparent',
-          }}>
-            <span aria-hidden="true">🔐</span>Admin
-          </button>
-          {/* Settings row: text size + language */}
-          <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <div>
-              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
-                Text size
-              </div>
-              <TextSizeToggle compact />
-            </div>
-            <div>
-              <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
-                Language
-              </div>
-              <select
-                value={lang}
-                onChange={e => setLang(e.target.value)}
-                aria-label="Select language"
-                style={{
-                  width: '100%', padding: '10px 32px 10px 12px', borderRadius: 8,
-                  background: 'rgba(255,255,255,0.15)', color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.3)', fontSize: 14,
-                  fontFamily: 'Georgia, serif', cursor: 'pointer',
-                  appearance: 'none', WebkitAppearance: 'none',
-                  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
-                }}
-              >
-                {LANGS.map(l => (
-                  <option key={l.code} value={l.code} style={{ color: '#000' }}>{l.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} />
       )}
     </header>
   )
 }
 
-function TextSizeToggle({ compact }) {
+function TextSizeToggle({ compact, tone = 'dark' }) {
   const [size, setSize] = useTextSize()
   const sizes = [['sm', 'A', 13, 'Default text size'], ['lg', 'A', 18, 'Larger text']]
+  const light = tone === 'light'
   return (
     <div role="group" aria-label="Text size" style={{
       display: 'inline-flex', borderRadius: 8, overflow: 'hidden',
-      border: '1px solid rgba(255,255,255,.3)',
+      border: light ? '1px solid #D8D5CB' : '1px solid rgba(255,255,255,.3)',
       marginLeft: compact ? 0 : 8,
     }}>
       {sizes.map(([key, letter, fs, label]) => (
@@ -131,8 +289,8 @@ function TextSizeToggle({ compact }) {
           aria-pressed={size === key}
           style={{
             padding: compact ? '6px 12px' : '6px 14px',
-            background: size === key ? 'rgba(255,255,255,.25)' : 'transparent',
-            border: 'none', color: '#fff', cursor: 'pointer',
+            background: size === key ? (light ? '#E6F1FB' : 'rgba(255,255,255,.25)') : 'transparent',
+            border: 'none', color: light ? '#0F2D5E' : '#fff', cursor: 'pointer',
             fontFamily: 'Georgia, serif', fontWeight: size === key ? 700 : 400,
             fontSize: fs, lineHeight: 1, minHeight: compact ? 32 : 36,
           }}
@@ -146,9 +304,6 @@ function TextSizeToggle({ compact }) {
 
 function DesktopNav({ page, setPage, lang, setLang, t }) {
   const [open, setOpen] = useState(false)
-  function goAdmin() {
-    window.location.assign('/admin')
-  }
 
   return (
     <header style={{ background: 'linear-gradient(135deg, #1B3A6B 0%, #1B4D8E 100%)', padding: '0 32px' }}>
@@ -182,55 +337,7 @@ function DesktopNav({ page, setPage, lang, setLang, t }) {
         </button>
       </div>
       {open && (
-        <div style={{ background: '#0F2D5E', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 32px 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 8 }}>
-            {[['home', t.nav_home, '🏠'], ['resources', t.nav_resources, '📋'], ['contact', t.nav_contact, '💬']].map(([id, label, icon]) => (
-              <button key={id} onClick={() => { setPage(id); setOpen(false) }} style={{
-                display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-                padding: '12px 14px',
-                background: page === id ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 8,
-                color: '#fff', fontSize: 15, fontFamily: 'Georgia, serif',
-                cursor: 'pointer', textAlign: 'left',
-              }}>
-                <span aria-hidden="true">{icon}</span>{label}
-              </button>
-            ))}
-            <button onClick={goAdmin} style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '12px 14px',
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 8,
-              color: '#fff', fontSize: 15, fontFamily: 'Georgia, serif',
-              cursor: 'pointer', textAlign: 'left',
-            }}>
-              <span aria-hidden="true">🔐</span>Admin
-            </button>
-            <div style={{ padding: '4px 0', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <TextSizeToggle compact />
-              <select
-                value={lang}
-                onChange={e => setLang(e.target.value)}
-                aria-label="Select language"
-                style={{
-                  padding: '9px 32px 9px 12px', borderRadius: 8,
-                  background: 'rgba(255,255,255,.15)', color: '#fff',
-                  border: '1px solid rgba(255,255,255,.3)', fontSize: 13,
-                  fontFamily: 'Georgia, serif', cursor: 'pointer', appearance: 'none',
-                  WebkitAppearance: 'none',
-                  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
-                }}
-              >
-                {LANGS.map(l => (
-                  <option key={l.code} value={l.code} style={{ color: '#000' }}>{l.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        <PublicMenuDrawer page={page} setPage={setPage} lang={lang} setLang={setLang} t={t} onClose={() => setOpen(false)} />
       )}
     </header>
   )
