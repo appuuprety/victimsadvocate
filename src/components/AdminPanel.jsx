@@ -8,6 +8,7 @@ import BrochureForm from './BrochureForm'
 export default function AdminPanel({ brochures, setBrochures, categories, setCategories, adminProfile, onLogout, onShare }) {
   const [view, setView] = useState('dashboard')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [resourceTab, setResourceTab] = useState('tutorial')
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [shareLogs, setShareLogs] = useState([])
@@ -265,22 +266,70 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     shares: shareLogs.length,
   }
 
-  const navItems = [
+  const primaryNavItems = [
     ['dashboard', 'Dashboard'],
+    ['tutorial', 'Volunteer Resources'],
+  ]
+  const menuNavItems = [
     ['brochures', 'Brochures'],
     ['categories', 'Categories'],
     ['activity', 'Activity'],
     ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
-    ['tutorial', 'Volunteer Resources'],
+    ['users', 'Invites'],
   ]
-  navItems.push(['users', 'Invites'])
+  const profileInitial = (adminProfile?.email || 'A').trim().charAt(0).toUpperCase()
 
   return (
     <div style={{ fontFamily: 'Georgia, serif', background: '#FAFAF7', minHeight: '100vh', colorScheme: 'light' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
-        .admin-menu-toggle { display: none; }
-        @media (max-width: 820px) {
+        .admin-menu-toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 36px;
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,.35);
+          background: rgba(255,255,255,.12);
+          color: #fff;
+          font-size: 20px;
+          cursor: pointer;
+        }
+        .admin-profile-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,.35);
+          background: rgba(255,255,255,.16);
+          color: #fff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 14px;
+        }
+        .admin-header-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          flex: 1;
+        }
+        .admin-overflow-menu {
+          background: #0F2D5E;
+          border-top: 1px solid rgba(255,255,255,.12);
+          box-shadow: 0 10px 24px rgba(0,0,0,.18);
+        }
+        .admin-overflow-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 10px 32px 14px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 8px;
+        }
+          @media (max-width: 820px) {
           .admin-header { padding: 0 16px !important; }
           .admin-header-inner {
             height: auto !important;
@@ -290,44 +339,24 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             padding: 10px 0;
             gap: 10px;
           }
-          .admin-header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-          }
+          .admin-header-top { width: 100%; }
           .admin-brand { min-width: 0; }
           .admin-role-badge { display: none; }
-          .admin-menu-toggle {
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 36px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,.35);
-            background: rgba(255,255,255,.12);
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-          }
           .admin-nav {
-            display: none !important;
-            flex-direction: column;
+            display: flex !important;
             width: 100%;
             gap: 6px !important;
             padding-bottom: 6px;
           }
-          .admin-nav.is-open { display: flex !important; }
           .admin-nav button {
             width: 100%;
-            text-align: left;
-            justify-content: flex-start;
             margin-left: 0 !important;
             padding: 10px 12px !important;
           }
+          .admin-overflow-inner { padding: 10px 16px 14px; grid-template-columns: 1fr; }
           .admin-content { padding: 20px 16px !important; }
           .invite-form-grid { grid-template-columns: 1fr !important; }
+          .field-guide-layout { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -341,18 +370,23 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                 {adminProfile?.role === 'super_admin' ? 'Super Admin' : 'Staff'}
               </span>
             </div>
-            <button
-              type="button"
-              className="admin-menu-toggle"
-              aria-label={mobileNavOpen ? 'Close admin menu' : 'Open admin menu'}
-              aria-expanded={mobileNavOpen}
-              onClick={() => setMobileNavOpen(open => !open)}
-            >
-              {mobileNavOpen ? '×' : '☰'}
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="admin-profile-icon" title={adminProfile?.email || 'Admin'} aria-label={adminProfile?.email || 'Admin profile'}>
+                {profileInitial}
+              </div>
+              <button
+                type="button"
+                className="admin-menu-toggle"
+                aria-label={mobileNavOpen ? 'Close admin menu' : 'Open admin menu'}
+                aria-expanded={mobileNavOpen}
+                onClick={() => setMobileNavOpen(open => !open)}
+              >
+                {mobileNavOpen ? '×' : '☰'}
+              </button>
+            </div>
           </div>
-          <div className={`admin-nav${mobileNavOpen ? ' is-open' : ''}`} style={{ display: 'flex', gap: 4 }}>
-            {navItems.map(([id, label]) => (
+          <div className="admin-nav" style={{ display: 'flex', gap: 4 }}>
+            {primaryNavItems.map(([id, label]) => (
               <button key={id} onClick={() => { setView(id); setMobileNavOpen(false) }} style={{
                 background: view === id ? 'rgba(255,255,255,.15)' : 'transparent',
                 border: 'none', color: '#fff', padding: '6px 14px', borderRadius: 8,
@@ -361,15 +395,42 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                 {label}
               </button>
             ))}
-            <button onClick={onLogout} style={{
-              background: 'rgba(163,45,45,.5)', border: 'none', color: '#fff',
-              padding: '6px 14px', borderRadius: 8, fontSize: 13, cursor: 'pointer',
-              fontFamily: 'Georgia, serif', marginLeft: 8,
-            }}>
-              Sign Out
-            </button>
           </div>
         </div>
+        {mobileNavOpen && (
+          <div className="admin-overflow-menu">
+            <div className="admin-overflow-inner">
+              {menuNavItems.map(([id, label]) => (
+                <button key={id} onClick={() => { setView(id); setMobileNavOpen(false) }} style={{
+                  background: view === id ? 'rgba(255,255,255,.15)' : 'rgba(255,255,255,.06)',
+                  border: '1px solid rgba(255,255,255,.12)',
+                  color: '#fff',
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  cursor: 'pointer',
+                  fontFamily: 'Georgia, serif',
+                  textAlign: 'left',
+                }}>
+                  {label}
+                </button>
+              ))}
+              <button onClick={onLogout} style={{
+                background: 'rgba(163,45,45,.45)',
+                border: '1px solid rgba(255,255,255,.12)',
+                color: '#fff',
+                padding: '10px 12px',
+                borderRadius: 8,
+                fontSize: 13,
+                cursor: 'pointer',
+                fontFamily: 'Georgia, serif',
+                textAlign: 'left',
+              }}>
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       <div className="admin-content" style={{ maxWidth: 1200, margin: '0 auto', padding: 32 }}>
@@ -574,6 +635,8 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             fieldGuideEntries={fieldGuideEntries}
             fieldGuideQuery={fieldGuideQuery}
             setFieldGuideQuery={setFieldGuideQuery}
+            resourceTab={resourceTab}
+            setResourceTab={setResourceTab}
             editingFieldGuideEntry={editingFieldGuideEntry}
             setEditingFieldGuideEntry={setEditingFieldGuideEntry}
             completedSteps={completedSteps}
@@ -819,6 +882,8 @@ function TutorialView({
   fieldGuideEntries,
   fieldGuideQuery,
   setFieldGuideQuery,
+  resourceTab,
+  setResourceTab,
   editingFieldGuideEntry,
   setEditingFieldGuideEntry,
   completedSteps,
@@ -837,12 +902,18 @@ function TutorialView({
   const done = steps.filter(s => completedSteps.includes(s.id)).length
   const pct = total ? Math.round((done / total) * 100) : 0
   const allDone = total > 0 && done === total
+  const [activeFieldSection, setActiveFieldSection] = useState('')
+  const [activeFieldEntryId, setActiveFieldEntryId] = useState('')
+  const guideSections = [...new Set(fieldGuideEntries.map(entry => entry.section || 'General'))]
+  const selectedSection = activeFieldSection || guideSections[0] || ''
   const query = fieldGuideQuery.trim().toLowerCase()
   const filteredGuideEntries = fieldGuideEntries.filter(entry => {
+    if (selectedSection && (entry.section || 'General') !== selectedSection) return false
     if (!query) return true
     const tags = Array.isArray(entry.tags) ? entry.tags.join(' ') : ''
     return `${entry.section} ${entry.title} ${entry.body} ${tags}`.toLowerCase().includes(query)
   })
+  const activeFieldEntry = filteredGuideEntries.find(entry => entry.id === activeFieldEntryId) || filteredGuideEntries[0]
 
   return (
     <div>
@@ -866,11 +937,38 @@ function TutorialView({
         </div>
       </div>
 
+      <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+        {[
+          ['tutorial', 'Tutorial'],
+          ['fieldGuide', 'Field Guide'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setResourceTab(id)}
+            style={{
+              background: resourceTab === id ? COLORS.primary : '#FFFFFF',
+              color: resourceTab === id ? '#fff' : COLORS.textSecondary,
+              border: `1.5px solid ${resourceTab === id ? COLORS.primary : COLORS.border}`,
+              borderRadius: 10,
+              padding: '9px 14px',
+              fontSize: 14,
+              fontFamily: 'Georgia, serif',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {resourceTab === 'fieldGuide' && (
       <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 18, marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
           <div>
             <h3 style={{ margin: 0, fontSize: 17, color: COLORS.textPrimary }}>Field Guide</h3>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>Search quick-reference guidance on mobile or desktop.</p>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>Use the table of contents or search quick-reference guidance.</p>
           </div>
           {editMode && (
             <Btn small onClick={() => setEditingFieldGuideEntry({ section: 'General', title: '', body: '', tags: '', sort_order: 100, published: true })}>
@@ -894,35 +992,92 @@ function TutorialView({
           />
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, marginTop: 16 }}>
-          {filteredGuideEntries.length === 0 ? (
-            <div style={{ gridColumn: '1 / -1', padding: 24, textAlign: 'center', color: COLORS.textMuted, background: '#FAFAF7', borderRadius: 12 }}>
-              No field guide entries found.
+        <div className="field-guide-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 280px) 1fr', gap: 16, marginTop: 16 }}>
+          <aside style={{ border: '1px solid #E8E6DE', borderRadius: 12, overflow: 'hidden', background: '#FAFAF7' }}>
+            <div style={{ padding: '12px 14px', fontSize: 12, fontWeight: 700, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #E8E6DE' }}>
+              Table of Contents
             </div>
-          ) : filteredGuideEntries.map(entry => (
-            <article key={entry.id} style={{ border: '1px solid #E8E6DE', borderRadius: 12, padding: 16, background: '#FAFAF7' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.primary, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
-                {entry.section}
-              </div>
-              <h4 style={{ margin: '0 0 8px', color: COLORS.textPrimary, fontSize: 16 }}>{entry.title}</h4>
-              <p style={{ margin: 0, whiteSpace: 'pre-wrap', color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.6 }}>{entry.body}</p>
-              {Array.isArray(entry.tags) && entry.tags.length > 0 && (
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 12 }}>
-                  {entry.tags.map(tag => <Badge key={tag} label={tag} color={COLORS.textSecondary} bg="#F0EEE8" />)}
+            {guideSections.map(section => (
+              <button
+                key={section}
+                type="button"
+                onClick={() => { setActiveFieldSection(section); setActiveFieldEntryId('') }}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  display: 'block',
+                  padding: '11px 14px',
+                  border: 'none',
+                  borderBottom: '1px solid #E8E6DE',
+                  background: selectedSection === section ? '#E6F1FB' : 'transparent',
+                  color: selectedSection === section ? COLORS.primary : COLORS.textSecondary,
+                  fontFamily: 'Georgia, serif',
+                  fontWeight: selectedSection === section ? 700 : 500,
+                  cursor: 'pointer',
+                }}
+              >
+                {section}
+              </button>
+            ))}
+          </aside>
+
+          <div style={{ minWidth: 0 }}>
+            <div style={{ border: '1px solid #E8E6DE', borderRadius: 12, background: '#FAFAF7', overflow: 'hidden', marginBottom: 12 }}>
+              {filteredGuideEntries.length === 0 ? (
+                <div style={{ padding: 24, textAlign: 'center', color: COLORS.textMuted }}>
+                  No field guide entries found.
                 </div>
-              )}
-              {editMode && (
-                <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-                  <Btn small variant="ghost" onClick={() => setEditingFieldGuideEntry({ ...entry, tags: Array.isArray(entry.tags) ? entry.tags.join(', ') : '' })}>Edit</Btn>
-                  <Btn small variant="danger" onClick={() => onDeleteFieldGuideEntry(entry)}>Delete</Btn>
+              ) : filteredGuideEntries.map((entry, index) => (
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => setActiveFieldEntryId(entry.id)}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '12px 14px',
+                    border: 'none',
+                    borderBottom: index < filteredGuideEntries.length - 1 ? '1px solid #E8E6DE' : 'none',
+                    background: activeFieldEntry?.id === entry.id ? '#FFFFFF' : 'transparent',
+                    color: COLORS.textPrimary,
+                    fontFamily: 'Georgia, serif',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{entry.title}</div>
+                  {Array.isArray(entry.tags) && entry.tags.length > 0 && (
+                    <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 3 }}>{entry.tags.slice(0, 4).join(', ')}</div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {activeFieldEntry && (
+              <article style={{ border: '1px solid #E8E6DE', borderRadius: 12, padding: 18, background: '#FFFFFF' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.primary, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
+                  {activeFieldEntry.section}
                 </div>
-              )}
-            </article>
-          ))}
+                <h4 style={{ margin: '0 0 10px', color: COLORS.textPrimary, fontSize: 20 }}>{activeFieldEntry.title}</h4>
+                <p style={{ margin: 0, whiteSpace: 'pre-wrap', color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.7 }}>{activeFieldEntry.body}</p>
+                {Array.isArray(activeFieldEntry.tags) && activeFieldEntry.tags.length > 0 && (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 14 }}>
+                    {activeFieldEntry.tags.map(tag => <Badge key={tag} label={tag} color={COLORS.textSecondary} bg="#F0EEE8" />)}
+                  </div>
+                )}
+                {editMode && (
+                  <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                    <Btn small variant="ghost" onClick={() => setEditingFieldGuideEntry({ ...activeFieldEntry, tags: Array.isArray(activeFieldEntry.tags) ? activeFieldEntry.tags.join(', ') : '' })}>Edit</Btn>
+                    <Btn small variant="danger" onClick={() => onDeleteFieldGuideEntry(activeFieldEntry)}>Delete</Btn>
+                  </div>
+                )}
+              </article>
+            )}
+          </div>
         </div>
       </div>
+      )}
 
-      {!editMode && total > 0 && (
+      {resourceTab === 'tutorial' && !editMode && total > 0 && (
         <div style={{ background: '#E8E6DE', borderRadius: 8, height: 8, marginBottom: 28, overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 8,
@@ -932,7 +1087,7 @@ function TutorialView({
         </div>
       )}
 
-      {!editMode && allDone && (
+      {resourceTab === 'tutorial' && !editMode && allDone && (
         <div style={{ background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 14, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ fontSize: 32 }}>🎉</div>
           <div>
@@ -942,7 +1097,7 @@ function TutorialView({
         </div>
       )}
 
-      {editingStep && (
+      {resourceTab === 'tutorial' && editingStep && (
         <TutorialEditor
           step={editingStep}
           setStep={setEditingStep}
@@ -951,13 +1106,13 @@ function TutorialView({
         />
       )}
 
-      {total === 0 && !editingStep && (
+      {resourceTab === 'tutorial' && total === 0 && !editingStep && (
         <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
           No resource checklist items yet. {editMode ? 'Click "Add step" below to create one.' : 'An admin can add checklist items from the edit view.'}
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {resourceTab === 'tutorial' && <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {steps.map((step, idx) => {
           const isDone = completedSteps.includes(step.id)
           const borderColor = step.is_warning ? '#F5C4B3' : isDone ? '#A8D5B5' : '#E8E6DE'
@@ -1042,9 +1197,9 @@ function TutorialView({
             </div>
           )
         })}
-      </div>
+      </div>}
 
-      {editMode && !editingStep && (
+      {resourceTab === 'tutorial' && editMode && !editingStep && (
         <div style={{ marginTop: 16 }}>
           <Btn onClick={() => setEditingStep({ icon: '📌', title: '', body: '', is_warning: false, highlight: false, action_label: '', action_view: '' })}>
             + Add checklist item
@@ -1052,7 +1207,7 @@ function TutorialView({
         </div>
       )}
 
-      {!editMode && (
+      {resourceTab === 'tutorial' && !editMode && (
         <div style={{ marginTop: 24, background: '#EEF4FB', borderRadius: 14, padding: '16px 20px', borderLeft: `4px solid ${COLORS.primary}` }}>
           <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.primaryDark, marginBottom: 4 }}>Need help?</div>
           <div style={{ fontSize: 13, color: COLORS.primary, lineHeight: 1.6 }}>
