@@ -352,3 +352,34 @@ test('approved admin can create, search, edit, and delete field guide entries', 
     await cleanup({ userId: adminUser.userId })
   }
 })
+
+test('seeded victim advocate field guide entries are searchable', async () => {
+  const adminUser = await createApprovedAdminUser('admin')
+  const client = makeUserClient()
+
+  try {
+    const { error: signInError } = await client.auth.signInWithPassword({
+      email: adminUser.email,
+      password: adminUser.password,
+    })
+    assert.ifError(signInError)
+
+    const { data: creed, error: creedError } = await client
+      .from('field_guide_entries')
+      .select('title,body')
+      .ilike('title', '%Creed%')
+      .single()
+    assert.ifError(creedError)
+    assert.match(creed.body, /listen/)
+
+    const { data: callSummary, error: callSummaryError } = await client
+      .from('field_guide_entries')
+      .select('title,body')
+      .ilike('body', '%Summary Call Sheet%')
+      .limit(1)
+    assert.ifError(callSummaryError)
+    assert.equal(callSummary.length, 1)
+  } finally {
+    await cleanup({ userId: adminUser.userId })
+  }
+})
