@@ -7,6 +7,7 @@ import BrochureForm from './BrochureForm'
 
 export default function AdminPanel({ brochures, setBrochures, categories, setCategories, adminProfile, onLogout, onShare }) {
   const [view, setView] = useState('dashboard')
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [shareLogs, setShareLogs] = useState([])
@@ -219,24 +220,87 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`],
     ['tutorial', '🎓 Tutorial'],
   ]
-  if (adminProfile?.role === 'super_admin') navItems.push(['users', 'Users'])
+  if (adminProfile?.role === 'super_admin') navItems.push(['users', 'Invites'])
 
   return (
     <div style={{ fontFamily: 'Georgia, serif', background: '#FAFAF7', minHeight: '100vh', colorScheme: 'light' }}>
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+        .admin-menu-toggle { display: none; }
+        @media (max-width: 820px) {
+          .admin-header { padding: 0 16px !important; }
+          .admin-header-inner {
+            height: auto !important;
+            min-height: 60px;
+            align-items: stretch !important;
+            flex-direction: column;
+            padding: 10px 0;
+            gap: 10px;
+          }
+          .admin-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+          }
+          .admin-brand { min-width: 0; }
+          .admin-role-badge { display: none; }
+          .admin-menu-toggle {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.35);
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+          }
+          .admin-nav {
+            display: none !important;
+            flex-direction: column;
+            width: 100%;
+            gap: 6px !important;
+            padding-bottom: 6px;
+          }
+          .admin-nav.is-open { display: flex !important; }
+          .admin-nav button {
+            width: 100%;
+            text-align: left;
+            justify-content: flex-start;
+            margin-left: 0 !important;
+            padding: 10px 12px !important;
+          }
+          .admin-content { padding: 20px 16px !important; }
+          .invite-form-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
 
-      <header style={{ background: 'linear-gradient(135deg, #0F2D5E, #1B4D8E)', padding: '0 32px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 60 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <ColoradoLogo size={32} />
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>CVR Admin Portal</div>
-            <span style={{ background: 'rgba(255,255,255,.15)', color: '#B5D4F4', fontSize: 11, padding: '2px 10px', borderRadius: 10, fontWeight: 600 }}>
-              {adminProfile?.role === 'super_admin' ? 'Super Admin' : 'Staff'}
-            </span>
+      <header className="admin-header" style={{ background: 'linear-gradient(135deg, #0F2D5E, #1B4D8E)', padding: '0 32px' }}>
+        <div className="admin-header-inner" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 60 }}>
+          <div className="admin-header-top">
+            <div className="admin-brand" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <ColoradoLogo size={32} />
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>CVR Admin Portal</div>
+              <span className="admin-role-badge" style={{ background: 'rgba(255,255,255,.15)', color: '#B5D4F4', fontSize: 11, padding: '2px 10px', borderRadius: 10, fontWeight: 600 }}>
+                {adminProfile?.role === 'super_admin' ? 'Super Admin' : 'Staff'}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="admin-menu-toggle"
+              aria-label={mobileNavOpen ? 'Close admin menu' : 'Open admin menu'}
+              aria-expanded={mobileNavOpen}
+              onClick={() => setMobileNavOpen(open => !open)}
+            >
+              {mobileNavOpen ? '×' : '☰'}
+            </button>
           </div>
-          <div style={{ display: 'flex', gap: 4 }}>
+          <div className={`admin-nav${mobileNavOpen ? ' is-open' : ''}`} style={{ display: 'flex', gap: 4 }}>
             {navItems.map(([id, label]) => (
-              <button key={id} onClick={() => setView(id)} style={{
+              <button key={id} onClick={() => { setView(id); setMobileNavOpen(false) }} style={{
                 background: view === id ? 'rgba(255,255,255,.15)' : 'transparent',
                 border: 'none', color: '#fff', padding: '6px 14px', borderRadius: 8,
                 fontSize: 13, fontWeight: view === id ? 600 : 400, cursor: 'pointer', fontFamily: 'Georgia, serif',
@@ -255,7 +319,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         </div>
       </header>
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: 32 }}>
+      <div className="admin-content" style={{ maxWidth: 1200, margin: '0 auto', padding: 32 }}>
 
         {view === 'dashboard' && <>
           <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 24px', color: COLORS.textPrimary }}>Dashboard</h2>
@@ -467,13 +531,13 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         )}
 
         {view === 'users' && adminProfile?.role === 'super_admin' && <>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>User Invites</h2>
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Send Invites</h2>
           <p style={{ color: COLORS.textMuted, marginTop: 0, marginBottom: 24, fontSize: 14 }}>
-            Create invite links for staff accounts. Only invited users can register for admin access.
+            Send invite links for staff accounts. Only invited users can register for admin access.
           </p>
           <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 24, marginBottom: 24 }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.textPrimary }}>Create Invite</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px auto', gap: 12, alignItems: 'end' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.textPrimary }}>Send Invite</h3>
+            <div className="invite-form-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px auto', gap: 12, alignItems: 'end' }}>
               <Field label="Staff Email">
                 <Input value={inviteEmail} onChange={setInviteEmail} type="email" placeholder="staff@example.org" />
               </Field>
@@ -491,7 +555,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                   <option value="super_admin">Super Admin</option>
                 </select>
               </Field>
-              <Btn onClick={createInvite} disabled={inviteSending}>{inviteSending ? 'Sending...' : 'Create Invite'}</Btn>
+              <Btn onClick={createInvite} disabled={inviteSending}>{inviteSending ? 'Sending...' : 'Send Invite'}</Btn>
             </div>
             {inviteError && <p style={{ color: COLORS.danger, fontSize: 13, marginBottom: 0 }}>{inviteError}</p>}
             {inviteLink && (
