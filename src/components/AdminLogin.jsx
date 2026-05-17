@@ -417,9 +417,7 @@ export default function AdminLogin({ onLogin, passwordRecovery = false, onPasswo
             Accept an admin invite
           </button>
         </div>
-        <p style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: COLORS.textMuted }}>
-          Staff access is managed through Supabase Authentication.
-        </p>
+       
       </div>
     </div>
   )
