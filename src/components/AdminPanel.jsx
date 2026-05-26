@@ -31,16 +31,24 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [inviteSending, setInviteSending] = useState(false)
   const [editingStep, setEditingStep] = useState(null) // tutorial step being edited
   const [tutorialEditMode, setTutorialEditMode] = useState(false)
+  const tutorialProgressKey = `tutorial_steps:${adminProfile?.user_id || 'local'}`
   const [completedSteps, setCompletedSteps] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('tutorial_steps') || '[]') } catch { return [] }
+    const key = `tutorial_steps:${adminProfile?.user_id || 'local'}`
+    try { return JSON.parse(localStorage.getItem(key) || localStorage.getItem('tutorial_steps') || '[]') } catch { return [] }
   })
 
   function toggleStep(id) {
     setCompletedSteps(prev => {
       const next = prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-      localStorage.setItem('tutorial_steps', JSON.stringify(next))
+      localStorage.setItem(tutorialProgressKey, JSON.stringify(next))
       return next
     })
+  }
+
+  function resetTutorialProgress() {
+    if (!window.confirm('Reset tutorial progress for this admin user? Completed tutorial items will show again.')) return
+    localStorage.removeItem(tutorialProgressKey)
+    setCompletedSteps([])
   }
 
   useEffect(() => {
@@ -835,6 +843,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             setEditingFieldGuideEntry={setEditingFieldGuideEntry}
             completedSteps={completedSteps}
             toggleStep={toggleStep}
+            onResetTutorialProgress={resetTutorialProgress}
             onNavigate={setView}
             editMode={tutorialEditMode}
             setEditMode={setTutorialEditMode}
@@ -1092,6 +1101,7 @@ function TutorialView({
   setEditingFieldGuideEntry,
   completedSteps,
   toggleStep,
+  onResetTutorialProgress,
   onNavigate,
   editMode,
   setEditMode,
@@ -1106,6 +1116,7 @@ function TutorialView({
   const done = steps.filter(s => completedSteps.includes(s.id)).length
   const pct = total ? Math.round((done / total) * 100) : 0
   const allDone = total > 0 && done === total
+  const visibleSteps = editMode ? steps : steps.filter(step => !completedSteps.includes(step.id))
   const [activeFieldSection, setActiveFieldSection] = useState('')
   const [activeFieldEntryId, setActiveFieldEntryId] = useState('')
   const guideSections = [...new Set(fieldGuideEntries.map(entry => entry.section || 'General'))]
@@ -1148,6 +1159,11 @@ function TutorialView({
           <Btn small variant={editMode ? 'primary' : 'ghost'} onClick={() => { setEditMode(!editMode); setEditingStep(null); setEditingFieldGuideEntry(null) }}>
             {editMode ? 'Done editing' : isTutorial ? 'Edit tutorial' : 'Edit resources'}
           </Btn>
+          {isTutorial && editMode && done > 0 && (
+            <Btn small variant="ghost" onClick={onResetTutorialProgress}>
+              Reset progress
+            </Btn>
+          )}
         </div>
       </div>
 
@@ -1300,9 +1316,16 @@ function TutorialView({
         </div>
       )}
 
+      {isTutorial && total > 0 && visibleSteps.length === 0 && !editingStep && !editMode && (
+        <div className="admin-card" style={{ padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
+          Tutorial complete. Completed items are hidden until an admin resets this user&apos;s tutorial progress.
+        </div>
+      )}
+
       {isTutorial && <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {steps.map((step, idx) => {
+        {visibleSteps.map((step) => {
           const isDone = completedSteps.includes(step.id)
+          const stepNumber = steps.findIndex(item => item.id === step.id) + 1
           const borderColor = step.is_warning ? '#F5C4B3' : isDone ? '#A8D5B5' : '#E8E6DE'
           const bgColor = step.is_warning ? '#FAECE7' : isDone ? '#F4FBF6' : '#FFFFFF'
 
@@ -1336,7 +1359,7 @@ function TutorialView({
                       color: isDone && !editMode ? COLORS.textMuted : step.is_warning ? '#993C1D' : COLORS.textPrimary,
                       textDecoration: isDone && !editMode ? 'line-through' : 'none',
                     }}>
-                      Step {idx + 1} — {step.title}
+                      Step {stepNumber} — {step.title}
                     </span>
                     {step.is_warning && (
                       <span style={{ fontSize: 11, background: '#F5C4B3', color: '#712B13', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>Important</span>
