@@ -8,7 +8,6 @@ import BrochureForm from './BrochureForm'
 export default function AdminPanel({ brochures, setBrochures, categories, setCategories, adminProfile, onLogout, onShare }) {
   const [view, setView] = useState('dashboard')
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [resourceTab, setResourceTab] = useState('tutorial')
   const [showForm, setShowForm] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [shareLogs, setShareLogs] = useState([])
@@ -276,7 +275,8 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     {
       title: 'Content',
       items: [
-        ['tutorial', 'Volunteer Resources', 'V'],
+        ['tutorial', 'Tutorial', 'T'],
+        ['fieldGuide', 'Volunteer Advocate Resources', 'V'],
         ['brochures', 'Brochures', 'B'],
         ['categories', 'Categories', 'C'],
       ],
@@ -824,14 +824,13 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           </div>
         </>}
 
-        {view === 'tutorial' && (
+        {(view === 'tutorial' || view === 'fieldGuide') && (
           <TutorialView
+            section={view}
             steps={tutorialSteps}
             fieldGuideEntries={fieldGuideEntries}
             fieldGuideQuery={fieldGuideQuery}
             setFieldGuideQuery={setFieldGuideQuery}
-            resourceTab={resourceTab}
-            setResourceTab={setResourceTab}
             editingFieldGuideEntry={editingFieldGuideEntry}
             setEditingFieldGuideEntry={setEditingFieldGuideEntry}
             completedSteps={completedSteps}
@@ -1084,12 +1083,11 @@ function CategoryEditor({ cat, setCat, onSave, onCancel, onDelete, error }) {
 }
 
 function TutorialView({
+  section,
   steps,
   fieldGuideEntries,
   fieldGuideQuery,
   setFieldGuideQuery,
-  resourceTab,
-  setResourceTab,
   editingFieldGuideEntry,
   setEditingFieldGuideEntry,
   completedSteps,
@@ -1124,56 +1122,36 @@ function TutorialView({
   })).filter(group => group.entries.length > 0)
   const filteredGuideEntries = matchingGuideEntries.filter(entry => (entry.section || 'General') === selectedSection)
   const activeFieldEntry = filteredGuideEntries.find(entry => entry.id === activeFieldEntryId) || filteredGuideEntries[0]
+  const isTutorial = section === 'tutorial'
+  const isFieldGuide = section === 'fieldGuide'
+  const title = isTutorial ? 'Tutorial' : 'Volunteer Advocate Resources'
+  const description = isTutorial
+    ? editMode ? 'Add, edit, or remove tutorial checklist items.' : 'Work through the volunteer advocate tutorial checklist.'
+    : editMode ? 'Add, edit, or remove advocate resource guide entries.' : 'Search quick-reference guidance for volunteer advocate work.'
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 4px', color: COLORS.textPrimary }}>Volunteer Advocate Resources</h2>
+          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 4px', color: COLORS.textPrimary }}>{title}</h2>
           <p style={{ margin: 0, fontSize: 14, color: COLORS.textMuted }}>
-            {editMode ? 'Add, edit, or remove checklist items and field guide entries.' : 'Use the checklist and searchable field guide during volunteer advocate work.'}
+            {description}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {!editMode && total > 0 && (
+          {isTutorial && !editMode && total > 0 && (
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 22, fontWeight: 700, color: allDone ? COLORS.success : COLORS.primary }}>{pct}%</div>
               <div style={{ fontSize: 12, color: COLORS.textMuted }}>{done} of {total} completed</div>
             </div>
           )}
-          <Btn small variant={editMode ? 'primary' : 'ghost'} onClick={() => { setEditMode(!editMode); setEditingStep(null) }}>
-            {editMode ? 'Done editing' : 'Edit resources'}
+          <Btn small variant={editMode ? 'primary' : 'ghost'} onClick={() => { setEditMode(!editMode); setEditingStep(null); setEditingFieldGuideEntry(null) }}>
+            {editMode ? 'Done editing' : isTutorial ? 'Edit tutorial' : 'Edit resources'}
           </Btn>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
-        {[
-          ['tutorial', 'Tutorial'],
-          ['fieldGuide', 'Field Guide'],
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setResourceTab(id)}
-            style={{
-              background: resourceTab === id ? COLORS.primary : '#FFFFFF',
-              color: resourceTab === id ? '#fff' : COLORS.textSecondary,
-              border: `1.5px solid ${resourceTab === id ? COLORS.primary : COLORS.border}`,
-              borderRadius: 10,
-              padding: '9px 14px',
-              fontSize: 14,
-              fontFamily: 'Georgia, serif',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {resourceTab === 'fieldGuide' && (
+      {isFieldGuide && (
       <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 18, marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
           <div>
@@ -1287,7 +1265,7 @@ function TutorialView({
       </div>
       )}
 
-      {resourceTab === 'tutorial' && !editMode && total > 0 && (
+      {isTutorial && !editMode && total > 0 && (
         <div style={{ background: '#E8E6DE', borderRadius: 8, height: 8, marginBottom: 28, overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 8,
@@ -1297,7 +1275,7 @@ function TutorialView({
         </div>
       )}
 
-      {resourceTab === 'tutorial' && !editMode && allDone && (
+      {isTutorial && !editMode && allDone && (
         <div className="admin-card" style={{ background: '#F0FDF4', borderColor: '#ABEFC6', padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
           <div className="admin-symbol" style={{ background: '#DCFAE6', color: '#067647', borderColor: '#ABEFC6' }}>OK</div>
           <div>
@@ -1307,7 +1285,7 @@ function TutorialView({
         </div>
       )}
 
-      {resourceTab === 'tutorial' && editingStep && (
+      {isTutorial && editingStep && (
         <TutorialEditor
           step={editingStep}
           setStep={setEditingStep}
@@ -1316,13 +1294,13 @@ function TutorialView({
         />
       )}
 
-      {resourceTab === 'tutorial' && total === 0 && !editingStep && (
+      {isTutorial && total === 0 && !editingStep && (
         <div className="admin-card" style={{ padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
           No resource checklist items yet. {editMode ? 'Click "Add step" below to create one.' : 'An admin can add checklist items from the edit view.'}
         </div>
       )}
 
-      {resourceTab === 'tutorial' && <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {isTutorial && <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {steps.map((step, idx) => {
           const isDone = completedSteps.includes(step.id)
           const borderColor = step.is_warning ? '#F5C4B3' : isDone ? '#A8D5B5' : '#E8E6DE'
@@ -1409,7 +1387,7 @@ function TutorialView({
         })}
       </div>}
 
-      {resourceTab === 'tutorial' && editMode && !editingStep && (
+      {isTutorial && editMode && !editingStep && (
         <div style={{ marginTop: 16 }}>
           <Btn onClick={() => setEditingStep({ icon: 'GEN', title: '', body: '', is_warning: false, highlight: false, action_label: '', action_view: '' })}>
             + Add checklist item
@@ -1417,7 +1395,7 @@ function TutorialView({
         </div>
       )}
 
-      {resourceTab === 'tutorial' && !editMode && (
+      {isTutorial && !editMode && (
         <div style={{ marginTop: 24, background: '#EEF4FB', borderRadius: 14, padding: '16px 20px', borderLeft: `4px solid ${COLORS.primary}` }}>
           <div style={{ fontWeight: 700, fontSize: 14, color: COLORS.primaryDark, marginBottom: 4 }}>Need help?</div>
           <div style={{ fontSize: 13, color: COLORS.primary, lineHeight: 1.6 }}>
@@ -1434,6 +1412,7 @@ const ACTION_VIEWS = [
   { value: 'dashboard', label: 'Dashboard' },
   { value: 'brochures', label: 'Brochures' },
   { value: 'categories', label: 'Categories' },
+  { value: 'fieldGuide', label: 'Volunteer Advocate Resources' },
   { value: 'activity', label: 'Activity' },
   { value: 'trash', label: 'Trash' },
 ]
