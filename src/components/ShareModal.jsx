@@ -86,7 +86,9 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   async function copyAll() {
     const text = items.map(b => `${b.title}\n${b.link}`).join('\n\n')
-    try { await navigator.clipboard.writeText(text) } catch {}
+    try { await navigator.clipboard.writeText(text) } catch {
+      // Clipboard access can be unavailable in some browsers.
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
     items.forEach(b => logShare(b.id, 'link'))

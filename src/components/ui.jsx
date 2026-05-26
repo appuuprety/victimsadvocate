@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // Shared design tokens
 export const COLORS = {
   primary: '#003DA5',
