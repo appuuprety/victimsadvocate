@@ -5,6 +5,41 @@ import BrochureCard from './BrochureCard'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS, LANGS } from '../lib/translations'
 
+function quickExit() {
+  window.open('', '_self')
+  window.close()
+  window.setTimeout(() => {
+    window.location.replace('https://www.google.com/')
+  }, 80)
+}
+
+function QuickExitButton({ compact = false }) {
+  return (
+    <button
+      type="button"
+      onClick={quickExit}
+      className="public-quick-exit"
+      aria-label="Quick exit"
+      title="Quick exit"
+      style={{
+        minHeight: compact ? 36 : 40,
+        padding: compact ? '8px 12px' : '9px 14px',
+        borderRadius: 8,
+        border: '1px solid #8A1F1F',
+        background: '#A32D2D',
+        color: '#FFFFFF',
+        cursor: 'pointer',
+        fontFamily: 'Georgia, serif',
+        fontSize: compact ? 12 : 13,
+        fontWeight: 700,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      Quick exit
+    </button>
+  )
+}
+
 function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, setSearch, onSearchSubmit }) {
   const navGroups = [
     {
@@ -213,6 +248,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
         </div>
 
         <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA', display: 'grid', gap: 10 }}>
+          <QuickExitButton compact />
           <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, color: '#64748B', fontSize: 12, fontWeight: 700 }}>
             Language
             <select
@@ -296,6 +332,7 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <TextSizeToggle compact tone="light" />
+          <QuickExitButton compact />
           <button
             onClick={() => setOpen(!open)}
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -366,6 +403,7 @@ function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSear
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <TextSizeToggle compact tone="light" />
+          <QuickExitButton />
           <button
             onClick={() => setOpen(!open)}
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -502,6 +540,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         .public-admin-row:focus-visible,
         .public-drawer-close:focus-visible,
         .public-search-submit:focus-visible,
+        .public-quick-exit:focus-visible,
         .public-header-control:focus-visible {
           outline: 3px solid #FFC726;
           outline-offset: 2px;

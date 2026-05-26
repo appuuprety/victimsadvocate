@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
-import { Badge, Btn, Field, Input, Spinner, COLORS } from './ui'
+import { Badge, Btn, Field, Input, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
 import BrochureForm from './BrochureForm'
@@ -13,7 +13,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [editTarget, setEditTarget] = useState(null)
   const [shareLogs, setShareLogs] = useState([])
   const [newCatName, setNewCatName] = useState('')
-  const [newCatIcon, setNewCatIcon] = useState('📌')
+  const [newCatIcon, setNewCatIcon] = useState('GEN')
   const [newCatColor, setNewCatColor] = useState(COLORS.primary)
   const [catError, setCatError] = useState('')
   const [editingCat, setEditingCat] = useState(null) // category being edited
@@ -100,7 +100,9 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
       setInviteEmail('')
       setInviteRole('admin')
       setInvites(prev => [data, ...prev])
-      try { await navigator.clipboard.writeText(link) } catch {}
+      try { await navigator.clipboard.writeText(link) } catch {
+        // Clipboard access can be unavailable in some browsers.
+      }
 
       const { error: sendError } = await supabase.functions.invoke('send-invite', {
         body: { to: email, inviteLink: link, role },
@@ -130,7 +132,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     } else {
       const nextOrder = (tutorialSteps[tutorialSteps.length - 1]?.sort_order || 0) + 10
       const { data } = await supabase.from('tutorial_steps').insert({
-        icon: step.icon || '📌', title: step.title, body: step.body || '',
+        icon: step.icon || 'GEN', title: step.title, body: step.body || '',
         is_warning: !!step.is_warning, highlight: !!step.highlight,
         action_label: step.action_label || null, action_view: step.action_view || null,
         sort_order: nextOrder,
@@ -228,7 +230,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     if (error) return setCatError(error.message)
     setCategories(prev => [...prev, data])
     setNewCatName('')
-    setNewCatIcon('📌')
+    setNewCatIcon('GEN')
     setCatError('')
   }
 
@@ -291,9 +293,62 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const profileInitial = (adminProfile?.email || 'A').trim().charAt(0).toUpperCase()
 
   return (
-    <div style={{ fontFamily: 'Georgia, serif', background: '#FAFAF7', minHeight: '100vh', colorScheme: 'light' }}>
+    <div style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: '#F6F7F9', minHeight: '100vh', colorScheme: 'light' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
+        .admin-panel button,
+        .admin-panel input,
+        .admin-panel select,
+        .admin-panel textarea {
+          font-family: inherit !important;
+        }
+        .admin-page-title {
+          font-size: 27px;
+          font-weight: 700;
+          margin: 0 0 22px;
+          color: #182230;
+          letter-spacing: 0;
+        }
+        .admin-card {
+          background: #FFFFFF;
+          border: 1px solid #DDE3EA;
+          border-radius: 8px;
+          box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+        }
+        .admin-stat-card {
+          padding: 18px 18px 16px;
+        }
+        .admin-stat-icon,
+        .admin-symbol {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+          background: #EEF2F6;
+          color: #344054;
+          border: 1px solid #DDE3EA;
+          font-weight: 800;
+          letter-spacing: .04em;
+        }
+        .admin-stat-icon {
+          width: 34px;
+          height: 34px;
+          font-size: 11px;
+          margin-bottom: 14px;
+        }
+        .admin-symbol {
+          width: 42px;
+          height: 42px;
+          font-size: 12px;
+        }
+        .admin-link-button {
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 700;
+          padding: 0;
+        }
         .admin-menu-toggle {
           display: inline-flex;
           align-items: center;
@@ -417,7 +472,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           background: transparent;
           padding: 10px 10px;
           color: #1E293B;
-          font-family: Georgia, serif;
+          font-family: inherit;
           font-size: 14px;
           font-weight: 600;
           text-align: left;
@@ -468,7 +523,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           background: #FFF5F5;
           color: #9F2D2D;
           padding: 10px 12px;
-          font-family: Georgia, serif;
+          font-family: inherit;
           font-size: 14px;
           font-weight: 700;
           text-align: left;
@@ -493,13 +548,13 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         }
       `}</style>
 
-      <header className="admin-header" style={{ background: 'linear-gradient(135deg, #0F2D5E, #1B4D8E)', padding: '0 32px' }}>
+      <header className="admin-header admin-panel" style={{ background: '#111827', padding: '0 32px', borderBottom: '1px solid #273244' }}>
         <div className="admin-header-inner" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 60 }}>
           <div className="admin-header-top">
             <div className="admin-brand" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <ColoradoLogo size={32} />
               <div style={{ color: '#fff', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>CVR Admin Portal</div>
-              <span className="admin-role-badge" style={{ background: 'rgba(255,255,255,.15)', color: '#B5D4F4', fontSize: 11, padding: '2px 10px', borderRadius: 10, fontWeight: 600 }}>
+              <span className="admin-role-badge" style={{ background: 'rgba(255,255,255,.08)', color: '#D0D5DD', fontSize: 11, padding: '2px 10px', borderRadius: 6, fontWeight: 700 }}>
                 {adminProfile?.role === 'super_admin' ? 'Super Admin' : 'Staff'}
               </span>
             </div>
@@ -573,21 +628,21 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         </>}
       </header>
 
-      <div className="admin-content" style={{ maxWidth: 1200, margin: '0 auto', padding: 32 }}>
+      <div className="admin-content admin-panel" style={{ maxWidth: 1200, margin: '0 auto', padding: 32 }}>
 
         {view === 'dashboard' && <>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 24px', color: COLORS.textPrimary }}>Dashboard</h2>
+          <h2 className="admin-page-title">Dashboard</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 16, marginBottom: 32 }}>
             {[
-              { label: 'Total Brochures', value: stats.total, icon: '📄', color: COLORS.primary },
-              { label: 'Featured', value: stats.featured, icon: '⭐', color: '#BA7517' },
-              { label: 'Categories', value: stats.categories, icon: '🗂️', color: COLORS.success },
-              { label: 'Share Events', value: stats.shares, icon: '📤', color: '#533AB7' },
+              { label: 'Total Brochures', value: stats.total, icon: 'DOC', color: '#175CD3' },
+              { label: 'Featured', value: stats.featured, icon: 'FEA', color: '#B54708' },
+              { label: 'Categories', value: stats.categories, icon: 'CAT', color: '#067647' },
+              { label: 'Share Events', value: stats.shares, icon: 'SHR', color: '#475467' },
             ].map(s => (
-              <div key={s.label} style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: '18px 20px' }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>{s.icon}</div>
+              <div key={s.label} className="admin-card admin-stat-card">
+                <div className="admin-stat-icon">{s.icon}</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: s.color, marginBottom: 4 }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+                <div style={{ fontSize: 11, color: '#667085', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -596,7 +651,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             <h3 style={{ margin: 0, fontSize: 18, color: COLORS.textPrimary }}>Recent Uploads</h3>
             <Btn small onClick={() => { setView('brochures'); setShowForm(true); setEditTarget(null) }}>+ Add Brochure</Btn>
           </div>
-          <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
+          <div className="admin-card" style={{ overflow: 'hidden' }}>
             {activeBrochures.slice(0, 6).map((b, i) => {
               const cat = categories.find(c => c.id === b.category_id)
               return (
@@ -622,7 +677,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
 
         {view === 'brochures' && <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: COLORS.textPrimary }}>Manage Brochures</h2>
+            <h2 className="admin-page-title" style={{ margin: 0 }}>Manage Brochures</h2>
             <Btn onClick={() => { setShowForm(!showForm); setEditTarget(null) }}>{showForm ? 'Cancel' : '+ Add Brochure'}</Btn>
           </div>
           {showForm && (
@@ -640,9 +695,9 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
               <div key={b.id}>
                 <BrochureCard brochure={b} categories={categories} onShare={onShare} lang="en" />
                 <div style={{ marginTop: 8, display: 'flex', gap: 12, paddingLeft: 4 }}>
-                  <button onClick={() => { setEditTarget(b); setShowForm(true); window.scrollTo(0, 0) }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: COLORS.primary, fontFamily: 'Georgia, serif' }}>✏️ Edit</button>
-                  <button onClick={() => handleToggleFeatured(b)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: b.featured ? '#BA7517' : COLORS.textMuted, fontFamily: 'Georgia, serif' }}>{b.featured ? '★ Unfeature' : '☆ Feature'}</button>
-                  <button onClick={() => handleDelete(b)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: COLORS.danger, fontFamily: 'Georgia, serif' }}>🗑 Delete</button>
+                  <button className="admin-link-button" onClick={() => { setEditTarget(b); setShowForm(true); window.scrollTo(0, 0) }} style={{ color: COLORS.primary }}>Edit</button>
+                  <button className="admin-link-button" onClick={() => handleToggleFeatured(b)} style={{ color: b.featured ? '#B54708' : '#667085' }}>{b.featured ? 'Unfeature' : 'Feature'}</button>
+                  <button className="admin-link-button" onClick={() => handleDelete(b)} style={{ color: COLORS.danger }}>Delete</button>
                 </div>
               </div>
             ))}
@@ -650,16 +705,16 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         </>}
 
         {view === 'trash' && <>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Trash</h2>
+          <h2 className="admin-page-title" style={{ marginBottom: 8 }}>Trash</h2>
           <p style={{ color: COLORS.textMuted, marginTop: 0, marginBottom: 24, fontSize: 14 }}>
             Deleted brochures stay here until you permanently remove them.
           </p>
           {trashedBrochures.length === 0 ? (
-            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 48, textAlign: 'center', color: COLORS.textMuted }}>
+            <div className="admin-card" style={{ padding: 48, textAlign: 'center', color: COLORS.textMuted }}>
               Trash is empty.
             </div>
           ) : (
-            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
+            <div className="admin-card" style={{ overflow: 'hidden' }}>
               {trashedBrochures.map((b, i) => {
                 const cat = categories.find(c => c.id === b.category_id)
                 const deletedDate = b.deleted_at?.split('T')[0]
@@ -687,26 +742,26 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
         </>}
 
         {view === 'categories' && <>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 24px', color: COLORS.textPrimary }}>Manage Categories</h2>
+          <h2 className="admin-page-title">Manage Categories</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: 16, marginBottom: 32 }}>
             {categories.map(cat => {
               const count = brochures.filter(b => b.category_id === cat.id).length
               return (
-                <div key={cat.id} style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 18 }}>
+                <div key={cat.id} className="admin-card" style={{ padding: 18 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: 28 }}>{cat.icon}</div>
+                    <div className="admin-symbol">{formatAdminSymbol(cat.icon, cat.label)}</div>
                     <Badge label={`${count} resources`} color={COLORS.textSecondary} bg="#F5F3EE" />
                   </div>
                   <div style={{ fontWeight: 700, fontSize: 15, marginTop: 10, color: COLORS.textPrimary }}>{cat.label}</div>
                   <div style={{ marginTop: 8, width: 24, height: 4, borderRadius: 2, background: cat.color }} />
                   <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
                     <button onClick={() => { setEditingCat({ ...cat }); setCatError('') }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: COLORS.primary, fontFamily: 'Georgia, serif', padding: 0 }}>
-                      ✏️ Edit
+                      className="admin-link-button" style={{ color: COLORS.primary }}>
+                      Edit
                     </button>
                     <button onClick={() => deleteCategory(cat)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: COLORS.danger, fontFamily: 'Georgia, serif', padding: 0 }}>
-                      🗑 Delete
+                      className="admin-link-button" style={{ color: COLORS.danger }}>
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -724,10 +779,10 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
               error={catError}
             />
           ) : (
-            <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 24 }}>
+            <div className="admin-card" style={{ padding: 24 }}>
               <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.textPrimary }}>Add New Category</h3>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-                <div style={{ width: 72 }}><Field label="Icon"><Input value={newCatIcon} onChange={setNewCatIcon} placeholder="📌" /></Field></div>
+                <div style={{ width: 96 }}><Field label="Symbol"><Input value={newCatIcon} onChange={setNewCatIcon} placeholder="GEN" maxLength={4} /></Field></div>
                 <div style={{ flex: 1, minWidth: 160 }}><Field label="Name"><Input value={newCatName} onChange={setNewCatName} placeholder="Category name…" /></Field></div>
                 <div style={{ width: 52 }}>
                   <Field label="Color">
@@ -737,15 +792,15 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                 </div>
                 <Btn onClick={addCategory}>Add</Btn>
               </div>
-              <EmojiPicker onPick={setNewCatIcon} current={newCatIcon} />
+              <SymbolPicker onPick={setNewCatIcon} current={newCatIcon} />
               {catError && <p style={{ color: COLORS.danger, fontSize: 13, marginTop: 10 }}>{catError}</p>}
             </div>
           )}
         </>}
 
         {view === 'activity' && <>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 24px', color: COLORS.textPrimary }}>Share Activity</h2>
-          <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', overflow: 'hidden' }}>
+          <h2 className="admin-page-title">Share Activity</h2>
+          <div className="admin-card" style={{ overflow: 'hidden' }}>
             {shareLogs.length === 0
               ? <div style={{ padding: 40, textAlign: 'center', color: COLORS.textMuted }}>No share activity yet.</div>
               : shareLogs.map((log, i) => (
@@ -759,7 +814,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                     <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 2 }}>{new Date(log.shared_at).toLocaleString()}</div>
                   </div>
                   <Badge
-                    label={log.method === 'email' ? '📧 Email' : log.method === 'sms' ? '💬 SMS' : '🔗 Link'}
+                    label={log.method === 'email' ? 'Email' : log.method === 'sms' ? 'SMS' : 'Link'}
                     color={log.method === 'email' ? COLORS.primary : log.method === 'sms' ? '#533AB7' : COLORS.success}
                     bg={log.method === 'email' ? '#E6F1FB' : log.method === 'sms' ? '#EEEDFE' : '#E1F5EE'}
                   />
@@ -950,33 +1005,44 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   )
 }
 
-const EMOJI_OPTIONS = [
-  '🏠','🛏️','⚖️','💬','💵','🛡️','👨‍👩‍👧','🩺','🚨',
-  '🏳️‍🌈','💗','📞','📚','🧠','👶','🍎','🚗','✝️','🕊️','🌈','🤝','📋','📌',
+const SYMBOL_OPTIONS = [
+  'GEN', 'SAFE', 'LAW', 'CALL', 'CARE', 'HOME', 'MED', 'FAM', 'FIN', 'TRN', 'DOC', 'LGBT',
 ]
 
-function EmojiPicker({ onPick, current }) {
+function formatAdminSymbol(value, fallback = '') {
+  const plain = String(value || '').replace(/[^\p{L}\p{N}]/gu, '').toUpperCase()
+  if (plain) return plain.slice(0, 4)
+  return String(fallback || 'GEN').replace(/[^\p{L}\p{N}]/gu, '').toUpperCase().slice(0, 3) || 'GEN'
+}
+
+function SymbolPicker({ onPick, current }) {
   return (
     <div style={{ marginTop: 14 }}>
       <div style={{ fontSize: 11, fontWeight: 700, color: COLORS.textSecondary, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-        Quick pick
+        Quick symbols
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-        {EMOJI_OPTIONS.map(em => (
+        {SYMBOL_OPTIONS.map(symbol => (
           <button
-            key={em}
+            key={symbol}
             type="button"
-            onClick={() => onPick(em)}
-            aria-label={`Use ${em}`}
-            aria-pressed={em === current}
+            onClick={() => onPick(symbol)}
+            aria-label={`Use ${symbol}`}
+            aria-pressed={symbol === current}
             style={{
-              fontSize: 20, padding: '6px 10px', cursor: 'pointer',
-              background: em === current ? COLORS.primaryLight : '#FAFAF7',
-              border: `1.5px solid ${em === current ? COLORS.primary : '#E8E6DE'}`,
-              borderRadius: 8, lineHeight: 1,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: '.04em',
+              padding: '8px 10px',
+              cursor: 'pointer',
+              background: symbol === current ? '#E6F1FB' : '#FFFFFF',
+              color: symbol === current ? '#0F2D5E' : '#344054',
+              border: `1px solid ${symbol === current ? '#98C7EE' : '#DDE3EA'}`,
+              borderRadius: 6,
+              lineHeight: 1,
             }}
           >
-            {em}
+            {symbol}
           </button>
         ))}
       </div>
@@ -986,14 +1052,14 @@ function EmojiPicker({ onPick, current }) {
 
 function CategoryEditor({ cat, setCat, onSave, onCancel, onDelete, error }) {
   return (
-    <div style={{ background: '#FFFFFF', borderRadius: 14, border: `2px solid ${COLORS.primary}`, padding: 24 }}>
+    <div className="admin-card" style={{ borderColor: '#98A2B3', padding: 24 }}>
       <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.primary }}>
-        Edit Category — {cat.label}
+        Edit Category - {cat.label}
       </h3>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-        <div style={{ width: 72 }}>
-          <Field label="Icon">
-            <Input value={cat.icon} onChange={v => setCat({ ...cat, icon: v })} placeholder="📌" />
+        <div style={{ width: 96 }}>
+          <Field label="Symbol">
+            <Input value={cat.icon} onChange={v => setCat({ ...cat, icon: v })} placeholder="GEN" maxLength={4} />
           </Field>
         </div>
         <div style={{ flex: 1, minWidth: 160 }}>
@@ -1011,7 +1077,7 @@ function CategoryEditor({ cat, setCat, onSave, onCancel, onDelete, error }) {
         <Btn variant="ghost" onClick={onCancel}>Cancel</Btn>
         <Btn variant="danger" onClick={onDelete}>Delete</Btn>
       </div>
-      <EmojiPicker onPick={em => setCat({ ...cat, icon: em })} current={cat.icon} />
+      <SymbolPicker onPick={symbol => setCat({ ...cat, icon: symbol })} current={cat.icon} />
       {error && <p style={{ color: COLORS.danger, fontSize: 13, marginTop: 10 }}>{error}</p>}
     </div>
   )
@@ -1232,8 +1298,8 @@ function TutorialView({
       )}
 
       {resourceTab === 'tutorial' && !editMode && allDone && (
-        <div style={{ background: '#EAF6EE', border: '1px solid #A8D5B5', borderRadius: 14, padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ fontSize: 32 }}>🎉</div>
+        <div className="admin-card" style={{ background: '#F0FDF4', borderColor: '#ABEFC6', padding: '18px 22px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div className="admin-symbol" style={{ background: '#DCFAE6', color: '#067647', borderColor: '#ABEFC6' }}>OK</div>
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#1A6B3A', marginBottom: 2 }}>Resource checklist complete!</div>
             <div style={{ fontSize: 13, color: '#2E7D50', lineHeight: 1.5 }}>You are ready to support victims using this portal.</div>
@@ -1251,7 +1317,7 @@ function TutorialView({
       )}
 
       {resourceTab === 'tutorial' && total === 0 && !editingStep && (
-        <div style={{ background: '#FFFFFF', borderRadius: 14, border: '1px solid #E8E6DE', padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
+        <div className="admin-card" style={{ padding: 40, textAlign: 'center', color: COLORS.textMuted, marginBottom: 16 }}>
           No resource checklist items yet. {editMode ? 'Click "Add step" below to create one.' : 'An admin can add checklist items from the edit view.'}
         </div>
       )}
@@ -1263,8 +1329,8 @@ function TutorialView({
           const bgColor = step.is_warning ? '#FAECE7' : isDone ? '#F4FBF6' : '#FFFFFF'
 
           return (
-            <div key={step.id} style={{
-              background: bgColor, borderRadius: 14, border: `1px solid ${borderColor}`,
+            <div key={step.id} className="admin-card" style={{
+              background: bgColor, border: `1px solid ${borderColor}`,
               padding: '18px 20px', transition: 'all 0.2s',
             }}>
               <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
@@ -1286,7 +1352,7 @@ function TutorialView({
                 )}
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 16 }} aria-hidden="true">{step.icon}</span>
+                    <span className="admin-symbol" style={{ width: 30, height: 30, fontSize: 10 }} aria-hidden="true">{formatAdminSymbol(step.icon, step.title)}</span>
                     <span style={{
                       fontWeight: 700, fontSize: 15,
                       color: isDone && !editMode ? COLORS.textMuted : step.is_warning ? '#993C1D' : COLORS.textPrimary,
@@ -1345,7 +1411,7 @@ function TutorialView({
 
       {resourceTab === 'tutorial' && editMode && !editingStep && (
         <div style={{ marginTop: 16 }}>
-          <Btn onClick={() => setEditingStep({ icon: '📌', title: '', body: '', is_warning: false, highlight: false, action_label: '', action_view: '' })}>
+          <Btn onClick={() => setEditingStep({ icon: 'GEN', title: '', body: '', is_warning: false, highlight: false, action_label: '', action_view: '' })}>
             + Add checklist item
           </Btn>
         </div>
@@ -1420,12 +1486,12 @@ function FieldGuideEditor({ entry, setEntry, onSave, onCancel }) {
 
 function TutorialEditor({ step, setStep, onSave, onCancel }) {
   return (
-    <div style={{ background: '#FFFFFF', borderRadius: 14, border: `2px solid ${COLORS.primary}`, padding: 24, marginBottom: 16 }}>
+    <div className="admin-card" style={{ borderColor: '#98A2B3', padding: 24, marginBottom: 16 }}>
       <h3 style={{ margin: '0 0 16px', fontSize: 16, color: COLORS.primary }}>
         {step.id ? 'Edit checklist item' : 'Add checklist item'}
       </h3>
       <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: 12, marginBottom: 12 }}>
-        <Field label="Icon"><Input value={step.icon} onChange={v => setStep({ ...step, icon: v })} placeholder="📌" /></Field>
+        <Field label="Symbol"><Input value={step.icon} onChange={v => setStep({ ...step, icon: v })} placeholder="GEN" maxLength={4} /></Field>
         <Field label="Title"><Input value={step.title} onChange={v => setStep({ ...step, title: v })} placeholder="Step title" /></Field>
       </div>
       <div style={{ marginBottom: 12 }}>
