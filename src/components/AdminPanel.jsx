@@ -31,24 +31,33 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [inviteSending, setInviteSending] = useState(false)
   const [editingStep, setEditingStep] = useState(null) // tutorial step being edited
   const [tutorialEditMode, setTutorialEditMode] = useState(false)
-  const tutorialProgressKey = `tutorial_steps:${adminProfile?.user_id || 'local'}`
-  const [completedSteps, setCompletedSteps] = useState(() => {
-    const key = `tutorial_steps:${adminProfile?.user_id || 'local'}`
-    try { return JSON.parse(localStorage.getItem(key) || localStorage.getItem('tutorial_steps') || '[]') } catch { return [] }
-  })
+  const [completedSteps, setCompletedSteps] = useState([])
+  const [resettingTutorialUserId, setResettingTutorialUserId] = useState('')
 
-  function toggleStep(id) {
-    setCompletedSteps(prev => {
-      const next = prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-      localStorage.setItem(tutorialProgressKey, JSON.stringify(next))
-      return next
-    })
+  async function toggleStep(id) {
+    if (!adminProfile?.user_id) return
+    const isComplete = completedSteps.includes(id)
+    setCompletedSteps(prev => isComplete ? prev.filter(stepId => stepId !== id) : [...prev, id])
+
+    const { error } = isComplete
+      ? await supabase.from('tutorial_step_completions').delete().eq('user_id', adminProfile.user_id).eq('step_id', id)
+      : await supabase.from('tutorial_step_completions').upsert({ user_id: adminProfile.user_id, step_id: id })
+
+    if (error) {
+      setCompletedSteps(prev => isComplete ? [...prev, id] : prev.filter(stepId => stepId !== id))
+      alert(error.message)
+    }
   }
 
-  function resetTutorialProgress() {
-    if (!window.confirm('Reset tutorial progress for this admin user? Completed tutorial items will show again.')) return
-    localStorage.removeItem(tutorialProgressKey)
-    setCompletedSteps([])
+  async function resetTutorialProgress(profile = adminProfile) {
+    if (!profile?.user_id) return
+    if (!window.confirm(`Reset tutorial progress for ${profile.email || 'this admin'}? Completed tutorial items will show again for that user.`)) return
+    setResettingTutorialUserId(profile.user_id)
+    const { error } = await supabase.rpc('reset_tutorial_progress', { target_user_id: profile.user_id })
+    setResettingTutorialUserId('')
+    if (error) return alert(error.message)
+    if (profile.user_id === adminProfile?.user_id) setCompletedSteps([])
+    setInviteNotice(`Tutorial progress reset for ${profile.email || 'admin user'}.`)
   }
 
   useEffect(() => {
@@ -64,6 +73,14 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     supabase.from('field_guide_entries').select('*').order('sort_order').order('title')
       .then(({ data }) => setFieldGuideEntries(data || []))
   }, [])
+
+  useEffect(() => {
+    if (!adminProfile?.user_id) return
+    supabase.from('tutorial_step_completions').select('step_id').eq('user_id', adminProfile.user_id)
+      .then(({ data, error }) => {
+        if (!error) setCompletedSteps((data || []).map(row => row.step_id))
+      })
+  }, [adminProfile?.user_id])
 
   useEffect(() => {
     if (view === 'users' && adminProfile?.role === 'super_admin') {
@@ -853,6 +870,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             onDelete={deleteTutorialStep}
             onSaveFieldGuideEntry={saveFieldGuideEntry}
             onDeleteFieldGuideEntry={deleteFieldGuideEntry}
+            resettingTutorialUserId={resettingTutorialUserId}
           />
         )}
 
@@ -897,6 +915,14 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                           color={profile.role === 'super_admin' ? '#8B5E0A' : COLORS.primary}
                           bg={profile.role === 'super_admin' ? '#FDF3E3' : '#E6F1FB'}
                         />
+                        <Btn
+                          small
+                          variant="ghost"
+                          disabled={resettingTutorialUserId === profile.user_id}
+                          onClick={() => resetTutorialProgress(profile)}
+                        >
+                          {resettingTutorialUserId === profile.user_id ? 'Resetting...' : 'Reset Tutorial'}
+                        </Btn>
                         <Btn
                           small
                           variant="danger"
@@ -1111,6 +1137,7 @@ function TutorialView({
   onDelete,
   onSaveFieldGuideEntry,
   onDeleteFieldGuideEntry,
+  resettingTutorialUserId,
 }) {
   const total = steps.length
   const done = steps.filter(s => completedSteps.includes(s.id)).length
@@ -1160,8 +1187,8 @@ function TutorialView({
             {editMode ? 'Done editing' : isTutorial ? 'Edit tutorial' : 'Edit resources'}
           </Btn>
           {isTutorial && editMode && done > 0 && (
-            <Btn small variant="ghost" onClick={onResetTutorialProgress}>
-              Reset progress
+            <Btn small variant="ghost" disabled={!!resettingTutorialUserId} onClick={onResetTutorialProgress}>
+              {resettingTutorialUserId ? 'Resetting...' : 'Reset progress'}
             </Btn>
           )}
         </div>
