@@ -41,6 +41,19 @@ function QuickExitButton({ compact = false }) {
   )
 }
 
+function PhoneLink({ phone, children, style }) {
+  const tel = String(phone).replace(/[^\d+]/g, '')
+  return (
+    <a
+      href={`tel:${tel}`}
+      style={{ color: 'inherit', textDecoration: 'underline', textUnderlineOffset: 2, fontWeight: 700, ...style }}
+      aria-label={`Call ${children || phone}`}
+    >
+      {children || phone}
+    </a>
+  )
+}
+
 function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, setSearch, onSearchSubmit }) {
   const navGroups = [
     {
@@ -489,7 +502,7 @@ function PublicWikiView({ isMobile }) {
         ))}
       </div>
       <div style={{ marginTop: 20, background: '#FFF8E8', border: '1px solid #E7C46A', borderRadius: 12, padding: 18, color: '#704E00', fontSize: 14, lineHeight: 1.6 }}>
-        This site is for resource navigation. It is not an emergency reporting tool. For immediate danger, call 911.
+        This site is for resource navigation. It is not an emergency reporting tool. For immediate danger, call <PhoneLink phone="911">911</PhoneLink>.
       </div>
     </main>
   )
@@ -809,15 +822,17 @@ export default function PublicPortal({ brochures, categories, onShare }) {
           {/* Contact cards */}
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 32 }}>
             {[
-              { icon: '📞', label: 'After Hours', detail: '303-441-4444', note: '7 days, 24 hours' },
-              { icon: '🏢', label: 'Office', detail: '303-926-2841', note: 'Mon–Fri, 8am–5pm' },
+              { icon: '📞', label: 'After Hours', detail: '303-441-4444', phone: '303-441-4444', note: '7 days, 24 hours' },
+              { icon: '🏢', label: 'Office', detail: '303-926-2841', phone: '303-926-2841', note: 'Mon–Fri, 8am–5pm' },
               { icon: '✉️', label: 'Email', detail: 'victimservices@erieco.gov', note: 'Victim Services' },
-              { icon: '⚖️', label: 'Victim Rights', detail: '303-239-4497', note: 'CO Dept of Public Safety' },
+              { icon: '⚖️', label: 'Victim Rights', detail: '303-239-4497', phone: '303-239-4497', note: 'CO Dept of Public Safety' },
             ].map(c => (
               <div key={c.label} style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid #E8E6DE', padding: isMobile ? 16 : 20 }}>
                 <div style={{ fontSize: 26, marginBottom: 8 }}>{c.icon}</div>
                 <div style={{ fontWeight: 700, fontSize: 11, color: COLORS.textMuted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{c.label}</div>
-                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: COLORS.textPrimary, marginBottom: 4 }}>{c.detail}</div>
+                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: COLORS.textPrimary, marginBottom: 4 }}>
+                  {c.phone ? <PhoneLink phone={c.phone} style={{ color: COLORS.primary }}>{c.detail}</PhoneLink> : c.detail}
+                </div>
                 <div style={{ fontSize: 12, color: COLORS.textMuted }}>{c.note}</div>
               </div>
             ))}
@@ -838,7 +853,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             <p style={{ margin: '0 0 12px', color: COLORS.primaryDark, fontSize: 14, lineHeight: 1.7, fontWeight: 600 }}>
               Colorado Department of Public Safety, Division of Criminal Justice<br />
               700 Kipling Street, Suite 1000, Denver, CO 80215-5865<br />
-              📞 303-239-4497
+              📞 <PhoneLink phone="303-239-4497" style={{ color: COLORS.primaryDark }}>303-239-4497</PhoneLink>
             </p>
             <p style={{ margin: 0, color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
               Additional resource:{' '}
@@ -910,8 +925,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             <div>
               <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
               <div style={{ color: '#475569', fontSize: 13, lineHeight: 2 }}>
-                <div>📞 After Hours: 303-441-4444</div>
-                <div>🏢 Office: 303-926-2841</div>
+                <div>📞 After Hours: <PhoneLink phone="303-441-4444" style={{ color: '#0F2D5E' }}>303-441-4444</PhoneLink></div>
+                <div>🏢 Office: <PhoneLink phone="303-926-2841" style={{ color: '#0F2D5E' }}>303-926-2841</PhoneLink></div>
                 <div>✉️ victimservices@erieco.gov</div>
               </div>
             </div>
@@ -920,9 +935,9 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             <div>
               <div style={{ color: '#A32D2D', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Emergency</div>
               <div style={{ color: '#475569', fontSize: 13, lineHeight: 2 }}>
-                <div>🚨 Emergency: 911</div>
-                <div>💜 DV Hotline: 1-800-799-7233</div>
-                <div>⚖️ Victim Rights: 303-239-4497</div>
+                <div>🚨 Emergency: <PhoneLink phone="911" style={{ color: '#A32D2D' }}>911</PhoneLink></div>
+                <div>💜 DV Hotline: <PhoneLink phone="1-800-799-7233" style={{ color: '#0F2D5E' }}>1-800-799-7233</PhoneLink></div>
+                <div>⚖️ Victim Rights: <PhoneLink phone="303-239-4497" style={{ color: '#0F2D5E' }}>303-239-4497</PhoneLink></div>
               </div>
             </div>
           </div>

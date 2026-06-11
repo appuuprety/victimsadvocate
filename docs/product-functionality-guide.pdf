@@ -1,0 +1,1917 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 3764 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 20 Tf
+0.05 0.18 0.37 rg
+54 738 Td
+(Colorado Victim Resources Product Functionality) Tj
+ET
+BT
+/F1 20 Tf
+0.05 0.18 0.37 rg
+54 714 Td
+(Guide) Tj
+ET
+q
+0.86 0.89 0.92 RG
+1 w
+54 690 m 558 690 l S
+Q
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 672 Td
+(Version: June 11, 2026) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 654 Td
+(This guide explains the functionality available in the Colorado Victim Resources application. It) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 640 Td
+(covers the public resource site, the admin portal, and the secure admin message board.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 612 Td
+(1. Product Overview) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 588 Td
+(Colorado Victim Resources is a web application for finding, organizing, sharing, and maintaining) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 574 Td
+(victim-support resources. The product has two main experiences:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 556 Td
+(- Public site: used by community members, victims, advocates, and staff to find resources,) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 542 Td
+(share brochures, contact victim services, and adjust accessibility settings.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 528 Td
+(- Admin portal: used by approved administrators to manage brochures, categories, volunteer) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 514 Td
+(advocate resources, tutorials, admin invites, activity, help content, and internal team) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 500 Td
+(messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 482 Td
+(The application is backed by Supabase for authentication, database storage, file storage, Edge) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 468 Td
+(Functions, and row-level security.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 440 Td
+(2. Public Site Functionality) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 410 Td
+(2.1 Home Page) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 388 Td
+(The home page introduces the resource library and provides the fastest path to finding help.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 370 Td
+(Key functionality:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 352 Td
+(- Search resources from the main page.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 338 Td
+(- Browse resource categories.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 324 Td
+(- Open featured resources.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 310 Td
+(- Navigate to Resources, Contact, Help, or Admin from the hamburger menu.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 296 Td
+(- Use Quick exit to leave the site quickly.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 282 Td
+(- Adjust text size from the header.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 268 Td
+(- Change language from the menu.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 244 Td
+(2.2 Resource Search) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 222 Td
+(Users can search resources by title, description, and tags.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 204 Td
+(Search is available in:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 186 Td
+(- The home page search box.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 172 Td
+(- The Resources page search box.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 158 Td
+(- The hamburger menu as the first available menu function.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 140 Td
+(When a search is submitted, the app routes the user to the Resources page and displays matching) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 126 Td
+(brochures.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 102 Td
+(2.3 Resources Page) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 80 Td
+(The Resources page shows the full brochure library.) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 1) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 2 0 R
+>>
+endobj
+4 0 obj
+<< /Length 3606 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 738 Td
+(Users can:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 720 Td
+(- Filter resources by category.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 706 Td
+(- Search the full library.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 692 Td
+(- View brochure cards.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 678 Td
+(- Select up to five resources for grouped sharing.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 664 Td
+(- Clear filters when no results are found.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 640 Td
+(2.4 Sharing Resources) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 618 Td
+(Resource sharing allows users to send or copy resource information.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 600 Td
+(Supported flows include:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 582 Td
+(- Share a single brochure from a brochure card.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 568 Td
+(- Select up to five brochures and share them together.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 554 Td
+(- Send by email when configured through the Supabase Edge Function.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 540 Td
+(- Open or copy messages for alternate sharing workflows.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 522 Td
+(Privacy guidance:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 504 Td
+(- Do not include private victim information in resource notes or messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 490 Td
+(- Use approved anonymous workflows when texting resources.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 476 Td
+(- Avoid sending from a personal phone number when anonymity is required.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 452 Td
+(2.5 Contact Page) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 430 Td
+(The Contact page provides key service and rights information.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 412 Td
+(It includes:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 394 Td
+(- After-hours contact number.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 380 Td
+(- Office phone number.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 366 Td
+(- Victim Services email.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 352 Td
+(- Colorado Victim Rights information.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 338 Td
+(- Privacy and safety guidance.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 320 Td
+(The site is not an emergency reporting tool. For immediate danger, call 911.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 296 Td
+(2.6 Help Page) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 274 Td
+(The public Help page explains how to use the public side of the product.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 256 Td
+(It covers:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 238 Td
+(- Finding resources.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 224 Td
+(- Sharing resources.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 210 Td
+(- Safety and accessibility features.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 196 Td
+(- Contact information.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 182 Td
+(- Emergency-use limitations.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 158 Td
+(2.7 Public Hamburger Menu) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 136 Td
+(The public menu is designed to be accessible and mobile-friendly.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 118 Td
+(It includes:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 100 Td
+(- Resource search as the first item.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 86 Td
+(- Home.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 72 Td
+(- Resources.) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 2) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 4 0 R
+>>
+endobj
+6 0 obj
+<< /Length 3310 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 738 Td
+(- Contact.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 724 Td
+(- Help.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 710 Td
+(- Quick exit.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 696 Td
+(- Language selector.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 682 Td
+(- Admin portal link.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 664 Td
+(The menu uses a drawer pattern similar to the admin portal so both experiences feel related.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 640 Td
+(2.8 Accessibility Features) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 618 Td
+(Accessibility features include:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 600 Td
+(- Skip-to-content link.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 586 Td
+(- Keyboard-visible focus states.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 572 Td
+(- Text size control.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 558 Td
+(- Mobile-friendly drawer navigation.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 544 Td
+(- Clear labels on controls.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 530 Td
+(- Language selector.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 516 Td
+(- High-contrast emergency banner.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 488 Td
+(3. Admin Portal Functionality) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 458 Td
+(3.1 Admin Authentication) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 436 Td
+(The admin portal is available only to approved admin users.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 418 Td
+(Admin access supports:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 400 Td
+(- Email/password login.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 386 Td
+(- Password reset.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 372 Td
+(- Invite-based registration.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 358 Td
+(- Super admin approval and invite controls.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 344 Td
+(- Role-based permissions.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 326 Td
+(Admin roles:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 308 Td
+(- Admin: can manage resources and use internal admin tools.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 294 Td
+(- Super admin: can manage invites, admin users, and higher-risk administrative actions.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 270 Td
+(3.2 Admin Dashboard) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 248 Td
+(The dashboard gives administrators a quick operational snapshot.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 230 Td
+(It shows:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 212 Td
+(- Total brochures.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 198 Td
+(- Featured resources.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 184 Td
+(- Categories.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 170 Td
+(- Share events.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 156 Td
+(- Recent uploads.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 138 Td
+(Admins can quickly edit or share recently uploaded brochures from this area.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 114 Td
+(3.3 Brochure Management) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 92 Td
+(Admins can manage the public brochure library.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 74 Td
+(Supported actions:) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 3) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 6 0 R
+>>
+endobj
+8 0 obj
+<< /Length 3566 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 738 Td
+(- Add a brochure.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 724 Td
+(- Upload a document.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 710 Td
+(- Edit title, description, category, tags, and metadata.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 696 Td
+(- Feature or unfeature a brochure.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 682 Td
+(- Share a brochure.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 668 Td
+(- Move a brochure to Trash.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 654 Td
+(- Restore from Trash.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 640 Td
+(- Permanently delete from Trash.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 622 Td
+(Files are stored through Supabase Storage.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 598 Td
+(3.4 Category Management) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 576 Td
+(Categories organize resources for browsing and filtering.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 558 Td
+(Admins can:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 540 Td
+(- Add categories.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 526 Td
+(- Edit category labels.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 512 Td
+(- Set short symbols.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 498 Td
+(- Pick category colors.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 484 Td
+(- Delete categories when no brochures are using them.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 460 Td
+(3.5 Tutorial) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 438 Td
+(The Tutorial section is an admin-facing checklist for onboarding and repeatable workflows.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 420 Td
+(Admins can:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 402 Td
+(- Complete checklist items.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 388 Td
+(- Hide completed items.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 374 Td
+(- Reset tutorial progress.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 360 Td
+(- Add, edit, or remove tutorial steps in edit mode.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 342 Td
+(Super admins can reset tutorial progress for other admin users.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 318 Td
+(3.6 Volunteer Advocate Resources / Field Guide) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 296 Td
+(Volunteer Advocate Resources is a searchable field guide for advocate workflows.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 278 Td
+(It supports:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 260 Td
+(- Table-of-contents sections.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 246 Td
+(- Submenus for sections with multiple entries.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 232 Td
+(- Search across section, title, body, and tags.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 218 Td
+(- Mobile-friendly reading.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 204 Td
+(- Admin editing.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 190 Td
+(- Add, edit, delete, publish, tag, and sort entries.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 172 Td
+(Example field guide content includes:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 154 Td
+(- Taking the call.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 140 Td
+(- Arriving on scene or calling by phone.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 126 Td
+(- Crisis intervention.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 112 Td
+(- Ending a call.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 98 Td
+(- Conversation starters.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 84 Td
+(- Victim advocate creed.) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 4) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 8 0 R
+>>
+endobj
+10 0 obj
+<< /Length 3376 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 738 Td
+(3.7 Share Activity) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 716 Td
+(The Activity section shows recent sharing events.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 698 Td
+(It includes:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 680 Td
+(- Brochure title.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 666 Td
+(- Share method.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 652 Td
+(- Share timestamp.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 634 Td
+(This helps admins understand resource usage without storing private victim information.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 610 Td
+(3.8 Admin Invites and User Management) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 588 Td
+(Super admins can manage admin access.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 570 Td
+(Supported functionality:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 552 Td
+(- Send admin invite links.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 538 Td
+(- Choose admin or super admin role.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 524 Td
+(- Automatically email invite links when email configuration is working.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 510 Td
+(- Copy invite links.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 496 Td
+(- View active admin profiles.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 482 Td
+(- Delete admin access.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 468 Td
+(- View invite attempt logs.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 454 Td
+(- Verify that invite registration email matches the invited email exactly.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 436 Td
+(The invite attempt log records:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 418 Td
+(- Entered email.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 404 Td
+(- Invite email.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 390 Td
+(- Match status.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 376 Td
+(- Timestamp.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 352 Td
+(3.9 Admin Help) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 330 Td
+(The Admin Help page explains the admin portal and the public site from an operational) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 316 Td
+(perspective.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 298 Td
+(It covers:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 280 Td
+(- Dashboard.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 266 Td
+(- Tutorial.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 252 Td
+(- Volunteer advocate resources.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 238 Td
+(- Brochure and category management.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 224 Td
+(- Invites and admins.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 210 Td
+(- Activity.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 196 Td
+(- Message board.) Tj
+ET
+BT
+/F1 14 Tf
+0.05 0.18 0.37 rg
+54 172 Td
+(3.10 Admin Message Board) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 150 Td
+(The Message Board is a secure admin-only communication space.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 132 Td
+(Admins can:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 114 Td
+(- Read team messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 100 Td
+(- Post a message.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 86 Td
+(- Refresh messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 72 Td
+(- Pin their own messages.) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 5) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 10 0 R
+>>
+endobj
+12 0 obj
+<< /Length 3606 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 738 Td
+(- Delete their own messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 720 Td
+(Super admins can:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 702 Td
+(- Pin any message.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 688 Td
+(- Delete any message.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 670 Td
+(Security and privacy rules:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 652 Td
+(- Only approved authenticated admins can read or create messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 638 Td
+(- Messages are protected by Supabase row-level security.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 624 Td
+(- Do not post victim names, phone numbers, addresses, case numbers, or case facts.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 610 Td
+(- Use the board for operational updates, shift notes, resource reminders, and admin) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 596 Td
+(announcements.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 568 Td
+(4. Security Model) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 544 Td
+(The application uses Supabase Auth and row-level security.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 526 Td
+(Key protections:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 508 Td
+(- Admin-only tables require an approved admin profile.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 494 Td
+(- Super-admin functions are restricted by role.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 480 Td
+(- Admin invites are token-based and email-matched.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 466 Td
+(- Message board access is restricted to approved admins.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 452 Td
+(- Public users cannot access admin tables directly.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 424 Td
+(5. Supabase Functions and Data) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 400 Td
+(Supabase is used for:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 382 Td
+(- Authentication.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 368 Td
+(- Admin profile and invite management.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 354 Td
+(- Brochure records.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 340 Td
+(- Category records.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 326 Td
+(- Share logs.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 312 Td
+(- Tutorial steps and completions.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 298 Td
+(- Field guide entries.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 284 Td
+(- Admin message board.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 270 Td
+(- File storage for brochure documents.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 256 Td
+(- Email and invite Edge Functions.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 238 Td
+(Important Edge Functions:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 220 Td
+(- send-email: sends resource email messages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 206 Td
+(- send-invite: sends admin invite emails.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 178 Td
+(6. Recommended Operating Practices) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 154 Td
+(For public-side use:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 136 Td
+(- Search first when the user knows what they need.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 122 Td
+(- Browse categories when the user is unsure.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 108 Td
+(- Use Quick exit when privacy or safety is a concern.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 94 Td
+(- Call 911 for emergencies.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 76 Td
+(For admin-side use:) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 6) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 12 0 R
+>>
+endobj
+14 0 obj
+<< /Length 3350 >>
+stream
+q
+1 1 1 rg
+0 0 612 792 re f
+Q
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 738 Td
+(- Keep brochure titles clear and searchable.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 724 Td
+(- Use tags consistently.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 710 Td
+(- Avoid storing private victim details.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 696 Td
+(- Keep field guide entries short and mobile-friendly.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 682 Td
+(- Use the message board for admin operations only.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 668 Td
+(- Review invite attempts if a user reports registration issues.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 640 Td
+(7. Feature Checklist) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 616 Td
+(Public site:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 598 Td
+(- Home page.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 584 Td
+(- Search.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 570 Td
+(- Resources page.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 556 Td
+(- Category filtering.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 542 Td
+(- Resource cards.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 528 Td
+(- Multi-resource sharing.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 514 Td
+(- Contact page.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 500 Td
+(- Help page.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 486 Td
+(- Quick exit.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 472 Td
+(- Text size controls.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 458 Td
+(- Language selector.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 444 Td
+(- Mobile hamburger drawer.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 426 Td
+(Admin portal:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 408 Td
+(- Login.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 394 Td
+(- Password reset.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 380 Td
+(- Invite registration.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 366 Td
+(- Dashboard.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 352 Td
+(- Brochure management.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 338 Td
+(- Trash and restore.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 324 Td
+(- Category management.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 310 Td
+(- Tutorial checklist.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 296 Td
+(- Volunteer advocate field guide.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 282 Td
+(- Share activity.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 268 Td
+(- Admin invite management.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 254 Td
+(- Admin user deletion.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 240 Td
+(- Admin help page.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 226 Td
+(- Secure admin message board.) Tj
+ET
+BT
+/F1 17 Tf
+0.05 0.18 0.37 rg
+54 198 Td
+(8. Change Notes) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+54 174 Td
+(Recent additions covered by this guide:) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 156 Td
+(- Public and admin Help pages.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 142 Td
+(- Shared product guide content.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 128 Td
+(- Secure admin Message Board.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 114 Td
+(- Supabase admin_messages table and row-level security policies.) Tj
+ET
+BT
+/F1 10 Tf
+0.12 0.16 0.23 rg
+68 100 Td
+(- Message board integration test coverage.) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+54 28 Td
+(Colorado Victim Resources Product Functionality Guide) Tj
+ET
+BT
+/F1 9 Tf
+0.45 0.50 0.56 rg
+516 28 Td
+(Page 7) Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page
+/Parent 16 0 R
+/MediaBox [0 0 612 792]
+/Resources << /Font << /F1 1 0 R >> >>
+/Contents 14 0 R
+>>
+endobj
+16 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 7 >>
+endobj
+17 0 obj
+<< /Type /Catalog /Pages 16 0 R >>
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000003895 00000 n 
+0000004022 00000 n 
+0000007680 00000 n 
+0000007807 00000 n 
+0000011169 00000 n 
+0000011296 00000 n 
+0000014914 00000 n 
+0000015041 00000 n 
+0000018470 00000 n 
+0000018599 00000 n 
+0000022258 00000 n 
+0000022387 00000 n 
+0000025790 00000 n 
+0000025919 00000 n 
+0000026016 00000 n 
+trailer
+<< /Size 18 /Root 17 0 R >>
+startxref
+26067
+%%EOF
