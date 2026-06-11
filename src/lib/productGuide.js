@@ -1,6 +1,14 @@
-export const publicGuideSections = [
+export const publicWikiSections = [
   {
-    title: 'Find resources',
+    title: 'Getting Started',
+    items: [
+      'Use the public site to find victim-support resources, share resource information, and contact victim services.',
+      'Use the admin portal to maintain the resource library, field guide, tutorials, and internal team updates.',
+      'The hamburger menu gives quick access to search, page navigation, language, quick exit, and admin login.',
+    ],
+  },
+  {
+    title: 'Finding Resources',
     items: [
       'Use the search field on the home page or in the menu to find resources by title, description, or tag.',
       'Open Resources to browse the full library and filter by category.',
@@ -8,7 +16,7 @@ export const publicGuideSections = [
     ],
   },
   {
-    title: 'Share resources',
+    title: 'Sharing Resources',
     items: [
       'Select up to five resources, then use the share bar to send or copy them together.',
       'Open an individual resource card to share a single brochure.',
@@ -16,7 +24,7 @@ export const publicGuideSections = [
     ],
   },
   {
-    title: 'Safety and accessibility',
+    title: 'Accessibility and Safety Tools',
     items: [
       'Use Quick exit if someone needs to leave the site immediately.',
       'Use the text size control in the header to increase readability.',
@@ -24,10 +32,34 @@ export const publicGuideSections = [
     ],
   },
   {
-    title: 'Contact information',
+    title: 'Contact Information',
     items: [
       'Open Contact for after-hours, office, email, and victim-rights contact details.',
       'For emergencies, call 911. The site is not an emergency reporting tool.',
+    ],
+  },
+  {
+    title: 'Admin Portal Overview',
+    items: [
+      'Dashboard shows current brochure, category, featured-resource, and sharing activity totals.',
+      'Brochures lets admins add, edit, feature, delete, restore, and permanently remove resource records.',
+      'Categories keeps the public resource filters organized and easy to scan.',
+    ],
+  },
+  {
+    title: 'Volunteer Advocate Resources',
+    items: [
+      'Tutorial provides an admin checklist for onboarding and repeatable workflows.',
+      'Volunteer Advocate Resources is a searchable field guide with a mobile-friendly table of contents.',
+      'Admins can keep field guide entries short, searchable, and organized by section.',
+    ],
+  },
+  {
+    title: 'Admin Collaboration',
+    items: [
+      'Invites allow approved team members to join the admin portal.',
+      'Activity shows recent resource-sharing events.',
+      'Message Board gives admins a place for announcements, shift notes, and team updates.',
     ],
   },
 ]

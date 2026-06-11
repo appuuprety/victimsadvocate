@@ -4,7 +4,7 @@ import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS, LANGS } from '../lib/translations'
-import { publicGuideSections } from '../lib/productGuide'
+import { publicWikiSections } from '../lib/productGuide'
 
 function quickExit() {
   window.open('', '_self')
@@ -49,7 +49,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
         ['home', t.nav_home, 'H'],
         ['resources', t.nav_resources, 'R'],
         ['contact', t.nav_contact, 'C'],
-        ['help', 'Help', '?'],
+        ['wiki', 'Wiki', 'W'],
       ],
     },
   ]
@@ -471,15 +471,15 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
   )
 }
 
-function PublicHelpView({ isMobile }) {
+function PublicWikiView({ isMobile }) {
   return (
-    <main id="main-content" aria-label="Help" style={{ maxWidth: 960, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${isMobile ? 16 : 32}px`, background: '#FFFFFF' }}>
-      <h1 style={{ fontSize: isMobile ? 28 : 36, margin: '0 0 8px', color: '#0F2D5E' }}>Help</h1>
+    <main id="main-content" aria-label="Wiki" style={{ maxWidth: 960, margin: '0 auto', padding: `${isMobile ? 32 : 56}px ${isMobile ? 16 : 32}px`, background: '#FFFFFF' }}>
+      <h1 style={{ fontSize: isMobile ? 28 : 36, margin: '0 0 8px', color: '#0F2D5E' }}>Wiki</h1>
       <p style={{ color: COLORS.textSecondary, fontSize: 16, lineHeight: 1.7, margin: '0 0 28px' }}>
-        Use this guide to find resources, share information, adjust accessibility settings, and contact victim services.
+        A plain-language guide to the public resource site and the admin tools used to keep it current.
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
-        {publicGuideSections.map(section => (
+        {publicWikiSections.map(section => (
           <section key={section.title} style={{ background: '#FFFFFF', border: '1px solid #D8E6F2', borderRadius: 12, padding: 20 }}>
             <h2 style={{ margin: '0 0 12px', color: COLORS.textPrimary, fontSize: 20 }}>{section.title}</h2>
             <ul style={{ margin: 0, paddingLeft: 20, color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.7 }}>
@@ -856,7 +856,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         </main>
       )}
 
-      {page === 'help' && <PublicHelpView isMobile={isMobile} />}
+      {page === 'wiki' && <PublicWikiView isMobile={isMobile} />}
 
       {/* Floating multi-share bar */}
       {selected.size > 0 && (
