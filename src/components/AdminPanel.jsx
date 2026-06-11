@@ -4,6 +4,7 @@ import { Badge, Btn, Field, Input, COLORS } from './ui'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
 import BrochureForm from './BrochureForm'
+import { adminGuideSections } from '../lib/productGuide'
 
 export default function AdminPanel({ brochures, setBrochures, categories, setCategories, adminProfile, onLogout, onShare }) {
   const [view, setView] = useState('dashboard')
@@ -33,6 +34,10 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const [tutorialEditMode, setTutorialEditMode] = useState(false)
   const [completedSteps, setCompletedSteps] = useState([])
   const [resettingTutorialUserId, setResettingTutorialUserId] = useState('')
+  const [adminMessages, setAdminMessages] = useState([])
+  const [newAdminMessage, setNewAdminMessage] = useState('')
+  const [messageBoardError, setMessageBoardError] = useState('')
+  const [messageSending, setMessageSending] = useState(false)
 
   async function toggleStep(id) {
     if (!adminProfile?.user_id) return
@@ -65,7 +70,55 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
       supabase.from('share_logs').select('*, brochures(title)').order('shared_at', { ascending: false }).limit(30)
         .then(({ data }) => setShareLogs(data || []))
     }
+    if (view === 'messageBoard') {
+      loadAdminMessages()
+    }
   }, [view])
+
+  async function loadAdminMessages() {
+    const { data, error } = await supabase.from('admin_messages')
+      .select('*')
+      .order('pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(80)
+    if (error) return setMessageBoardError(error.message)
+    setMessageBoardError('')
+    setAdminMessages(data || [])
+  }
+
+  async function sendAdminMessage() {
+    const body = newAdminMessage.trim()
+    if (!body) return setMessageBoardError('Message is required.')
+    setMessageSending(true)
+    setMessageBoardError('')
+    const { data, error } = await supabase.from('admin_messages').insert({
+      author_id: adminProfile.user_id,
+      author_email: adminProfile.email || '',
+      body,
+    }).select().single()
+    setMessageSending(false)
+    if (error) return setMessageBoardError(error.message)
+    setAdminMessages(prev => [data, ...prev])
+    setNewAdminMessage('')
+  }
+
+  async function togglePinnedMessage(message) {
+    const { data, error } = await supabase.from('admin_messages')
+      .update({ pinned: !message.pinned, updated_at: new Date().toISOString() })
+      .eq('id', message.id)
+      .select()
+      .single()
+    if (error) return setMessageBoardError(error.message)
+    setAdminMessages(prev => prev.map(item => item.id === data.id ? data : item)
+      .sort((a, b) => Number(b.pinned) - Number(a.pinned) || new Date(b.created_at) - new Date(a.created_at)))
+  }
+
+  async function deleteAdminMessage(message) {
+    if (!window.confirm('Delete this message?')) return
+    const { error } = await supabase.from('admin_messages').delete().eq('id', message.id)
+    if (error) return setMessageBoardError(error.message)
+    setAdminMessages(prev => prev.filter(item => item.id !== message.id))
+  }
 
   useEffect(() => {
     supabase.from('tutorial_steps').select('*').order('sort_order')
@@ -295,7 +348,10 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
   const menuGroups = [
     {
       title: 'Main',
-      items: [['dashboard', 'Dashboard', 'D']],
+      items: [
+        ['dashboard', 'Dashboard', 'D'],
+        ['help', 'Help', 'H'],
+      ],
     },
     {
       title: 'Content',
@@ -309,6 +365,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
     {
       title: 'Admin',
       items: [
+        ['messageBoard', 'Message Board', 'M'],
         ['activity', 'Activity', 'A'],
         ['users', 'Invites', 'I'],
         ['trash', `Trash${trashedBrochures.length ? ` (${trashedBrochures.length})` : ''}`, 'T'],
@@ -874,6 +931,30 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
           />
         )}
 
+        {view === 'help' && (
+          <ProductGuideView
+            title="Admin Help"
+            description="A practical guide to the admin tools and the public resource experience."
+            sections={adminGuideSections}
+          />
+        )}
+
+        {view === 'messageBoard' && (
+          <MessageBoardView
+            messages={adminMessages}
+            messageText={newAdminMessage}
+            setMessageText={setNewAdminMessage}
+            error={messageBoardError}
+            sending={messageSending}
+            currentUserId={adminProfile?.user_id}
+            isSuperAdmin={adminProfile?.role === 'super_admin'}
+            onSend={sendAdminMessage}
+            onRefresh={loadAdminMessages}
+            onTogglePinned={togglePinnedMessage}
+            onDelete={deleteAdminMessage}
+          />
+        )}
+
         {view === 'users' && <>
           <h2 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Send Invites</h2>
           {adminProfile?.role !== 'super_admin' ? (
@@ -1034,6 +1115,118 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
             </>
           )}
         </>}
+      </div>
+    </div>
+  )
+}
+
+function ProductGuideView({ title, description, sections }) {
+  return (
+    <div>
+      <h2 className="admin-page-title">{title}</h2>
+      <p style={{ margin: '0 0 24px', color: COLORS.textMuted, fontSize: 14, lineHeight: 1.6 }}>
+        {description}
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+        {sections.map(section => (
+          <section key={section.title} className="admin-card" style={{ padding: 20 }}>
+            <h3 style={{ margin: '0 0 12px', color: COLORS.textPrimary, fontSize: 17 }}>{section.title}</h3>
+            <ul style={{ margin: 0, paddingLeft: 20, color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>
+              {section.items.map(item => <li key={item}>{item}</li>)}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function MessageBoardView({
+  messages,
+  messageText,
+  setMessageText,
+  error,
+  sending,
+  currentUserId,
+  isSuperAdmin,
+  onSend,
+  onRefresh,
+  onTogglePinned,
+  onDelete,
+}) {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 18 }}>
+        <div>
+          <h2 className="admin-page-title" style={{ marginBottom: 6 }}>Message Board</h2>
+          <p style={{ margin: 0, color: COLORS.textMuted, fontSize: 14, lineHeight: 1.6 }}>
+            Secure admin-only announcements and team updates. Do not post victim names, contact details, addresses, or case facts.
+          </p>
+        </div>
+        <Btn small variant="ghost" onClick={onRefresh}>Refresh</Btn>
+      </div>
+
+      <div className="admin-card" style={{ padding: 20, marginBottom: 20 }}>
+        <Field label="Post a message">
+          <textarea
+            value={messageText}
+            onChange={event => setMessageText(event.target.value)}
+            placeholder="Share a shift update, resource note, or admin announcement..."
+            maxLength={2000}
+            rows={4}
+            style={{
+              width: '100%',
+              border: `1.5px solid ${COLORS.border}`,
+              borderRadius: 8,
+              padding: '12px 14px',
+              resize: 'vertical',
+              fontSize: 14,
+              color: COLORS.textPrimary,
+              background: '#FFFFFF',
+            }}
+          />
+        </Field>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 10 }}>
+          <div style={{ color: COLORS.textMuted, fontSize: 12 }}>{messageText.length}/2000 characters</div>
+          <Btn onClick={onSend} disabled={sending || !messageText.trim()}>{sending ? 'Posting...' : 'Post Message'}</Btn>
+        </div>
+        {error && <p style={{ color: COLORS.danger, fontSize: 13, margin: '12px 0 0' }}>{error}</p>}
+      </div>
+
+      <div style={{ display: 'grid', gap: 12 }}>
+        {messages.length === 0 ? (
+          <div className="admin-card" style={{ padding: 36, textAlign: 'center', color: COLORS.textMuted }}>
+            No messages yet.
+          </div>
+        ) : messages.map(message => {
+          const canManage = isSuperAdmin || message.author_id === currentUserId
+          return (
+            <article key={message.id} className="admin-card" style={{ padding: 18, borderColor: message.pinned ? '#98C7EE' : '#DDE3EA', background: message.pinned ? '#F7FBFF' : '#FFFFFF' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <strong style={{ color: COLORS.textPrimary, fontSize: 14 }}>{message.author_email || 'Admin'}</strong>
+                    {message.pinned && <Badge label="Pinned" color={COLORS.primary} bg="#E6F1FB" />}
+                  </div>
+                  <div style={{ color: COLORS.textMuted, fontSize: 12, marginTop: 2 }}>
+                    {new Date(message.created_at).toLocaleString()}
+                  </div>
+                </div>
+                {canManage && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <Btn small variant="ghost" onClick={() => onTogglePinned(message)}>
+                      {message.pinned ? 'Unpin' : 'Pin'}
+                    </Btn>
+                    <Btn small variant="danger" onClick={() => onDelete(message)}>Delete</Btn>
+                  </div>
+                )}
+              </div>
+              <p style={{ margin: 0, color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                {message.body}
+              </p>
+            </article>
+          )
+        })}
       </div>
     </div>
   )

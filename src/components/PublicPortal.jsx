@@ -4,6 +4,7 @@ import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS, LANGS } from '../lib/translations'
+import { publicGuideSections } from '../lib/productGuide'
 
 function quickExit() {
   window.open('', '_self')
@@ -48,6 +49,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
         ['home', t.nav_home, 'H'],
         ['resources', t.nav_resources, 'R'],
         ['contact', t.nav_contact, 'C'],
+        ['help', 'Help', '?'],
       ],
     },
   ]
@@ -469,6 +471,30 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
   )
 }
 
+function PublicHelpView({ isMobile }) {
+  return (
+    <main id="main-content" aria-label="Help" style={{ maxWidth: 960, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${isMobile ? 16 : 32}px`, background: '#FFFFFF' }}>
+      <h1 style={{ fontSize: isMobile ? 28 : 36, margin: '0 0 8px', color: '#0F2D5E' }}>Help</h1>
+      <p style={{ color: COLORS.textSecondary, fontSize: 16, lineHeight: 1.7, margin: '0 0 28px' }}>
+        Use this guide to find resources, share information, adjust accessibility settings, and contact victim services.
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
+        {publicGuideSections.map(section => (
+          <section key={section.title} style={{ background: '#FFFFFF', border: '1px solid #D8E6F2', borderRadius: 12, padding: 20 }}>
+            <h2 style={{ margin: '0 0 12px', color: COLORS.textPrimary, fontSize: 20 }}>{section.title}</h2>
+            <ul style={{ margin: 0, paddingLeft: 20, color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.7 }}>
+              {section.items.map(item => <li key={item}>{item}</li>)}
+            </ul>
+          </section>
+        ))}
+      </div>
+      <div style={{ marginTop: 20, background: '#FFF8E8', border: '1px solid #E7C46A', borderRadius: 12, padding: 18, color: '#704E00', fontSize: 14, lineHeight: 1.6 }}>
+        This site is for resource navigation. It is not an emergency reporting tool. For immediate danger, call 911.
+      </div>
+    </main>
+  )
+}
+
 export default function PublicPortal({ brochures, categories, onShare }) {
   const [lang, setLang] = useState('en')
   const [activeCat, setActiveCat] = useState('all')
@@ -829,6 +855,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
           </div>
         </main>
       )}
+
+      {page === 'help' && <PublicHelpView isMobile={isMobile} />}
 
       {/* Floating multi-share bar */}
       {selected.size > 0 && (
