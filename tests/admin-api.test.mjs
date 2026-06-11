@@ -82,7 +82,8 @@ async function createApprovedAdminUser(role = 'admin') {
   return { email, password, userId }
 }
 
-async function cleanup({ userId, brochureId, filePath }) {
+async function cleanup({ userId, brochureId, filePath, messageId }) {
+  if (messageId) await service.from('admin_messages').delete().eq('id', messageId)
   if (brochureId) await service.from('brochures').delete().eq('id', brochureId)
   if (filePath) await service.storage.from('brochures').remove([filePath])
   if (userId) {
@@ -350,6 +351,53 @@ test('approved admin can create, search, edit, and delete field guide entries', 
   } finally {
     if (entryId) await service.from('field_guide_entries').delete().eq('id', entryId)
     await cleanup({ userId: adminUser.userId })
+  }
+})
+
+test('approved admin can use secure message board', async () => {
+  const adminUser = await createApprovedAdminUser('admin')
+  const client = makeUserClient()
+  let messageId = null
+
+  try {
+    const { error: signInError } = await client.auth.signInWithPassword({
+      email: adminUser.email,
+      password: adminUser.password,
+    })
+    assert.ifError(signInError)
+
+    const body = `E2E message board ${randomUUID()}`
+    const { data: inserted, error: insertError } = await client
+      .from('admin_messages')
+      .insert({
+        author_id: adminUser.userId,
+        author_email: adminUser.email,
+        body,
+      })
+      .select()
+      .single()
+    assert.ifError(insertError)
+    messageId = inserted.id
+    assert.equal(inserted.body, body)
+
+    const { data: messages, error: readError } = await client
+      .from('admin_messages')
+      .select('id,body,author_id')
+      .eq('id', messageId)
+    assert.ifError(readError)
+    assert.equal(messages.length, 1)
+    assert.equal(messages[0].author_id, adminUser.userId)
+
+    const { data: pinned, error: updateError } = await client
+      .from('admin_messages')
+      .update({ pinned: true, updated_at: new Date().toISOString() })
+      .eq('id', messageId)
+      .select()
+      .single()
+    assert.ifError(updateError)
+    assert.equal(pinned.pinned, true)
+  } finally {
+    await cleanup({ userId: adminUser.userId, messageId })
   }
 })
 
