@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Btn, COLORS } from './ui'
+import { useState, useEffect, useRef } from 'react'
+import { Btn, PUBLIC_COLORS } from './ui'
+import { CategoryMark, ContactIcon } from './icons'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
+import { supabase } from '../supabaseClient'
 import { getCategoryBg, useIsMobile, useTextSize } from '../lib/helpers'
 import { T, CAT_LABELS, LANGS } from '../lib/translations'
 import { publicWikiSections } from '../lib/productGuide'
@@ -111,7 +113,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           zIndex: 190,
           display: 'flex',
           flexDirection: 'column',
-          color: '#1E293B',
+          color: '#3A2E27',
         }}
       >
         <div style={{
@@ -120,14 +122,14 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           justifyContent: 'space-between',
           gap: 12,
           padding: '18px 18px 14px',
-          borderBottom: '1px solid #E8E6DE',
-          background: '#F7F8FA',
+          borderBottom: '1px solid #EFE3D3',
+          background: '#FBF6EE',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
             <ColoradoLogo size={42} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 700, color: '#0F2D5E' }}>Colorado Victim Resources</div>
-              <div style={{ color: '#475569', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontWeight: 700, color: '#8F4128' }}>Colorado Victim Resources</div>
+              <div style={{ color: '#7A6A5D', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {t.tagline}
               </div>
             </div>
@@ -141,9 +143,9 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
               width: 36,
               height: 36,
               borderRadius: 8,
-              border: '1px solid #D8D5CB',
+              border: '1px solid #EFE3D3',
               background: '#fff',
-              color: '#1B3A6B',
+              color: '#B5563A',
               cursor: 'pointer',
               fontSize: 20,
               flex: '0 0 auto',
@@ -156,7 +158,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
         <div style={{ padding: 14, overflow: 'auto', flex: 1 }}>
           <div style={{ padding: '8px 0 18px' }}>
             <div style={{
-              color: '#64748B',
+              color: '#948578',
               fontSize: 11,
               fontWeight: 700,
               letterSpacing: '.06em',
@@ -174,10 +176,10 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
                 style={{
                   width: '100%',
                   minHeight: 44,
-                  border: '1px solid #D8D5CB',
+                  border: '1px solid #EFE3D3',
                   borderRadius: 8,
                   background: '#FFFFFF',
-                  color: '#1F2933',
+                  color: '#3A2E27',
                   fontSize: 15,
                   fontFamily: 'Georgia, serif',
                   padding: '10px 44px 10px 12px',
@@ -197,7 +199,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
                   height: 32,
                   border: 'none',
                   background: 'transparent',
-                  color: '#0F2D5E',
+                  color: '#8F4128',
                   fontSize: 20,
                   cursor: 'pointer',
                 }}
@@ -210,7 +212,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           {navGroups.map(group => (
             <div key={group.title} style={{ padding: '8px 0 14px' }}>
               <div style={{
-                color: '#64748B',
+                color: '#948578',
                 fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: '.06em',
@@ -230,11 +232,11 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
                     display: 'flex',
                     alignItems: 'center',
                     gap: 12,
-                    border: page === id ? '1px solid #C7DFF4' : '1px solid transparent',
+                    border: page === id ? '1px solid #F3DDD3' : '1px solid transparent',
                     borderRadius: 8,
-                    background: page === id ? '#E6F1FB' : 'transparent',
+                    background: page === id ? '#F3DDD3' : 'transparent',
                     padding: '10px',
-                    color: page === id ? '#0F2D5E' : '#1E293B',
+                    color: page === id ? '#8F4128' : '#3A2E27',
                     fontFamily: 'Georgia, serif',
                     fontSize: 15,
                     fontWeight: 600,
@@ -246,8 +248,8 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
                     width: 28,
                     height: 28,
                     borderRadius: 8,
-                    background: page === id ? '#1B4D8E' : '#EEF2F7',
-                    color: page === id ? '#fff' : '#1B4D8E',
+                    background: page === id ? '#B5563A' : '#FBF6EE',
+                    color: page === id ? '#fff' : '#B5563A',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -262,9 +264,9 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           ))}
         </div>
 
-        <div style={{ borderTop: '1px solid #E8E6DE', padding: 14, background: '#F7F8FA', display: 'grid', gap: 10 }}>
+        <div style={{ borderTop: '1px solid #EFE3D3', padding: 14, background: '#FBF6EE', display: 'grid', gap: 10 }}>
           <QuickExitButton compact />
-          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, color: '#64748B', fontSize: 12, fontWeight: 700 }}>
+          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, color: '#948578', fontSize: 12, fontWeight: 700 }}>
             Language
             <select
               value={lang}
@@ -275,14 +277,14 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
                 padding: '7px 28px 7px 10px',
                 borderRadius: 8,
                 background: '#FFFFFF',
-                color: '#1F2933',
-                border: '1px solid #D8D5CB',
+                color: '#3A2E27',
+                border: '1px solid #EFE3D3',
                 fontSize: 13,
                 fontFamily: 'Georgia, serif',
                 cursor: 'pointer',
                 appearance: 'none',
                 WebkitAppearance: 'none',
-                backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%231B3A6B' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%23B5563A' stroke-width='2'%3E%3Cpolyline points='1,1 6,7 11,1'/%3E%3C/svg%3E\")",
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'right 9px center',
               }}
@@ -298,10 +300,10 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
             className="public-admin-row"
             style={{
               width: '100%',
-              border: '1px solid #C7DFF4',
+              border: '1px solid #F3DDD3',
               borderRadius: 8,
-              background: '#E6F1FB',
-              color: '#0F2D5E',
+              background: '#F3DDD3',
+              color: '#8F4128',
               padding: '10px 12px',
               fontFamily: 'Georgia, serif',
               fontSize: 14,
@@ -323,11 +325,11 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
 
   return (
     <header style={{
-      background: '#F3F8FD',
+      background: '#FBF6EE',
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      borderBottom: '1px solid #E8E6DE',
+      borderBottom: '1px solid #EFE3D3',
     }}>
       <div style={{
         display: 'flex',
@@ -340,7 +342,7 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', minWidth: 0, flex: 1 }} onClick={() => { setPage('home'); setOpen(false) }}>
           <ColoradoLogo size={32} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Colorado Victim Resources
             </div>
           </div>
@@ -354,7 +356,7 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
             aria-expanded={open}
             style={{
               background: '#FFFFFF',
-              border: '1px solid #D8D5CB', borderRadius: 8, color: '#0F2D5E', cursor: 'pointer',
+              border: '1px solid #EFE3D3', borderRadius: 8, color: '#8F4128', cursor: 'pointer',
               fontSize: 20, width: 40, height: 40, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               WebkitTapHighlightColor: 'transparent',
@@ -378,7 +380,7 @@ function TextSizeToggle({ compact, tone = 'dark' }) {
   return (
     <div role="group" aria-label="Text size" style={{
       display: 'inline-flex', borderRadius: 8, overflow: 'hidden',
-      border: light ? '1px solid #D8D5CB' : menu ? '1px solid rgba(255,255,255,.65)' : '1px solid rgba(255,255,255,.3)',
+      border: light ? '1px solid #EFE3D3' : menu ? '1px solid rgba(255,255,255,.65)' : '1px solid rgba(255,255,255,.3)',
       marginLeft: compact ? 0 : 8,
     }}>
       {sizes.map(([key, letter, fs, label]) => (
@@ -390,8 +392,8 @@ function TextSizeToggle({ compact, tone = 'dark' }) {
           aria-pressed={size === key}
           style={{
             padding: compact ? '6px 12px' : '6px 14px',
-            background: size === key ? (light ? '#E6F1FB' : menu ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.25)') : 'transparent',
-            border: 'none', color: light ? '#0F2D5E' : '#fff', cursor: 'pointer',
+            background: size === key ? (light ? '#F3DDD3' : menu ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.25)') : 'transparent',
+            border: 'none', color: light ? '#8F4128' : '#fff', cursor: 'pointer',
             fontFamily: 'Georgia, serif', fontWeight: size === key ? 700 : 400,
             fontSize: fs, lineHeight: 1, minHeight: compact ? 32 : 36,
           }}
@@ -407,13 +409,13 @@ function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSear
   const [open, setOpen] = useState(false)
 
   return (
-    <header style={{ background: '#F3F8FD', padding: '0 32px', borderBottom: '1px solid #D8E6F2' }}>
+    <header style={{ background: '#FBF6EE', padding: '0 32px', borderBottom: '1px solid #EFE3D3' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 68 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }} onClick={() => setPage('home')}>
           <ColoradoLogo size={44} />
           <div>
-            <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 17 }}>Colorado Victim Resources</div>
-            <div style={{ color: '#667085', fontSize: 11 }}>{t.tagline}</div>
+            <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 17 }}>Colorado Victim Resources</div>
+            <div style={{ color: '#948578', fontSize: 11 }}>{t.tagline}</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -425,9 +427,9 @@ function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSear
             aria-expanded={open}
             style={{
               background: '#FFFFFF',
-              border: '1px solid #D8D5CB',
+              border: '1px solid #EFE3D3',
               borderRadius: 8,
-              color: '#0F2D5E',
+              color: '#8F4128',
               cursor: 'pointer',
               fontSize: 20,
               width: 42,
@@ -453,7 +455,7 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
     <div style={{ position: 'relative', width: '100%' }}>
       <span aria-hidden="true" style={{
         position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
-        fontSize: 22, pointerEvents: 'none', color: '#111111',
+        fontSize: 22, pointerEvents: 'none', color: '#3A2E27',
       }}>⌕</span>
       <input
         aria-label="Search resources"
@@ -468,17 +470,17 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
           width: '100%',
           padding: '14px 14px 14px 42px',
           borderRadius: 0,
-          border: '1px solid #D8D5CB',
+          border: '1px solid #EFE3D3',
           fontSize: 16,
           fontFamily: 'Georgia, serif',
           background: '#FFFFFF',
-          color: '#1F2933',
+          color: '#3A2E27',
           outline: 'none',
           boxSizing: 'border-box',
           WebkitAppearance: 'none',
         }}
-        onFocus={e => { e.target.style.borderColor = '#0F2D5E' }}
-        onBlur={e => { e.target.style.borderColor = '#D8D5CB' }}
+        onFocus={e => { e.target.style.borderColor = '#8F4128' }}
+        onBlur={e => { e.target.style.borderColor = '#EFE3D3' }}
       />
     </div>
   )
@@ -487,15 +489,15 @@ function GlobalSearch({ value, onChange, placeholder, onSearch }) {
 function PublicWikiView({ isMobile }) {
   return (
     <main id="main-content" aria-label="Wiki" style={{ maxWidth: 960, margin: '0 auto', padding: `${isMobile ? 32 : 56}px ${isMobile ? 16 : 32}px`, background: '#FFFFFF' }}>
-      <h1 style={{ fontSize: isMobile ? 28 : 36, margin: '0 0 8px', color: '#0F2D5E' }}>Wiki</h1>
-      <p style={{ color: COLORS.textSecondary, fontSize: 16, lineHeight: 1.7, margin: '0 0 28px' }}>
+      <h1 style={{ fontSize: isMobile ? 28 : 36, margin: '0 0 8px', color: '#8F4128' }}>Wiki</h1>
+      <p style={{ color: PUBLIC_COLORS.textSecondary, fontSize: 16, lineHeight: 1.7, margin: '0 0 28px' }}>
         A plain-language guide to the public resource site and the admin tools used to keep it current.
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
         {publicWikiSections.map(section => (
-          <section key={section.title} style={{ background: '#FFFFFF', border: '1px solid #D8E6F2', borderRadius: 12, padding: 20 }}>
-            <h2 style={{ margin: '0 0 12px', color: COLORS.textPrimary, fontSize: 20 }}>{section.title}</h2>
-            <ul style={{ margin: 0, paddingLeft: 20, color: COLORS.textSecondary, fontSize: 15, lineHeight: 1.7 }}>
+          <section key={section.title} style={{ background: '#FFFFFF', border: '1px solid #EFE3D3', borderRadius: 12, padding: 20 }}>
+            <h2 style={{ margin: '0 0 12px', color: PUBLIC_COLORS.textPrimary, fontSize: 20 }}>{section.title}</h2>
+            <ul style={{ margin: 0, paddingLeft: 20, color: PUBLIC_COLORS.textSecondary, fontSize: 15, lineHeight: 1.7 }}>
               {section.items.map(item => <li key={item}>{item}</li>)}
             </ul>
           </section>
@@ -508,7 +510,7 @@ function PublicWikiView({ isMobile }) {
   )
 }
 
-export default function PublicPortal({ brochures, categories, onShare }) {
+export default function PublicPortal({ brochures, categories, onShare, setBrochures }) {
   const [lang, setLang] = useState('en')
   const [activeCat, setActiveCat] = useState('all')
   const [search, setSearch] = useState('')
@@ -516,10 +518,37 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const [selected, setSelected] = useState(new Set())
   const isMobile = useIsMobile()
   const t = T[lang]
+  const pendingTranslations = useRef(new Set())
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [page])
+
+  // Lazily translates a card's title/description into `targetLang` via the
+  // translate-brochure edge function, then caches the result both in Supabase
+  // (server-side, for future visitors) and in local state (for this session).
+  async function ensureTranslation(brochureId, targetLang) {
+    if (targetLang === 'en' || !setBrochures) return
+    const brochure = brochures.find(b => b.id === brochureId)
+    if (brochure?.translations?.[targetLang]) return
+    const key = `${brochureId}:${targetLang}`
+    if (pendingTranslations.current.has(key)) return
+    pendingTranslations.current.add(key)
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-brochure', {
+        body: { brochureId, lang: targetLang },
+      })
+      if (!error && data?.title) {
+        setBrochures(prev => prev.map(b => b.id === brochureId
+          ? { ...b, translations: { ...(b.translations || {}), [targetLang]: { title: data.title, description: data.description } } }
+          : b))
+      }
+    } catch {
+      // Network/edge-function failure — card just keeps showing the English fallback.
+    } finally {
+      pendingTranslations.current.delete(key)
+    }
+  }
 
   useEffect(() => {
     const isRTL = LANGS.find(l => l.code === lang)?.rtl
@@ -555,25 +584,25 @@ export default function PublicPortal({ brochures, categories, onShare }) {
   const px = isMobile ? 16 : 32
 
   return (
-    <div style={{ fontFamily: 'Georgia, serif', background: '#F4F8FC', minHeight: '100vh', colorScheme: 'light' }}>
+    <div style={{ fontFamily: 'Georgia, serif', background: '#FBF6EE', minHeight: '100vh', colorScheme: 'light' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         ::placeholder { color: rgba(31,41,51,0.55) !important; }
         * { box-sizing: border-box; }
         .skip-link {
           position: absolute; left: -9999px; top: 8px; z-index: 9999;
-          background: #003DA5; color: #fff; padding: 10px 16px; border-radius: 8px;
+          background: #B5563A; color: #fff; padding: 10px 16px; border-radius: 8px;
           font-weight: 600; text-decoration: none;
         }
         .skip-link:focus { left: 8px; }
         .public-drawer-row:hover,
         .public-admin-row:hover {
-          background: #F4F7FB !important;
-          border-color: #E2E8F0 !important;
+          background: #FBF6EE !important;
+          border-color: #EFE3D3 !important;
         }
         .public-drawer-row.active:hover {
-          background: #E6F1FB !important;
-          border-color: #C7DFF4 !important;
+          background: #F3DDD3 !important;
+          border-color: #F3DDD3 !important;
         }
         .public-drawer-row:focus-visible,
         .public-admin-row:focus-visible,
@@ -581,7 +610,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         .public-search-submit:focus-visible,
         .public-quick-exit:focus-visible,
         .public-header-control:focus-visible {
-          outline: 3px solid #FFC726;
+          outline: 3px solid #C9962C;
           outline-offset: 2px;
         }
       `}</style>
@@ -596,19 +625,19 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       {page === 'home' && <main id="main-content" aria-label="Home">
         {/* Hero */}
         <section style={{
-          background: 'linear-gradient(180deg, #EAF4FF 0%, #F7FBFF 58%, #FFFFFF 100%)',
+          background: 'linear-gradient(180deg, #FBF0DA 0%, #FBF6EE 58%, #FFFFFF 100%)',
           padding: isMobile ? '48px 16px 40px' : '72px 32px 64px',
-          borderBottom: '1px solid #D8E6F2',
+          borderBottom: '1px solid #EFE3D3',
         }}>
           <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
             <div style={{
               display: 'inline-block',
-              background: '#F4F7FB',
-              border: '1px solid #E8E6DE',
+              background: '#FBF6EE',
+              border: '1px solid #EFE3D3',
               borderRadius: 20,
               padding: '6px 18px',
               fontSize: 12,
-              color: '#0F2D5E',
+              color: '#8F4128',
               marginBottom: 16,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -616,7 +645,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               {t.hero_label}
             </div>
             <h1 style={{
-              color: '#0F2D5E',
+              color: '#8F4128',
               fontSize: isMobile ? 28 : 40,
               fontWeight: 700,
               margin: '0 0 14px',
@@ -625,7 +654,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               {t.hero_title}
             </h1>
             <p style={{
-              color: '#475569',
+              color: '#7A6A5D',
               fontSize: isMobile ? 15 : 17,
               lineHeight: 1.7,
               margin: '0 0 28px',
@@ -643,7 +672,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Btn onClick={() => { doSearch(); if (!search.trim()) setPage('resources') }} style={{
-                background: COLORS.primary,
+                background: PUBLIC_COLORS.primary,
                 color: '#FFFFFF',
                 padding: isMobile ? '12px 20px' : '12px 28px',
                 fontSize: 15,
@@ -652,8 +681,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
                 {t.browse}
               </Btn>
               <Btn onClick={() => setPage('contact')} variant="ghost" style={{
-                borderColor: COLORS.primary,
-                color: COLORS.primary,
+                borderColor: PUBLIC_COLORS.primary,
+                color: PUBLIC_COLORS.primary,
                 padding: isMobile ? '12px 20px' : '12px 28px',
                 fontSize: 15,
                 flex: isMobile ? 1 : 'none',
@@ -683,8 +712,8 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
         {/* Categories */}
         <section style={{ padding: `${isMobile ? 36 : 56}px ${px}px`, maxWidth: 1100, margin: '0 auto', background: '#FFFFFF' }}>
-          <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.categories}</h2>
-          <p style={{ color: COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.categories_sub}</p>
+          <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: '0 0 6px', color: PUBLIC_COLORS.textPrimary }}>{t.categories}</h2>
+          <p style={{ color: PUBLIC_COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.categories_sub}</p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(190px, 1fr))', gap: 12 }}>
             {categories.map(cat => {
               const count = brochures.filter(b => b.category_id === cat.id).length
@@ -696,18 +725,20 @@ export default function PublicPortal({ brochures, categories, onShare }) {
                   style={{
                     background: '#FFFFFF',
                     borderRadius: 16,
-                    border: '1px solid #E8E6DE',
+                    border: '1px solid #EFE3D3',
                     padding: isMobile ? 16 : 20,
                     cursor: 'pointer',
                     transition: 'all .2s',
                     WebkitTapHighlightColor: 'transparent',
                   }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = cat.color; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#E8E6DE'; e.currentTarget.style.transform = 'none' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#EFE3D3'; e.currentTarget.style.transform = 'none' }}
                 >
-                  <div style={{ fontSize: isMobile ? 24 : 28, marginBottom: 8 }}>{cat.icon}</div>
-                  <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: COLORS.textPrimary, marginBottom: 4, lineHeight: 1.3 }}>{label}</div>
-                  <div style={{ fontSize: 12, color: COLORS.textMuted }}>{count} {lang === 'es' ? 'recurso' : 'resource'}{count !== 1 ? 's' : ''}</div>
+                  <div style={{ marginBottom: 10 }}>
+                    <CategoryMark id={cat.id} emoji={cat.icon} size={isMobile ? 18 : 20} tile bg={getCategoryBg(cat.id)} color={cat.color} />
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: PUBLIC_COLORS.textPrimary, marginBottom: 4, lineHeight: 1.3 }}>{label}</div>
+                  <div style={{ fontSize: 12, color: PUBLIC_COLORS.textMuted }}>{count} {lang === 'es' ? 'recurso' : 'resource'}{count !== 1 ? 's' : ''}</div>
                 </div>
               )
             })}
@@ -717,11 +748,11 @@ export default function PublicPortal({ brochures, categories, onShare }) {
         {/* Featured */}
         {brochures.filter(b => b.featured).length > 0 && (
           <section style={{ padding: `0 ${px}px ${isMobile ? 40 : 56}px`, maxWidth: 1100, margin: '0 auto', background: '#FFFFFF' }}>
-            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.featured}</h2>
-            <p style={{ color: COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.featured_sub}</p>
+            <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 700, margin: '0 0 6px', color: PUBLIC_COLORS.textPrimary }}>{t.featured}</h2>
+            <p style={{ color: PUBLIC_COLORS.textSecondary, margin: '0 0 24px', fontSize: 15 }}>{t.featured_sub}</p>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
               {brochures.filter(b => b.featured).map(b => (
-                <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} />
+                <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} onNeedTranslation={ensureTranslation} palette={PUBLIC_COLORS} useLineIcons />
               ))}
             </div>
           </section>
@@ -731,13 +762,13 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       {/* ─── RESOURCES ─── */}
       {page === 'resources' && (
         <main id="main-content" aria-label="Resources" style={{ maxWidth: 1100, margin: '0 auto', padding: `32px ${px}px`, background: '#FFFFFF' }}>
-          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, margin: '0 0 6px', color: COLORS.textPrimary }}>{t.all_resources}</h2>
-          <p style={{ color: COLORS.textSecondary, margin: '0 0 20px' }}>{t.resources_label(filtered.length)}</p>
+          <h2 style={{ fontSize: isMobile ? 24 : 32, fontWeight: 700, margin: '0 0 6px', color: PUBLIC_COLORS.textPrimary }}>{t.all_resources}</h2>
+          <p style={{ color: PUBLIC_COLORS.textSecondary, margin: '0 0 20px' }}>{t.resources_label(filtered.length)}</p>
 
           {/* Search */}
           <div style={{
             background: '#FFFFFF',
-            border: '1px solid #E8E6DE',
+            border: '1px solid #EFE3D3',
             borderRadius: 0,
             padding: 16,
             marginBottom: 20,
@@ -759,7 +790,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             paddingBottom: 4,
             scrollbarWidth: 'none',
           }}>
-            {[{ id: 'all', label: t.all, icon: '', color: COLORS.primary }, ...categories].map(cat => {
+            {[{ id: 'all', label: t.all, icon: '', color: PUBLIC_COLORS.primary }, ...categories].map(cat => {
               const label = cat.id !== 'all' ? (CAT_LABELS[lang]?.[cat.id] || cat.label) : cat.label
               const isActive = activeCat === cat.id
               return (
@@ -773,9 +804,9 @@ export default function PublicPortal({ brochures, categories, onShare }) {
                     cursor: 'pointer',
                     border: '1.5px solid',
                     fontFamily: 'Georgia, serif',
-                    borderColor: isActive ? (cat.color || COLORS.primary) : '#E8E6DE',
+                    borderColor: isActive ? (cat.color || PUBLIC_COLORS.primary) : '#EFE3D3',
                     background: isActive ? getCategoryBg(cat.id) : '#FFFFFF',
-                    color: isActive ? (cat.color || COLORS.primary) : COLORS.textSecondary,
+                    color: isActive ? (cat.color || PUBLIC_COLORS.primary) : PUBLIC_COLORS.textSecondary,
                     fontWeight: isActive ? 600 : 400,
                     whiteSpace: 'nowrap',
                     flexShrink: 0,
@@ -783,7 +814,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  {cat.icon} {label}
+                  {cat.icon && <span style={{ marginRight: 5, verticalAlign: -2, display: 'inline-block' }}><CategoryMark id={cat.id} emoji={cat.icon} size={13} color={isActive ? (cat.color || PUBLIC_COLORS.primary) : PUBLIC_COLORS.textSecondary} /></span>}{label}
                 </button>
               )
             })}
@@ -791,11 +822,11 @@ export default function PublicPortal({ brochures, categories, onShare }) {
 
           {filtered.length === 0
             ? (
-              <div style={{ textAlign: 'center', padding: '60px 0', color: COLORS.textSecondary }}>
+              <div style={{ textAlign: 'center', padding: '60px 0', color: PUBLIC_COLORS.textSecondary }}>
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
                 <div style={{ fontSize: 16, lineHeight: 1.6, maxWidth: 340, margin: '0 auto' }}>{t.no_results}</div>
                 <button onClick={() => { setSearch(''); setActiveCat('all') }} style={{
-                  marginTop: 16, background: 'none', border: 'none', color: COLORS.primary,
+                  marginTop: 16, background: 'none', border: 'none', color: PUBLIC_COLORS.primary,
                   fontSize: 14, cursor: 'pointer', fontFamily: 'Georgia, serif', textDecoration: 'underline',
                 }}>
                   Clear filters
@@ -804,7 +835,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             )
             : (
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-                {filtered.map(b => <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} />)}
+                {filtered.map(b => <BrochureCard key={b.id} brochure={b} categories={categories} onShare={onShare} lang={lang} selected={selected} onSelect={toggleSelect} onNeedTranslation={ensureTranslation} palette={PUBLIC_COLORS} useLineIcons />)}
               </div>
             )
           }
@@ -814,59 +845,59 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       {/* ─── CONTACT ─── */}
       {page === 'contact' && (
         <main id="main-content" aria-label="Contact" style={{ maxWidth: 800, margin: '0 auto', padding: `${isMobile ? 36 : 56}px ${px}px`, background: '#FFFFFF' }}>
-          <h2 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, margin: '0 0 8px', color: COLORS.textPrimary }}>Victim Services</h2>
-          <p style={{ color: COLORS.textSecondary, margin: '0 0 32px', fontSize: 16, lineHeight: 1.7 }}>
-            Services are available seven days a week, 24 hours a day.
+          <h2 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 700, margin: '0 0 8px', color: PUBLIC_COLORS.textPrimary }}>{t.contact_heading}</h2>
+          <p style={{ color: PUBLIC_COLORS.textSecondary, margin: '0 0 32px', fontSize: 16, lineHeight: 1.7 }}>
+            {t.contact_hours_note}
           </p>
 
           {/* Contact cards */}
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14, marginBottom: 32 }}>
             {[
-              { icon: '📞', label: 'After Hours', detail: '303-441-4444', phone: '303-441-4444', note: '7 days, 24 hours' },
-              { icon: '🏢', label: 'Office', detail: '303-926-2841', phone: '303-926-2841', note: 'Mon–Fri, 8am–5pm' },
-              { icon: '✉️', label: 'Email', detail: 'victimservices@erieco.gov', note: 'Victim Services' },
-              { icon: '⚖️', label: 'Victim Rights', detail: '303-239-4497', phone: '303-239-4497', note: 'CO Dept of Public Safety' },
+              { kind: 'phone', label: t.contact_after_hours, detail: '303-441-4444', phone: '303-441-4444', note: t.contact_after_hours_note },
+              { kind: 'building', label: t.contact_office, detail: '303-926-2841', phone: '303-926-2841', note: t.contact_office_note },
+              { kind: 'mail', label: t.contact_email, detail: 'victimservices@erieco.gov', note: t.contact_email_note },
+              { kind: 'legal', label: t.contact_victim_rights, detail: '303-239-4497', phone: '303-239-4497', note: t.contact_victim_rights_note },
             ].map(c => (
-              <div key={c.label} style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid #E8E6DE', padding: isMobile ? 16 : 20 }}>
-                <div style={{ fontSize: 26, marginBottom: 8 }}>{c.icon}</div>
-                <div style={{ fontWeight: 700, fontSize: 11, color: COLORS.textMuted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{c.label}</div>
-                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: COLORS.textPrimary, marginBottom: 4 }}>
-                  {c.phone ? <PhoneLink phone={c.phone} style={{ color: COLORS.primary }}>{c.detail}</PhoneLink> : c.detail}
+              <div key={c.label} style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid #EFE3D3', padding: isMobile ? 16 : 20 }}>
+                <div style={{ marginBottom: 10 }}><ContactIcon kind={c.kind} size={18} tile bg={PUBLIC_COLORS.pageBg} color={PUBLIC_COLORS.primary} /></div>
+                <div style={{ fontWeight: 700, fontSize: 11, color: PUBLIC_COLORS.textMuted, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{c.label}</div>
+                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: PUBLIC_COLORS.textPrimary, marginBottom: 4 }}>
+                  {c.phone ? <PhoneLink phone={c.phone} style={{ color: PUBLIC_COLORS.primary }}>{c.detail}</PhoneLink> : c.detail}
                 </div>
-                <div style={{ fontSize: 12, color: COLORS.textMuted }}>{c.note}</div>
+                <div style={{ fontSize: 12, color: PUBLIC_COLORS.textMuted }}>{c.note}</div>
               </div>
             ))}
           </div>
 
           {/* Victim Rights Act */}
-          <div style={{ background: '#EEF4FB', borderRadius: 16, padding: 22, borderLeft: `4px solid ${COLORS.primary}`, marginBottom: 20 }}>
-            <h3 style={{ margin: '0 0 10px', color: COLORS.primaryDark, fontSize: 16 }}>Ensuring Rights — Colorado Victim Rights Act</h3>
-            <p style={{ margin: '0 0 12px', color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
-              The work of Victim Services is based on the{' '}
-              <a href="https://dcj.colorado.gov/dcj-offices/victims-programs/crime-victim-rights-act-vra" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.primary, fontWeight: 600 }}>
-                Colorado Victim Rights Act
+          <div style={{ background: '#F3DDD3', borderRadius: 16, padding: 22, borderLeft: `4px solid ${PUBLIC_COLORS.primary}`, marginBottom: 20 }}>
+            <h3 style={{ margin: '0 0 10px', color: PUBLIC_COLORS.primaryDark, fontSize: 16 }}>{t.vra_title}</h3>
+            <p style={{ margin: '0 0 12px', color: PUBLIC_COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
+              {t.vra_intro}{' '}
+              <a href="https://dcj.colorado.gov/dcj-offices/victims-programs/crime-victim-rights-act-vra" target="_blank" rel="noopener noreferrer" style={{ color: PUBLIC_COLORS.primary, fontWeight: 600 }}>
+                {t.vra_act_name}
               </a>.
             </p>
-            <p style={{ margin: '0 0 12px', color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
-              If you feel unable to address your concerns at the local level, you may request assistance from the Crime Victim Services Advisory Board by contacting the Victim Rights Act Specialist at:
+            <p style={{ margin: '0 0 12px', color: PUBLIC_COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
+              {t.vra_advisory}
             </p>
-            <p style={{ margin: '0 0 12px', color: COLORS.primaryDark, fontSize: 14, lineHeight: 1.7, fontWeight: 600 }}>
-              Colorado Department of Public Safety, Division of Criminal Justice<br />
+            <p style={{ margin: '0 0 12px', color: PUBLIC_COLORS.primaryDark, fontSize: 14, lineHeight: 1.7, fontWeight: 600 }}>
+              {t.vra_dept_name}<br />
               700 Kipling Street, Suite 1000, Denver, CO 80215-5865<br />
-              📞 <PhoneLink phone="303-239-4497" style={{ color: COLORS.primaryDark }}>303-239-4497</PhoneLink>
+              📞 <PhoneLink phone="303-239-4497" style={{ color: PUBLIC_COLORS.primaryDark }}>303-239-4497</PhoneLink>
             </p>
-            <p style={{ margin: 0, color: COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
-              Additional resource:{' '}
-              <a href="https://www.colorado.gov/dcj" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.primary, fontWeight: 600 }}>
-                Division of Criminal Justice Office for Victims' Programs
+            <p style={{ margin: 0, color: PUBLIC_COLORS.primary, fontSize: 14, lineHeight: 1.7 }}>
+              {t.vra_additional_resource}{' '}
+              <a href="https://www.colorado.gov/dcj" target="_blank" rel="noopener noreferrer" style={{ color: PUBLIC_COLORS.primary, fontWeight: 600 }}>
+                {t.vra_link2_text}
               </a>
             </p>
           </div>
 
           {/* Privacy note */}
-          <div style={{ background: '#F5F3EE', borderRadius: 16, padding: 22, borderLeft: `4px solid #C8C6BE` }}>
-            <h3 style={{ margin: '0 0 8px', color: COLORS.textPrimary, fontSize: 16 }}>{t.privacy_title}</h3>
-            <p style={{ margin: 0, color: COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{t.privacy_body}</p>
+          <div style={{ background: '#FBF6EE', borderRadius: 16, padding: 22, borderLeft: `4px solid #EFE3D3` }}>
+            <h3 style={{ margin: '0 0 8px', color: PUBLIC_COLORS.textPrimary, fontSize: 16 }}>{t.privacy_title}</h3>
+            <p style={{ margin: 0, color: PUBLIC_COLORS.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{t.privacy_body}</p>
           </div>
         </main>
       )}
@@ -877,7 +908,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       {selected.size > 0 && (
         <div style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
-          background: COLORS.primary, color: '#fff', borderRadius: 100,
+          background: PUBLIC_COLORS.primary, color: '#fff', borderRadius: 100,
           padding: isMobile ? '12px 16px' : '14px 24px',
           display: 'flex', alignItems: 'center', gap: 12,
           boxShadow: '0 8px 32px rgba(0,0,0,0.28)', zIndex: 200,
@@ -894,7 +925,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             Clear
           </button>
           <button onClick={shareSelected} style={{
-            background: '#FFC726', border: 'none', color: '#002882',
+            background: '#C9962C', border: 'none', color: '#8F4128',
             borderRadius: 20, padding: '8px 18px', fontSize: 13,
             fontWeight: 700, cursor: 'pointer', fontFamily: 'Georgia, serif',
           }}>
@@ -904,7 +935,7 @@ export default function PublicPortal({ brochures, categories, onShare }) {
       )}
 
       {/* Footer */}
-      <footer style={{ background: '#FFFFFF', marginTop: 48, borderTop: '1px solid #E8E6DE' }}>
+      <footer style={{ background: '#FFFFFF', marginTop: 48, borderTop: '1px solid #EFE3D3' }}>
         {/* Main footer content */}
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '32px 20px 24px' : '40px 32px 28px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 28 : 40 }}>
@@ -914,19 +945,19 @@ export default function PublicPortal({ brochures, categories, onShare }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                 <ColoradoLogo size={36} />
                 <div>
-                  <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
-                  <div style={{ color: '#667085', fontSize: 12 }}>Volunteer Victim Advocate</div>
+                  <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
+                  <div style={{ color: '#948578', fontSize: 12 }}>Volunteer Victim Advocate</div>
                 </div>
               </div>
-              <p style={{ color: '#667085', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
+              <p style={{ color: '#948578', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
             </div>
 
             {/* Contact column */}
             <div>
-              <div style={{ color: '#0F2D5E', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
-              <div style={{ color: '#475569', fontSize: 13, lineHeight: 2 }}>
-                <div>📞 After Hours: <PhoneLink phone="303-441-4444" style={{ color: '#0F2D5E' }}>303-441-4444</PhoneLink></div>
-                <div>🏢 Office: <PhoneLink phone="303-926-2841" style={{ color: '#0F2D5E' }}>303-926-2841</PhoneLink></div>
+              <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
+              <div style={{ color: '#7A6A5D', fontSize: 13, lineHeight: 2 }}>
+                <div>📞 After Hours: <PhoneLink phone="303-441-4444" style={{ color: '#8F4128' }}>303-441-4444</PhoneLink></div>
+                <div>🏢 Office: <PhoneLink phone="303-926-2841" style={{ color: '#8F4128' }}>303-926-2841</PhoneLink></div>
                 <div>✉️ victimservices@erieco.gov</div>
               </div>
             </div>
@@ -934,22 +965,22 @@ export default function PublicPortal({ brochures, categories, onShare }) {
             {/* Emergency column */}
             <div>
               <div style={{ color: '#A32D2D', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Emergency</div>
-              <div style={{ color: '#475569', fontSize: 13, lineHeight: 2 }}>
+              <div style={{ color: '#7A6A5D', fontSize: 13, lineHeight: 2 }}>
                 <div>🚨 Emergency: <PhoneLink phone="911" style={{ color: '#A32D2D' }}>911</PhoneLink></div>
-                <div>💜 DV Hotline: <PhoneLink phone="1-800-799-7233" style={{ color: '#0F2D5E' }}>1-800-799-7233</PhoneLink></div>
-                <div>⚖️ Victim Rights: <PhoneLink phone="303-239-4497" style={{ color: '#0F2D5E' }}>303-239-4497</PhoneLink></div>
+                <div>💜 DV Hotline: <PhoneLink phone="1-800-799-7233" style={{ color: '#8F4128' }}>1-800-799-7233</PhoneLink></div>
+                <div>⚖️ Victim Rights: <PhoneLink phone="303-239-4497" style={{ color: '#8F4128' }}>303-239-4497</PhoneLink></div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Copyright bar */}
-        <div style={{ borderTop: '1px solid #E8E6DE', padding: isMobile ? '14px 20px' : '14px 32px' }}>
+        <div style={{ borderTop: '1px solid #EFE3D3', padding: isMobile ? '14px 20px' : '14px 32px' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-            <div style={{ color: '#667085', fontSize: 12 }}>
+            <div style={{ color: '#948578', fontSize: 12 }}>
               © {new Date().getFullYear()} Colorado Victim Resources. All rights reserved.
             </div>
-            <div style={{ color: '#667085', fontSize: 12 }}>
+            <div style={{ color: '#948578', fontSize: 12 }}>
               Services available 7 days a week, 24 hours a day.
             </div>
           </div>
