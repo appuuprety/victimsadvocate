@@ -180,7 +180,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
                   borderRadius: 8,
                   background: '#FFFFFF',
                   color: '#3A2E27',
-                  fontSize: 15,
+                  fontSize: 16,
                   fontFamily: 'Georgia, serif',
                   padding: '10px 44px 10px 12px',
                   outline: 'none',
@@ -273,13 +273,13 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
               onChange={e => setLang(e.target.value)}
               aria-label="Select language"
               style={{
-                width: 132,
+                width: 150,
                 padding: '7px 28px 7px 10px',
                 borderRadius: 8,
                 background: '#FFFFFF',
                 color: '#3A2E27',
                 border: '1px solid #EFE3D3',
-                fontSize: 13,
+                fontSize: 16,
                 fontFamily: 'Georgia, serif',
                 cursor: 'pointer',
                 appearance: 'none',
@@ -610,7 +610,7 @@ export default function PublicPortal({ brochures, categories, onShare, setBrochu
         .public-search-submit:focus-visible,
         .public-quick-exit:focus-visible,
         .public-header-control:focus-visible {
-          outline: 3px solid #C9962C;
+          outline: 3px solid #8F4128;
           outline-offset: 2px;
         }
       `}</style>
@@ -681,8 +681,8 @@ export default function PublicPortal({ brochures, categories, onShare, setBrochu
                 {t.browse}
               </Btn>
               <Btn onClick={() => setPage('contact')} variant="ghost" style={{
-                borderColor: PUBLIC_COLORS.primary,
-                color: PUBLIC_COLORS.primary,
+                borderColor: PUBLIC_COLORS.secondary,
+                color: PUBLIC_COLORS.secondary,
                 padding: isMobile ? '12px 20px' : '12px 28px',
                 fontSize: 15,
                 flex: isMobile ? 1 : 'none',
@@ -925,7 +925,7 @@ export default function PublicPortal({ brochures, categories, onShare, setBrochu
             Clear
           </button>
           <button onClick={shareSelected} style={{
-            background: '#C9962C', border: 'none', color: '#8F4128',
+            background: '#C9962C', border: 'none', color: '#3A2E27',
             borderRadius: 20, padding: '8px 18px', fontSize: 13,
             fontWeight: 700, cursor: 'pointer', fontFamily: 'Georgia, serif',
           }}>

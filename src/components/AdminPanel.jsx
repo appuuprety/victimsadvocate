@@ -1029,7 +1029,7 @@ export default function AdminPanel({ brochures, setBrochures, categories, setCat
                       onChange={e => setInviteRole(e.target.value)}
                       style={{
                         width: '100%', padding: '11px 14px', borderRadius: 12,
-                        border: `1.5px solid ${COLORS.border}`, fontSize: 15,
+                        border: `1.5px solid ${COLORS.border}`, fontSize: 16,
                         fontFamily: 'Georgia, serif', background: '#FFFFFF', color: COLORS.textPrimary,
                       }}
                     >
@@ -1180,7 +1180,7 @@ function MessageBoardView({
               borderRadius: 8,
               padding: '12px 14px',
               resize: 'vertical',
-              fontSize: 14,
+              fontSize: 16,
               color: COLORS.textPrimary,
               background: '#FFFFFF',
             }}

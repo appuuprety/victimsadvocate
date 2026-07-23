@@ -52,8 +52,10 @@ export function useTextSize() {
     return stored && TEXT_SIZES[stored] ? stored : 'sm'
   })
   useEffect(() => {
+    // `zoom` is non-standard, behaves inconsistently in Safari (including on
+    // fixed-position elements), and doubles up with the fontSize change below
+    // — font-size percentage alone is the standards-compliant way to scale text.
     document.documentElement.style.fontSize = `${TEXT_SIZES[size] * 100}%`
-    document.documentElement.style.zoom = TEXT_SIZES[size]
     localStorage.setItem(TEXT_SIZE_KEY, size)
   }, [size])
   return [size, setSize]
