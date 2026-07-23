@@ -72,6 +72,10 @@ export const T = {
     vra_dept_name: 'Colorado Department of Public Safety, Division of Criminal Justice',
     vra_additional_resource: 'Additional resource:',
     vra_link2_text: "Division of Criminal Justice Office for Victims' Programs",
+    footer_role: 'Volunteer Victim Advocate',
+    footer_emergency_heading: 'Emergency',
+    footer_dv_hotline: 'DV Hotline',
+    footer_rights: 'All rights reserved.',
   },
   es: {
     tagline: 'Red de Defensa de Víctimas de Colorado',
@@ -131,6 +135,10 @@ export const T = {
     vra_dept_name: 'Departamento de Seguridad Pública de Colorado, División de Justicia Penal',
     vra_additional_resource: 'Recurso adicional:',
     vra_link2_text: 'Oficina de Programas para Víctimas de la División de Justicia Penal',
+    footer_role: 'Defensor de Víctimas Voluntario',
+    footer_emergency_heading: 'Emergencia',
+    footer_dv_hotline: 'Línea de Violencia Doméstica',
+    footer_rights: 'Todos los derechos reservados.',
   },
   vi: {
     tagline: 'Mạng Lưới Hỗ Trợ Nạn Nhân Colorado',
@@ -190,6 +198,10 @@ export const T = {
     vra_dept_name: 'Sở An Toàn Công Cộng Colorado, Bộ Phận Tư Pháp Hình Sự',
     vra_additional_resource: 'Nguồn tài nguyên bổ sung:',
     vra_link2_text: 'Văn Phòng Chương Trình Nạn Nhân của Bộ Phận Tư Pháp Hình Sự',
+    footer_role: 'Người Bênh Vực Nạn Nhân Tình Nguyện',
+    footer_emergency_heading: 'Khẩn Cấp',
+    footer_dv_hotline: 'Đường Dây Bạo Lực Gia Đình',
+    footer_rights: 'Đã đăng ký bản quyền.',
   },
   zh: {
     tagline: '科罗拉多州受害者倡导网络',
@@ -249,6 +261,10 @@ export const T = {
     vra_dept_name: '科罗拉多州公共安全部刑事司法司',
     vra_additional_resource: '更多资源：',
     vra_link2_text: '刑事司法司受害者项目办公室',
+    footer_role: '志愿受害者倡导者',
+    footer_emergency_heading: '紧急情况',
+    footer_dv_hotline: '家暴热线',
+    footer_rights: '版权所有。',
   },
   ar: {
     tagline: 'شبكة مناصرة الضحايا في كولورادو',
@@ -308,6 +324,10 @@ export const T = {
     vra_dept_name: 'إدارة السلامة العامة بولاية كولورادو، شعبة العدالة الجنائية',
     vra_additional_resource: 'مورد إضافي:',
     vra_link2_text: 'مكتب برامج الضحايا التابع لشعبة العدالة الجنائية',
+    footer_role: 'مناصر ضحايا متطوع',
+    footer_emergency_heading: 'حالة طوارئ',
+    footer_dv_hotline: 'خط العنف الأسري',
+    footer_rights: 'جميع الحقوق محفوظة.',
   },
   ru: {
     tagline: 'Сеть защиты жертв в Колорадо',
@@ -367,6 +387,10 @@ export const T = {
     vra_dept_name: 'Департамент общественной безопасности Колорадо, Отдел уголовного правосудия',
     vra_additional_resource: 'Дополнительный ресурс:',
     vra_link2_text: 'Управление программ для жертв Отдела уголовного правосудия',
+    footer_role: 'Волонтёр — защитник жертв',
+    footer_emergency_heading: 'Экстренная помощь',
+    footer_dv_hotline: 'Горячая линия по домашнему насилию',
+    footer_rights: 'Все права защищены.',
   },
   tl: {
     tagline: 'Network ng Pagtataguyod sa mga Biktima ng Colorado',
@@ -426,6 +450,10 @@ export const T = {
     vra_dept_name: 'Colorado Department of Public Safety, Division of Criminal Justice',
     vra_additional_resource: 'Karagdagang rekurso:',
     vra_link2_text: "Division of Criminal Justice Office for Victims' Programs",
+    footer_role: 'Boluntaryong Tagapagtaguyod ng Biktima',
+    footer_emergency_heading: 'Emergency',
+    footer_dv_hotline: 'DV Hotline',
+    footer_rights: 'Nakalaan ang lahat ng karapatan.',
   },
   ne: {
     tagline: 'कोलोराडो पीडित अधिवक्ता सञ्जाल',
@@ -485,6 +513,10 @@ export const T = {
     vra_dept_name: 'कोलोराडो सार्वजनिक सुरक्षा विभाग, आपराधिक न्याय महाशाखा',
     vra_additional_resource: 'थप स्रोत:',
     vra_link2_text: 'आपराधिक न्याय महाशाखाको पीडित कार्यक्रम कार्यालय',
+    footer_role: 'स्वयंसेवक पीडित अधिवक्ता',
+    footer_emergency_heading: 'आपतकाल',
+    footer_dv_hotline: 'घरेलु हिंसा हटलाइन',
+    footer_rights: 'सर्वाधिकार सुरक्षित।',
   },
   hi: {
     tagline: 'कोलोराडो पीड़ित वकालत नेटवर्क',
@@ -544,6 +576,10 @@ export const T = {
     vra_dept_name: 'कोलोराडो सार्वजनिक सुरक्षा विभाग, आपराधिक न्याय प्रभाग',
     vra_additional_resource: 'अतिरिक्त संसाधन:',
     vra_link2_text: 'आपराधिक न्याय प्रभाग पीड़ित कार्यक्रम कार्यालय',
+    footer_role: 'स्वयंसेवी पीड़ित अधिवक्ता',
+    footer_emergency_heading: 'आपातकाल',
+    footer_dv_hotline: 'घरेलू हिंसा हॉटलाइन',
+    footer_rights: 'सर्वाधिकार सुरक्षित।',
   },
 }
 

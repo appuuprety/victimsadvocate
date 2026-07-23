@@ -1,4 +1,4 @@
-export default function ColoradoLogo({ size = 40 }) {
+export default function ColoradoLogo({ size = 40, label = 'VOLUNTEER VICTIM ADVOCATE' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -51,7 +51,7 @@ export default function ColoradoLogo({ size = 40 }) {
       {/* Curved text along the bottom */}
       <text fill="#1E306E" fontSize="10.5" fontFamily="Georgia, serif" fontWeight="bold" letterSpacing="0.8">
         <textPath href="#textArc" startOffset="50%" textAnchor="middle">
-          VOLUNTEER VICTIM ADVOCATE
+          {label.toUpperCase()}
         </textPath>
       </text>
 

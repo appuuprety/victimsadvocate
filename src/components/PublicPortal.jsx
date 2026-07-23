@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Btn, PUBLIC_COLORS } from './ui'
-import { CategoryMark, ContactIcon } from './icons'
+import { CategoryMark, ContactIcon, CategoryIcon } from './icons'
 import ColoradoLogo from './ColoradoLogo'
 import BrochureCard from './BrochureCard'
 import { supabase } from '../supabaseClient'
@@ -126,7 +126,7 @@ function PublicMenuDrawer({ page, setPage, lang, setLang, t, onClose, search, se
           background: '#FBF6EE',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-            <ColoradoLogo size={42} />
+            <ColoradoLogo size={42} label={t.footer_role} />
             <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 700, color: '#8F4128' }}>Colorado Victim Resources</div>
               <div style={{ color: '#7A6A5D', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -340,7 +340,7 @@ function MobileNav({ page, setPage, lang, setLang, t, search, setSearch, doSearc
       }}>
         {/* Logo + title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', minWidth: 0, flex: 1 }} onClick={() => { setPage('home'); setOpen(false) }}>
-          <ColoradoLogo size={32} />
+          <ColoradoLogo size={32} label={t.footer_role} />
           <div style={{ minWidth: 0 }}>
             <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Colorado Victim Resources
@@ -412,7 +412,7 @@ function DesktopNav({ page, setPage, lang, setLang, t, search, setSearch, doSear
     <header style={{ background: '#FBF6EE', padding: '0 32px', borderBottom: '1px solid #EFE3D3' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 68 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }} onClick={() => setPage('home')}>
-          <ColoradoLogo size={44} />
+          <ColoradoLogo size={44} label={t.footer_role} />
           <div>
             <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 17 }}>Colorado Victim Resources</div>
             <div style={{ color: '#948578', fontSize: 11 }}>{t.tagline}</div>
@@ -935,7 +935,7 @@ export default function PublicPortal({ brochures, categories, onShare, setBrochu
       )}
 
       {/* Footer */}
-      <footer style={{ background: '#FFFFFF', marginTop: 48, borderTop: '1px solid #EFE3D3' }}>
+      <footer style={{ background: PUBLIC_COLORS.cardBg, marginTop: 48, borderTop: `1px solid ${PUBLIC_COLORS.border}` }}>
         {/* Main footer content */}
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '32px 20px 24px' : '40px 32px 28px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 28 : 40 }}>
@@ -943,45 +943,63 @@ export default function PublicPortal({ brochures, categories, onShare, setBrochu
             {/* Brand column */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <ColoradoLogo size={36} />
+                <ColoradoLogo size={36} label={t.footer_role} />
                 <div>
-                  <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
-                  <div style={{ color: '#948578', fontSize: 12 }}>Volunteer Victim Advocate</div>
+                  <div style={{ color: PUBLIC_COLORS.primaryDark, fontWeight: 700, fontSize: 16 }}>Colorado Victim Resources</div>
+                  <div style={{ color: PUBLIC_COLORS.textMuted, fontSize: 12 }}>{t.footer_role}</div>
                 </div>
               </div>
-              <p style={{ color: '#948578', fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
+              <p style={{ color: PUBLIC_COLORS.textMuted, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{t.footer_tag}</p>
             </div>
 
             {/* Contact column */}
             <div>
-              <div style={{ color: '#8F4128', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Contact</div>
-              <div style={{ color: '#7A6A5D', fontSize: 13, lineHeight: 2 }}>
-                <div>📞 After Hours: <PhoneLink phone="303-441-4444" style={{ color: '#8F4128' }}>303-441-4444</PhoneLink></div>
-                <div>🏢 Office: <PhoneLink phone="303-926-2841" style={{ color: '#8F4128' }}>303-926-2841</PhoneLink></div>
-                <div>✉️ victimservices@erieco.gov</div>
+              <div style={{ color: PUBLIC_COLORS.primaryDark, fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{t.nav_contact}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                {[
+                  { kind: 'phone', label: t.contact_after_hours, phone: '303-441-4444' },
+                  { kind: 'building', label: t.contact_office, phone: '303-926-2841' },
+                  { kind: 'mail', label: t.contact_email, text: 'victimservices@erieco.gov' },
+                ].map(row => (
+                  <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: PUBLIC_COLORS.textSecondary }}>
+                    <ContactIcon kind={row.kind} size={14} color={PUBLIC_COLORS.textMuted} />
+                    <span>
+                      {row.label}: {row.phone
+                        ? <PhoneLink phone={row.phone} style={{ color: PUBLIC_COLORS.primaryDark }}>{row.phone}</PhoneLink>
+                        : row.text}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Emergency column */}
             <div>
-              <div style={{ color: '#A32D2D', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>Emergency</div>
-              <div style={{ color: '#7A6A5D', fontSize: 13, lineHeight: 2 }}>
-                <div>🚨 Emergency: <PhoneLink phone="911" style={{ color: '#A32D2D' }}>911</PhoneLink></div>
-                <div>💜 DV Hotline: <PhoneLink phone="1-800-799-7233" style={{ color: '#8F4128' }}>1-800-799-7233</PhoneLink></div>
-                <div>⚖️ Victim Rights: <PhoneLink phone="303-239-4497" style={{ color: '#8F4128' }}>303-239-4497</PhoneLink></div>
+              <div style={{ color: PUBLIC_COLORS.danger, fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{t.footer_emergency_heading}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                {[
+                  { id: 'emergency', label: t.footer_emergency_heading, phone: '911', color: PUBLIC_COLORS.danger },
+                  { id: 'safety', label: t.footer_dv_hotline, phone: '1-800-799-7233', color: PUBLIC_COLORS.primaryDark },
+                  { id: 'legal', label: t.contact_victim_rights, phone: '303-239-4497', color: PUBLIC_COLORS.primaryDark },
+                ].map(row => (
+                  <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: PUBLIC_COLORS.textSecondary }}>
+                    <CategoryIcon id={row.id} size={14} color={row.color} />
+                    <span>{row.label}: <PhoneLink phone={row.phone} style={{ color: row.color }}>{row.phone}</PhoneLink></span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
         {/* Copyright bar */}
-        <div style={{ borderTop: '1px solid #EFE3D3', padding: isMobile ? '14px 20px' : '14px 32px' }}>
+        <div style={{ borderTop: `1px solid ${PUBLIC_COLORS.border}`, padding: isMobile ? '14px 20px' : '14px 32px' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-            <div style={{ color: '#948578', fontSize: 12 }}>
-              © {new Date().getFullYear()} Colorado Victim Resources. All rights reserved.
+            <div style={{ color: PUBLIC_COLORS.textMuted, fontSize: 12 }}>
+              © {new Date().getFullYear()} Colorado Victim Resources. {t.footer_rights}
             </div>
-            <div style={{ color: '#948578', fontSize: 12 }}>
-              Services available 7 days a week, 24 hours a day.
+            <div style={{ color: PUBLIC_COLORS.textMuted, fontSize: 12 }}>
+              {t.contact_hours_note}
             </div>
           </div>
         </div>
