@@ -1,7 +1,7 @@
 // Service worker — offline-first cache for app shell, network-first for API.
 // Bump CACHE_VERSION whenever you ship a breaking change to force a refresh.
 
-const CACHE_VERSION = 'cvr-v1'
+const CACHE_VERSION = 'cvr-v2'
 const SHELL = ['/', '/admin', '/manifest.webmanifest', '/favicon.svg']
 
 self.addEventListener('install', e => {

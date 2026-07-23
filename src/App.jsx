@@ -1,11 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { supabase } from './supabaseClient'
 import { isAdmin } from './lib/helpers'
 import PublicPortal from './components/PublicPortal'
-import AdminLogin from './components/AdminLogin'
-import AdminPanel from './components/AdminPanel'
 import ShareModal from './components/ShareModal'
 import { COLORS, PUBLIC_COLORS } from './components/ui'
+
+// Lazy-loaded: the admin panel (and its dependencies) should never be part of
+// the bundle a public, anonymous visitor downloads — only fetched once someone
+// actually navigates to /admin.
+const AdminLogin = lazy(() => import('./components/AdminLogin'))
+const AdminPanel = lazy(() => import('./components/AdminPanel'))
+
+function AdminLoadingScreen() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: 'Georgia, serif',
+      color: '#1B4D8E',
+      background: '#FAFAF7',
+    }}>Loading admin access…</div>
+  )
+}
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -134,38 +152,33 @@ export default function App() {
         />
       )}
       {admin
-        ? passwordRecovery
-          ? <AdminLogin
-              passwordRecovery
-              onLogin={() => {}}
-              onPasswordUpdated={handlePasswordUpdated}
-              onCancelPasswordRecovery={handlePasswordRecoveryCancel}
-            />
-          : session && adminProfileLoading
-          ? <div style={{
-              minHeight: '100vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: 'Georgia, serif',
-              color: '#1B4D8E',
-              background: '#FAFAF7',
-            }}>Loading admin access…</div>
-          : session && adminProfile
-          ? <AdminPanel
-              brochures={brochures}
-              setBrochures={setBrochures}
-              categories={categories}
-              setCategories={setCategories}
-              adminProfile={adminProfile}
-              onLogout={handleLogout}
-              onShare={b => setShareTarget({ brochures: Array.isArray(b) ? b : [b], origin: 'admin' })}
-            />
-          : <AdminLogin
-              onLogin={() => {}}
-              adminError={adminError}
-              onClaimSuperAdmin={session ? handleSuperAdminClaim : null}
-            />
+        ? <Suspense fallback={<AdminLoadingScreen />}>
+            {passwordRecovery
+              ? <AdminLogin
+                  passwordRecovery
+                  onLogin={() => {}}
+                  onPasswordUpdated={handlePasswordUpdated}
+                  onCancelPasswordRecovery={handlePasswordRecoveryCancel}
+                />
+              : session && adminProfileLoading
+              ? <AdminLoadingScreen />
+              : session && adminProfile
+              ? <AdminPanel
+                  brochures={brochures}
+                  setBrochures={setBrochures}
+                  categories={categories}
+                  setCategories={setCategories}
+                  adminProfile={adminProfile}
+                  onLogout={handleLogout}
+                  onShare={b => setShareTarget({ brochures: Array.isArray(b) ? b : [b], origin: 'admin' })}
+                />
+              : <AdminLogin
+                  onLogin={() => {}}
+                  adminError={adminError}
+                  onClaimSuperAdmin={session ? handleSuperAdminClaim : null}
+                />
+            }
+          </Suspense>
         : <PublicPortal
             brochures={brochures.filter(b => !b.deleted_at)}
             categories={categories}
