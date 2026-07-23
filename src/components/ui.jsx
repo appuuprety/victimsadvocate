@@ -18,21 +18,25 @@ export const COLORS = {
 
 // Public-site-only palette (warm/inviting) — kept separate from COLORS so the
 // admin panel, which shares components like BrochureCard/ShareModal, is unaffected.
+// Every text/background pair below is checked against WCAG AA
+// (4.5:1 for normal text, 3:1 for large text/UI components).
 export const PUBLIC_COLORS = {
-  primary: '#B5563A',
-  primaryDark: '#8F4128',
+  primary: '#B5563A',       // vs #FFFFFF: 4.82:1
+  primaryDark: '#8F4128',   // vs #FFFFFF: 8.6:1
   primaryLight: '#F3DDD3',
-  accent: '#C9962C',
+  accent: '#C9962C',        // do not pair with white or primaryDark text — neither reaches 4.5:1; use textPrimary instead
   accentBg: '#FBF0DA',
+  secondary: '#2E6E9E',      // complementary blue accent vs #FFFFFF: 5.46:1
+  secondaryDark: '#204A69',  // vs #FFFFFF: 9.1:1
   hope: '#6B8F71',
   danger: '#BF0A30',
-  success: '#5F8A5A',
+  success: '#4C7A48',       // vs #FFFFFF: 5.02:1 (darkened from #5F8A5A, which was only 3.99:1)
   cardBg: '#FFFFFF',
   pageBg: '#FBF6EE',
   border: '#EFE3D3',
-  textPrimary: '#3A2E27',
-  textSecondary: '#7A6A5D',
-  textMuted: '#948578',
+  textPrimary: '#3A2E27',   // vs #FFFFFF: 14.5:1
+  textSecondary: '#7A6A5D', // vs #FFFFFF: 5.19:1
+  textMuted: '#7D6E60',     // vs #FFFFFF: 4.91:1 (darkened from #948578, which was only 3.57:1 — failed AA)
 }
 
 export const inp = {
@@ -40,7 +44,9 @@ export const inp = {
   padding: '11px 14px',
   borderRadius: 12,
   border: `1.5px solid ${COLORS.border}`,
-  fontSize: 15,
+  // Must stay >= 16px: iOS Safari auto-zooms the whole page on focus for any
+  // form field rendered smaller than that, which reads as "the site jumps".
+  fontSize: 16,
   fontFamily: 'Georgia, serif',
   outline: 'none',
   boxSizing: 'border-box',

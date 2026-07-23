@@ -230,7 +230,7 @@ export default function ShareModal({ brochures, onClose, lang, palette = COLORS 
               onChange={e => { setCarrier(e.target.value); resetStatus() }}
               style={{
                 width: '100%', padding: '11px 12px', borderRadius: 12,
-                border: `1.5px solid ${palette.border}`, fontSize: 14,
+                border: `1.5px solid ${palette.border}`, fontSize: 16,
                 color: carrier ? '#222' : palette.textMuted, background: palette.pageBg,
                 marginBottom: 12, cursor: 'pointer', appearance: 'none',
                 WebkitAppearance: 'none', outline: 'none',
