@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.send-invite]
 verify_jwt = false
+
+[functions.translate-brochure]
+verify_jwt = false

@@ -35,6 +35,9 @@ export default function BrochureForm({ categories, initial = {}, onDone, onCance
         fileSize = `${(file.size / 1024 / 1024).toFixed(1)} MB`
         fileType = ext
       }
+      // Any change to the translated fields invalidates cached machine translations
+      // (see supabase/functions/translate-brochure) — they regenerate lazily per language.
+      const contentChanged = title.trim() !== (initial.title || '') || description.trim() !== (initial.description || '')
       const payload = {
         title: title.trim(), description: description.trim(), category_id: categoryId,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean), featured,
@@ -42,6 +45,7 @@ export default function BrochureForm({ categories, initial = {}, onDone, onCance
         business_hours: businessHours.trim() || null,
         file_name: fileName, file_path: filePath,
         file_size: fileSize, file_type: fileType, updated_at: new Date().toISOString(),
+        ...(contentChanged ? { translations: {} } : {}),
       }
       let data, err
       if (editing) {

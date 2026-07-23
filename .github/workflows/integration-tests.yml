@@ -4,6 +4,8 @@ on:
   push:
     branches: ['**']
   pull_request:
+  schedule:
+    - cron: '0 7 * * *' # nightly at 07:00 UTC
 
 jobs:
   api-integration:

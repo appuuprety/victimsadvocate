@@ -183,6 +183,44 @@ test('public share email function sends an email', async () => {
   assert.equal(body.success, true)
 })
 
+test('public share text function sends via the email-to-SMS gateway', async () => {
+  // The "text" tab in ShareModal routes through the same send-email function,
+  // addressed to a carrier's email-to-SMS gateway instead of a real inbox.
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      to: '9705550100@tmomail.net',
+      brochureTitle: `E2E Text ${new Date().toISOString()}`,
+      link: 'https://example.com/victimsadvocate-e2e-text',
+    }),
+  })
+
+  const body = await response.json().catch(() => ({}))
+  assert.equal(response.status, 200, JSON.stringify(body))
+  assert.equal(body.success, true)
+})
+
+test('public share function returns a clear error for a malformed request', async () => {
+  // Regression check: the client (ShareModal) treats any non-2xx response as a
+  // send failure and shows the user a friendly "please try again" message. This
+  // confirms the function keeps failing loudly (structured error + non-200
+  // status) instead of silently succeeding, which is what made past failures
+  // show up client-side as an opaque error.
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      brochureTitle: 'Missing recipient',
+      link: 'https://example.com/victimsadvocate-e2e-missing-to',
+    }),
+  })
+
+  const body = await response.json().catch(() => ({}))
+  assert.notEqual(response.status, 200, JSON.stringify(body))
+  assert.ok(body.error, 'expected an error message in the response body')
+})
+
 test('super admin can send an admin invite email', async () => {
   const adminUser = await createApprovedAdminUser('super_admin')
   const client = makeUserClient()

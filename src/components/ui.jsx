@@ -16,6 +16,25 @@ export const COLORS = {
   textMuted: '#767370',
 }
 
+// Public-site-only palette (warm/inviting) — kept separate from COLORS so the
+// admin panel, which shares components like BrochureCard/ShareModal, is unaffected.
+export const PUBLIC_COLORS = {
+  primary: '#B5563A',
+  primaryDark: '#8F4128',
+  primaryLight: '#F3DDD3',
+  accent: '#C9962C',
+  accentBg: '#FBF0DA',
+  hope: '#6B8F71',
+  danger: '#BF0A30',
+  success: '#5F8A5A',
+  cardBg: '#FFFFFF',
+  pageBg: '#FBF6EE',
+  border: '#EFE3D3',
+  textPrimary: '#3A2E27',
+  textSecondary: '#7A6A5D',
+  textMuted: '#948578',
+}
+
 export const inp = {
   width: '100%',
   padding: '11px 14px',
@@ -30,7 +49,49 @@ export const inp = {
   WebkitAppearance: 'none',
 }
 
-export function Badge({ label, color = COLORS.primary, bg = COLORS.primaryLight }) {
+// Wraps an icon (emoji glyph or SVG) in a soft round tile — shared container
+// so emoji fallbacks and the custom line icons in icons.jsx look consistent.
+export function IconTile({ size = 16, bg, children }) {
+  return (
+    <span style={{
+      width: size * 1.9,
+      height: size * 1.9,
+      borderRadius: '50%',
+      background: bg || COLORS.pageBg,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      {children}
+    </span>
+  )
+}
+
+// Mutes emoji glyphs (category icons, file/star markers) so they read as flat,
+// desaturated icon marks instead of bright cartoon emoji. Used as a fallback
+// for any category an admin adds that isn't in the hand-drawn icon set.
+export function IconGlyph({ icon, size = 16, tile = false, bg, style = {} }) {
+  const glyph = (
+    <span
+      aria-hidden="true"
+      style={{
+        fontSize: size,
+        lineHeight: 1,
+        filter: 'grayscale(0.45) contrast(1)',
+        opacity: 0.88,
+        display: 'inline-block',
+        ...style,
+      }}
+    >
+      {icon}
+    </span>
+  )
+  if (!tile) return glyph
+  return <IconTile size={size} bg={bg}>{glyph}</IconTile>
+}
+
+export function Badge({ label, icon, iconNode, color = COLORS.primary, bg = COLORS.primaryLight }) {
   return (
     <span style={{
       fontSize: 11,
@@ -41,21 +102,24 @@ export function Badge({ label, color = COLORS.primary, bg = COLORS.primaryLight 
       color,
       letterSpacing: '0.03em',
       whiteSpace: 'nowrap',
-      display: 'inline-block',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 4,
     }}>
+      {iconNode || (icon && <IconGlyph icon={icon} size={11} />)}
       {label}
     </span>
   )
 }
 
-export function Btn({ children, onClick, variant = 'primary', small, disabled, style = {}, ...rest }) {
+export function Btn({ children, onClick, variant = 'primary', small, disabled, style = {}, palette = COLORS, ...rest }) {
   const v = {
-    primary: { background: COLORS.primary, color: '#fff', border: 'none' },
-    secondary: { background: 'transparent', color: COLORS.primary, border: `1.5px solid ${COLORS.primary}` },
-    danger: { background: COLORS.danger, color: '#fff', border: 'none' },
-    ghost: { background: 'transparent', color: COLORS.textSecondary, border: `1.5px solid ${COLORS.border}` },
-    success: { background: COLORS.success, color: '#fff', border: 'none' },
-    warm: { background: COLORS.accent, color: '#fff', border: 'none' },
+    primary: { background: palette.primary, color: '#fff', border: 'none' },
+    secondary: { background: 'transparent', color: palette.primary, border: `1.5px solid ${palette.primary}` },
+    danger: { background: palette.danger, color: '#fff', border: 'none' },
+    ghost: { background: 'transparent', color: palette.textSecondary, border: `1.5px solid ${palette.border}` },
+    success: { background: palette.success, color: '#fff', border: 'none' },
+    warm: { background: palette.accent, color: '#fff', border: 'none' },
   }
   return (
     <button

@@ -5,6 +5,7 @@ import PublicPortal from './components/PublicPortal'
 import AdminLogin from './components/AdminLogin'
 import AdminPanel from './components/AdminPanel'
 import ShareModal from './components/ShareModal'
+import { COLORS, PUBLIC_COLORS } from './components/ui'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -126,9 +127,10 @@ export default function App() {
     <>
       {shareTarget && (
         <ShareModal
-          brochures={shareTarget}
+          brochures={shareTarget.brochures}
           onClose={() => setShareTarget(null)}
           lang="en"
+          palette={shareTarget.origin === 'public' ? PUBLIC_COLORS : COLORS}
         />
       )}
       {admin
@@ -157,7 +159,7 @@ export default function App() {
               setCategories={setCategories}
               adminProfile={adminProfile}
               onLogout={handleLogout}
-              onShare={b => setShareTarget(Array.isArray(b) ? b : [b])}
+              onShare={b => setShareTarget({ brochures: Array.isArray(b) ? b : [b], origin: 'admin' })}
             />
           : <AdminLogin
               onLogin={() => {}}
@@ -167,7 +169,8 @@ export default function App() {
         : <PublicPortal
             brochures={brochures.filter(b => !b.deleted_at)}
             categories={categories}
-            onShare={b => setShareTarget(Array.isArray(b) ? b : [b])}
+            setBrochures={setBrochures}
+            onShare={b => setShareTarget({ brochures: Array.isArray(b) ? b : [b], origin: 'public' })}
           />
       }
     </>

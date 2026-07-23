@@ -4,7 +4,7 @@ import { buildShareLink, logShare } from '../lib/helpers'
 import { supabase, ANON_KEY } from '../supabaseClient'
 import { T } from '../lib/translations'
 
-export default function ShareModal({ brochures, onClose, lang }) {
+export default function ShareModal({ brochures, onClose, lang, palette = COLORS }) {
   const t = T[lang]
   const [tab, setTab] = useState('email')
   const [email, setEmail] = useState('')
@@ -40,6 +40,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
   function resetStatus() { setSent(false); setError('') }
 
+  const SEND_FAILURE_MESSAGE = "We couldn't send that. Please check the details and try again."
+
   async function invoke(to, item) {
     const { error } = await supabase.functions.invoke('send-email', {
       body: { to, brochureTitle: item.title, link: item.link },
@@ -61,7 +63,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
       await logShare(item.id, 'email')
       setSent(true)
     } catch (e) {
-      setError(e?.message || 'Failed to send. Please try again.')
+      console.error('Failed to send email share:', e)
+      setError(SEND_FAILURE_MESSAGE)
     } finally {
       setSending(false)
     }
@@ -78,7 +81,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
       await logShare(item.id, 'sms')
       setSent(true)
     } catch (e) {
-      setError(e?.message || 'Failed to send. Please try again.')
+      console.error('Failed to send text share:', e)
+      setError(SEND_FAILURE_MESSAGE)
     } finally {
       setSending(false)
     }
@@ -112,36 +116,36 @@ export default function ShareModal({ brochures, onClose, lang }) {
         aria-modal="true"
         aria-labelledby="share-modal-title"
         style={{
-          background: '#FFFFFF', borderRadius: 20,
+          background: palette.cardBg, borderRadius: 20,
           padding: '24px 24px 32px', width: '100%', maxWidth: 500,
           boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           maxHeight: '90vh', overflowY: 'auto',
         }}
       >
         {/* Drag handle */}
-        <div style={{ width: 40, height: 4, background: '#D3D1C7', borderRadius: 4, margin: '0 auto 20px' }} />
+        <div style={{ width: 40, height: 4, background: palette.border, borderRadius: 4, margin: '0 auto 20px' }} />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
           <div style={{ flex: 1, paddingRight: 12 }}>
-            <h3 id="share-modal-title" style={{ margin: 0, fontSize: 18, fontFamily: 'Georgia, serif', color: COLORS.primary }}>
+            <h3 id="share-modal-title" style={{ margin: 0, fontSize: 18, fontFamily: 'Georgia, serif', color: palette.primary }}>
               {isMulti ? `Share ${items.length} Resources` : t.share_resource}
             </h3>
             {isMulti ? (
               <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {items.map(b => (
-                  <div key={b.id} style={{ fontSize: 12, color: COLORS.textMuted, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-                    <span style={{ color: COLORS.primary, fontWeight: 700, flexShrink: 0 }}>·</span>
+                  <div key={b.id} style={{ fontSize: 12, color: palette.textMuted, display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                    <span style={{ color: palette.primary, fontWeight: 700, flexShrink: 0 }}>·</span>
                     <span>{b.title}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: COLORS.textMuted }}>{items[0]?.title}</p>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: palette.textMuted }}>{items[0]?.title}</p>
             )}
           </div>
           <button onClick={onClose} aria-label="Close" style={{
-            background: '#F5F3EE', border: 'none', cursor: 'pointer',
-            fontSize: 18, color: COLORS.textSecondary, borderRadius: '50%',
+            background: palette.pageBg, border: 'none', cursor: 'pointer',
+            fontSize: 18, color: palette.textSecondary, borderRadius: '50%',
             width: 32, height: 32, display: 'flex', alignItems: 'center',
             justifyContent: 'center', flexShrink: 0,
           }}>×</button>
@@ -152,9 +156,9 @@ export default function ShareModal({ brochures, onClose, lang }) {
           {['email', 'text', 'link'].map(t2 => (
             <button key={t2} role="tab" aria-selected={tab === t2} onClick={() => { setTab(t2); resetStatus() }} style={{
               flex: 1, padding: '10px 0', borderRadius: 12, border: '1.5px solid',
-              borderColor: tab === t2 ? COLORS.primary : '#E8E6DE',
-              background: tab === t2 ? COLORS.primaryLight : '#FAFAF7',
-              color: tab === t2 ? COLORS.primary : COLORS.textSecondary,
+              borderColor: tab === t2 ? palette.primary : palette.border,
+              background: tab === t2 ? palette.primaryLight : palette.pageBg,
+              color: tab === t2 ? palette.primary : palette.textSecondary,
               fontWeight: 600, fontSize: 13, cursor: 'pointer',
               fontFamily: 'Georgia, serif', minHeight: 44,
               WebkitTapHighlightColor: 'transparent',
@@ -172,13 +176,13 @@ export default function ShareModal({ brochures, onClose, lang }) {
             border: '1.5px solid #B8E1CF',
             marginBottom: 16,
           }}>
-            <p style={{ margin: '0 0 4px', fontSize: 15, color: COLORS.success, fontWeight: 700 }}>
+            <p style={{ margin: '0 0 4px', fontSize: 15, color: palette.success, fontWeight: 700 }}>
               {tab === 'text' ? 'Text sent anonymously.' : 'Email sent anonymously.'}
             </p>
-            <p style={{ margin: '0 0 12px', fontSize: 13, color: COLORS.textSecondary }}>
+            <p style={{ margin: '0 0 12px', fontSize: 13, color: palette.textSecondary }}>
               You can close this window to return to the resources page.
             </p>
-            <Btn variant="success" onClick={onClose} style={{ width: '100%' }}>
+            <Btn variant="success" palette={palette} onClick={onClose} style={{ width: '100%' }}>
               Close and Return to Resources.
             </Btn>
           </div>
@@ -186,7 +190,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
         {tab === 'email' && (
           <div>
-            <p style={{ fontSize: 14, color: COLORS.textSecondary, marginTop: 0, marginBottom: 4 }}>
+            <p style={{ fontSize: 14, color: palette.textSecondary, marginTop: 0, marginBottom: 4 }}>
               Recipient's email address
             </p>
             <Input
@@ -196,11 +200,11 @@ export default function ShareModal({ brochures, onClose, lang }) {
               type="email"
               style={{ marginBottom: 8 }}
             />
-            <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 0, marginBottom: 12 }}>
+            <p style={{ fontSize: 12, color: palette.textMuted, marginTop: 0, marginBottom: 12 }}>
               Sent from the org's address — your personal email stays hidden.
             </p>
             {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
-            <Btn style={{ width: '100%' }} onClick={sendEmail} disabled={sending || !email}>
+            <Btn palette={palette} style={{ width: '100%' }} onClick={sendEmail} disabled={sending || !email}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
             </Btn>
           </div>
@@ -208,7 +212,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
         {tab === 'text' && (
           <div>
-            <p style={{ fontSize: 14, color: COLORS.textSecondary, marginTop: 0, marginBottom: 12 }}>
+            <p style={{ fontSize: 14, color: palette.textSecondary, marginTop: 0, marginBottom: 12 }}>
               {t.text_label}
             </p>
             <Input
@@ -218,7 +222,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
               type="tel"
               style={{ marginBottom: 4 }}
             />
-            <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 0, marginBottom: 10 }}>
+            <p style={{ fontSize: 12, color: palette.textMuted, marginTop: 0, marginBottom: 10 }}>
               Digits only — no dashes or spaces.
             </p>
             <select
@@ -226,8 +230,8 @@ export default function ShareModal({ brochures, onClose, lang }) {
               onChange={e => { setCarrier(e.target.value); resetStatus() }}
               style={{
                 width: '100%', padding: '11px 12px', borderRadius: 12,
-                border: '1.5px solid #E8E6DE', fontSize: 14,
-                color: carrier ? '#222' : COLORS.textMuted, background: '#FAFAF7',
+                border: `1.5px solid ${palette.border}`, fontSize: 14,
+                color: carrier ? '#222' : palette.textMuted, background: palette.pageBg,
                 marginBottom: 12, cursor: 'pointer', appearance: 'none',
                 WebkitAppearance: 'none', outline: 'none',
               }}
@@ -237,11 +241,11 @@ export default function ShareModal({ brochures, onClose, lang }) {
                 <option key={c.gateway} value={c.gateway}>{c.label}</option>
               ))}
             </select>
-            <p style={{ fontSize: 12, color: COLORS.textMuted, marginTop: -6, marginBottom: 12 }}>
+            <p style={{ fontSize: 12, color: palette.textMuted, marginTop: -6, marginBottom: 12 }}>
               Sent via email-to-SMS gateway — your number stays hidden.
             </p>
             {error && <p style={{ fontSize: 13, color: '#B91C1C', marginBottom: 10 }}>{error}</p>}
-            <Btn style={{ width: '100%' }} onClick={sendSms} disabled={sending || !phone || !carrier}>
+            <Btn palette={palette} style={{ width: '100%' }} onClick={sendSms} disabled={sending || !phone || !carrier}>
               {sending ? 'Sending…' : sent ? 'Send Again' : 'Send Anonymously'}
             </Btn>
           </div>
@@ -249,19 +253,19 @@ export default function ShareModal({ brochures, onClose, lang }) {
 
         {tab === 'link' && (
           <div>
-            <p style={{ fontSize: 14, color: COLORS.textSecondary, marginTop: 0, marginBottom: 12 }}>{t.link_label}</p>
+            <p style={{ fontSize: 14, color: palette.textSecondary, marginTop: 0, marginBottom: 12 }}>{t.link_label}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
               {items.map(b => (
                 <div key={b.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {isMulti && <div style={{ fontSize: 11, color: COLORS.textMuted, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.title}</div>}
+                    {isMulti && <div style={{ fontSize: 11, color: palette.textMuted, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.title}</div>}
                     <input
                       readOnly
                       value={b.link}
                       style={{
                         width: '100%', padding: '9px 12px', borderRadius: 10,
-                        border: '1.5px solid #E8E6DE', fontSize: 12, fontFamily: 'monospace',
-                        background: '#F5F3EE', color: '#444441', overflow: 'hidden',
+                        border: `1.5px solid ${palette.border}`, fontSize: 12, fontFamily: 'monospace',
+                        background: palette.pageBg, color: '#444441', overflow: 'hidden',
                         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}
                     />
@@ -269,7 +273,7 @@ export default function ShareModal({ brochures, onClose, lang }) {
                 </div>
               ))}
             </div>
-            <Btn variant={copied ? 'success' : 'ghost'} onClick={copyAll} style={{ width: '100%' }}>
+            <Btn variant={copied ? 'success' : 'ghost'} palette={palette} onClick={copyAll} style={{ width: '100%' }}>
               {copied ? '✓ Copied!' : isMulti ? 'Copy All Links' : t.copy}
             </Btn>
           </div>
